@@ -2,11 +2,7 @@
 
 
 (vector-classes:define-data neuron-column ()
-  ((%activated-neurons-count :initarg :activated-neurons-count
-                             :reader read-activated-neurons-count
-                             :documentation "How many neurons should become active?"
-                             :type positive-fixnum)
-   (input :array t
+  ((input :array t
           :type non-negative-fixnum
           :reader read-input
           :documentation "Indices of neurons (of input SDR) connected to this column."

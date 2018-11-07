@@ -23,7 +23,7 @@
         :type single-float
         :reader read-p+)
    (%p- :initarg :p-
-        :documentation "Used to decreasing inactive synapses strength."
+        :documentation "Used to decrease inactive synapses strength."
         :type single-float
         :reader read-p-)
    (%threshold :initarg :threshold

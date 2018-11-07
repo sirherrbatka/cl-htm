@@ -22,4 +22,10 @@
                               columns
                               i
                               neuron-column))
-   (cl-htm.sdr:select-active layer)))
+   ;; calculate number of active synapses for each column
+   ;; sort columns by the number of active synapses
+   ;; select top active columns
+   ;; select predictive neurons
+   ;; set active neurons
+   ;; finally, return all predictive neurons
+   ))

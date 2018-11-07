@@ -3,4 +3,5 @@
 
 (defpackage #:cl-htm.sdr
   (:use #:cl #:cl-htm.aux-package)
-  (:export :content))
+  (:export #:content
+           #:read-content))

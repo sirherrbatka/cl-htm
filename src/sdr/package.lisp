@@ -4,6 +4,7 @@
 (defpackage #:cl-htm.sdr
   (:use #:cl #:cl-htm.aux-package)
   (:export
-   #:content
-   #:sdr
-   #:read-content))
+   #:active-neurons
+   #:read-active-neurons
+   #:clear-active
+   #:sdr))

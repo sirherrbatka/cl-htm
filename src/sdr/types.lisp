@@ -2,7 +2,7 @@
 
 
 (vector-classes:define-data sdr ()
-  ((content :array t
-            :initarg :content
-            :reader read-content
-            :type bit)))
+  ((active-neurons :array t
+                   :initform 0
+                   :reader read-active-neurons
+                   :type bit)))

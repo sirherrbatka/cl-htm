@@ -1,0 +1,4 @@
+* neuron-layer
+** predictive-state
+ The predictive state of the neuron is handled as follows: if a dendritic segment receives enough input, it becomes active and subsequently depolarizes the cell body without causing an immediate spike.
+ Neurons in the predictive state (i.e., depolarized) will have competitive advantage over other neurons receiving the same feedforward inputs. Specifically, a depolarized cell fires faster than other nondepolarized cells if it subsequently receives sufficient feedforward input. By firing faster, it prevents neighboring cells in the same column from activating with intracolumn inhibition.

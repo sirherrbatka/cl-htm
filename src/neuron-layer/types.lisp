@@ -19,7 +19,7 @@
              :reader read-columns
              :documentation "All columns of this layer.")
    (%p+ :initarg :p+
-        :documentation "Used to intrease active synapses strength."
+        :documentation "Used to increase active synapses strength."
         :type single-float
         :reader read-p+)
    (%p- :initarg :p-

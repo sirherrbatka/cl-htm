@@ -7,4 +7,6 @@
    #:active-neurons
    #:read-active-neurons
    #:clear-active
+   #:set-active
+   #:select-active
    #:sdr))

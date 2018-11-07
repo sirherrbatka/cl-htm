@@ -1,4 +1,12 @@
 * neuron-layer
 ** predictive-state
+ #+BEGIN_QUOTE
  The predictive state of the neuron is handled as follows: if a dendritic segment receives enough input, it becomes active and subsequently depolarizes the cell body without causing an immediate spike.
  Neurons in the predictive state (i.e., depolarized) will have competitive advantage over other neurons receiving the same feedforward inputs. Specifically, a depolarized cell fires faster than other nondepolarized cells if it subsequently receives sufficient feedforward input. By firing faster, it prevents neighboring cells in the same column from activating with intracolumn inhibition.
+ #+END_QUOTE
+*** neurons with input above threshold becomes predictive
+*** neurons in predictive state are prefered in the selection during activation
+** learning
+ #+BEGIN_QUOTE
+ The lateral connections in the sequence memory model are learned using a Hebbian-like rule. Specifically, if a cell is depolarized and subsequently becomes active, we reinforce the dendritic segment that caused the depolarization. If no cell in an active column is predicted, we select the cell with the most activated segment and reinforce that segment. Reinforcement of a dendritic segment involves decreasing permanence values of inactive synapses by a small value p and increasing the permanence for active synapses by a larger value p+.
+ #+END_QUOTE

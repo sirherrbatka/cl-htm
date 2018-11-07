@@ -14,4 +14,8 @@
   :serial T
   :pathname "src"
   :components ((:file "aux-package")
-               (:file "package")))
+               (:file "package")
+               (:module "sdr"
+                :components ((:file "package")
+                             (:file "protocol")
+                             (:file "types")))))

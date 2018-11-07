@@ -26,6 +26,9 @@
         :documentation "Used to decrease inactive synapses strength."
         :type single-float
         :reader read-p-)
+   (%decay :initarg :decay
+           :type single-float
+           :reader read-decay)
    (%threshold :initarg :threshold
                :reader read-threshold
                :type single-float

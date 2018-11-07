@@ -21,7 +21,10 @@
                (:module "sdr"
                 :components ((:file "package")
                              (:file "protocol")
-                             (:file "types")))
+                             (:file "types")
+                             (:file "implementation")))
                (:module "neuron-layer"
                 :components ((:file "package")
-                             (:file "types")))))
+                             (:file "protocol")
+                             (:file "types")
+                             (:file "implementation")))))

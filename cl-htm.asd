@@ -18,4 +18,6 @@
                (:module "sdr"
                 :components ((:file "package")
                              (:file "protocol")
-                             (:file "types")))))
+                             (:file "types")))
+               (:module "neuron-layer"
+                :components ((:file "package")))))

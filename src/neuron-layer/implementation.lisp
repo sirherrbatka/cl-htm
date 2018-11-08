@@ -10,8 +10,8 @@
                      context
                      &optional (prev-data +empty-vector+))
   (nest
-   (let* ((active-neurons (cl-htm.sdr:select-active sdr))
-          (columns (read-columns layer))
+   (let* ((columns (read-columns layer))
+          (column-indices (read-column-indices layer))
           (activate-neurons-count (read-activated-neurons-count columns))
           (activated-columns-count (read-activated-columns-count columns))))
    (vector-classes:with-data (((synapses-strength synapses-strength))
@@ -22,8 +22,17 @@
                               columns
                               i
                               neuron-column))
+   (let* ((active-synapses-for-columns (calculate-active-synapses-for-columns
+                                        columns sdr))
+          (active-columns (select-active-columns columns
+                                                 active-synapses-for-columns))
+          (predictive-neurons (select-predictive-neurons layer columns active-columns))
+          (active-neurons (select-active-neurons layer
+                                                 columns
+                                                 active-columns
+                                                 predictive-neurons)))
+     active-neurons)
    ;; calculate number of active synapses for each column
-   ;; sort columns by the number of active synapses
    ;; select top active columns
    ;; select predictive neurons
    ;; set active neurons

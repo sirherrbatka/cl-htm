@@ -3,4 +3,6 @@
 
 (defpackage cl-htm.utils
   (:use #:cl #:cl-htm.aux-package)
-  (:export #:random-float))
+  (:export
+   #:random-float
+   #:vector-iota))

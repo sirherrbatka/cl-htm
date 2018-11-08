@@ -25,6 +25,9 @@
    (%decay :initarg :decay
            :type single-float
            :reader read-decay)
+   (%column-indices :initarg :column-indices
+                    :type (simple-array fixnum)
+                    :reader read-column-indices)
    (%threshold :initarg :threshold
                :reader read-threshold
                :type single-float

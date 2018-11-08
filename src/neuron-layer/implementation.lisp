@@ -5,7 +5,6 @@
   :test 'vector=)
 
 
-*compile-file-truename*
 (defmethod activate ((layer neuron-layer)
                      (sdr cl-htm.sdr:sdr)
                      context

@@ -10,26 +10,17 @@
                      (sdr cl-htm.sdr:sdr)
                      context
                      &optional (prev-data +empty-vector+))
+  ;; calculate number of active synapses for each column
+  ;; select top active columns
+  ;; select predictive neurons
+  ;; set active neurons
+  ;; finally, return all predictive neurons
   (nest
    (let* ((columns (read-columns layer))
           (column-indices (read-column-indices layer))
           (activate-neurons-count (read-activated-neurons-count columns))
-          (activated-columns-count (read-activated-columns-count columns))))
-   (vector-classes:with-data (((synapses-strength synapses-strength)
-                               (active cl-htm.sdr:active-neurons))
-                              layer
-                              i
-                              neuron-layer))
-   (vector-classes:with-data (((neuron-input input))
-                              columns
-                              i
-                              neuron-column))
-   ;; calculate number of active synapses for each column
-   ;; select top active columns
-   ;; select predictive neurons
-   ;; set active neurons
-   ;; finally, return all predictive neurons
-   (let* ((active-synapses-for-columns (calculate-active-synapses-for-columns
+          (activated-columns-count (read-activated-columns-count columns))
+          (active-synapses-for-columns (calculate-active-synapses-for-columns
                                         columns sdr))
           (active-columns (select-active-columns columns
                                                  active-synapses-for-columns))
@@ -39,8 +30,7 @@
           (active-neurons (select-active-neurons layer
                                                  columns
                                                  active-columns
-                                                 predictive-neurons)))
-     (iterate
-       (for i from 0 below (vector-classes:size layer))
-       (setf (active) 1))
+                                                 prev-data)))
+     (cl-htm.sdr:set-active layer active-neurons 1)
+     (update-synapses layer columns active-columns prev-data active-neurons)
      predictive-neurons)))

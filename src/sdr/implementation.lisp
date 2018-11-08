@@ -1,7 +1,7 @@
 (in-package #:cl-htm.sdr)
 
 
-(defmethod clear-active ((sdr sdr))
+(defmethod clear-all-active ((sdr sdr))
   (vector-classes:with-data (((active-neuron active-neurons)) sdr i sdr)
     (iterate
       (for i from 0 below (vector-classes:size sdr))
@@ -9,15 +9,19 @@
       (finally (return sdr)))))
 
 
-(defmethod set-active ((sdr sdr) input)
+(defmethod set-active ((sdr sdr) input value)
+  (check-type value bit)
+  (check-type input vector)
   (vector-classes:with-data (((active-neuron active-neurons)) sdr i sdr)
     (iterate
       (for i in-vector input)
-      (setf (active-neuron) 1)
+      (setf (active-neuron) value)
       (finally (return sdr)))))
 
 
-(defmethod select-active ((sdr sdr) &optional destination)
+(defmethod select-active ((sdr sdr) value &optional destination)
+  (check-type value bit)
+  (check-type destination (or null vector))
   (lret ((destination (or destination
                           (make-array (truncate (vector-classes:size sdr) 40)
                                       :fill-pointer 0
@@ -25,5 +29,5 @@
     (vector-classes:with-data (((active-neuron active-neurons)) sdr i sdr)
       (iterate
         (for i from 0 below (vector-classes:size sdr))
-        (unless (zerop (active-neuron))
+        (when (eql (active-neuron) value)
           (vector-push-extend i destination))))))

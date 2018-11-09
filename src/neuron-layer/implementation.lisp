@@ -36,6 +36,39 @@
                           (curry #'aref active-synapses)))
 
 
+(defmethod select-predictive-neurons ((layer neuron-layer)
+                                      (sdr cl-htm.sdr:sdr)
+                                      (columns neuron-column)
+                                      active-columns)
+  (check-type active-columns simple-vector)
+  (nest
+   (vector-classes:with-data (((synapses-strength synapses-strength))
+                              layer neuron-index neuron-layer))
+   (vector-classes:with-data (((columns-input input))
+                              columns column-index neuron-column))
+   (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
+                              sdr input-index cl-htm.sdr:sdr))
+   (let ((threshold (read-threshold layer))
+         (column-size (truncate (vector-classes:size layer)
+                                (vector-classes:size columns)))
+         (result (make-array 0 :adjustable t :fill-pointer 0))
+         (synapses-count (array-dimension synapses-strength 1))))
+   (iterate
+     (for column-index in-vector active-columns)
+     (for column-start = (* column-index column-size))
+     (iterate
+       (for neuron-index from column-start)
+       (repeat column-size)
+       (for value = (iterate
+                      (for k from 0 below synapses-count)
+                      (for input-index = (columns-input k))
+                      (when (active)
+                        (multiplying (synapses-strength k)))))
+       (when (> value threshold)
+         (vector-push-extend neuron-index result))
+       (finally (return result))))))
+
+
 (defmethod activate ((layer neuron-layer)
                      (sdr cl-htm.sdr:sdr)
                      context

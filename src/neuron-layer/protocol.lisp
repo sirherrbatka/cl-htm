@@ -6,7 +6,7 @@
 (defgeneric update-synapses (layer columns active-columns
                              predictive-neurons active-neurons))
 
-(defgeneric select-predictive-neurons (layer columns active-columns))
+(defgeneric select-predictive-neurons (layer sdr columns active-columns))
 
 (defgeneric select-active-neurons (layer columns
                                    active-columns

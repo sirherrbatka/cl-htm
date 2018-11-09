@@ -5,6 +5,37 @@
   :test 'vector=)
 
 
+(defmethod calculate-active-synapses-for-columns ((layer neuron-layer)
+                                                  (columns neuron-column)
+                                                  (input cl-htm.sdr:sdr))
+  (nest
+   (vector-classes:with-data (((column-input input))
+                              columns i neuron-column))
+   (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
+                              input j cl-htm.sdr:sdr))
+   (iterate
+     (with size = (vector-classes:size columns))
+     (with syn-count = (array-dimension column-input 1))
+     (with result = (make-array size :element-type 'fixnum))
+     (for i from 0 below size)
+     (setf (aref result i)
+           (iterate
+             (for k from 0 below syn-count)
+             (for j = (column-input k))
+             (sum (active))))
+     (finally (return result)))))
+
+
+(defmethod select-active-columns ((layer neuron-layer)
+                                  (columns neuron-column)
+                                  active-synapses)
+  (check-type active-synapses (simple-array fixnum (*)))
+  (cl-ds.utils:select-top (read-column-indices layer)
+                          (read-activated-columns-count layer)
+                          #'> :key
+                          (curry #'aref active-synapses)))
+
+
 (defmethod activate ((layer neuron-layer)
                      (sdr cl-htm.sdr:sdr)
                      context
@@ -19,7 +50,7 @@
          (activate-neurons-count (read-activated-neurons-count columns))
          (activated-columns-count (read-activated-columns-count columns))
          (active-synapses-for-columns (calculate-active-synapses-for-columns
-                                       columns sdr))
+                                       layer columns sdr))
          (active-columns (select-active-columns columns
                                                 active-synapses-for-columns))
          (predictive-neurons (select-predictive-neurons layer

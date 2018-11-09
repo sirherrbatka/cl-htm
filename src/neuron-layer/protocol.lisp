@@ -11,3 +11,7 @@
 (defgeneric select-active-neurons (layer columns
                                    active-columns
                                    predictive-neurons))
+
+(defgeneric select-active-columns (layer columns active-synapses))
+
+(defgeneric calculate-active-synapses-for-columns (layer columns input))

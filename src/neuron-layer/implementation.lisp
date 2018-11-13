@@ -49,24 +49,28 @@
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               sdr input-index cl-htm.sdr:sdr))
    (let ((threshold (read-threshold layer))
-         (column-size (truncate (vector-classes:size layer)
-                                (vector-classes:size columns)))
-         (result (make-array 0 :adjustable t :fill-pointer 0))
-         (synapses-count (array-dimension synapses-strength 1))))
-   (iterate
-     (for column-index in-vector active-columns)
-     (for column-start = (* column-index column-size))
+         (column-size (/ (vector-classes:size layer)
+                         (vector-classes:size columns)))
+         (result (make-array
+                  0 :adjustable t
+                    :fill-pointer 0
+                    :element-type 'non-negative-fixnum))
+         (synapses-count (array-dimension synapses-strength 1)))
      (iterate
-       (for neuron-index from column-start)
-       (repeat column-size)
-       (for value = (iterate
-                      (for k from 0 below synapses-count)
-                      (for input-index = (columns-input k))
-                      (when (active)
-                        (multiplying (synapses-strength k)))))
-       (when (> value threshold)
-         (vector-push-extend neuron-index result))
-       (finally (return result))))))
+       (for i from 0)
+       (for column-index in-vector active-columns)
+       (for column-start = (* column-index column-size))
+       (iterate
+         (for neuron-index from column-start)
+         (repeat column-size)
+         (for value = (iterate
+                        (for k from 0 below synapses-count)
+                        (for input-index = (columns-input k))
+                        (when (active)
+                          (multiplying (synapses-strength k)))))
+         (when (> value threshold)
+           (vector-push-extend neuron-index result))
+         (finally (return result)))))))
 
 
 (defmethod activate ((layer neuron-layer)

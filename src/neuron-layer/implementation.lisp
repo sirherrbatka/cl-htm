@@ -73,6 +73,19 @@
          (finally (return result)))))))
 
 
+(defmethod select-active-neurons ((layer neuron-layer)
+                                  (columns neuron-column)
+                                  active-columns
+                                  predictive-neurons)
+  (let ((neurons-in-active-columns (neurons-in-columns predictive-neurons
+                                                       active-columns)))
+    (iterate
+      (for neurons in-vector neurons-in-active-columns)
+      (if (emptyp neurons)
+          cl-ds.utils:todo
+          cl-ds.utils:todo))))
+
+
 (defmethod activate ((layer neuron-layer)
                      (sdr cl-htm.sdr:sdr)
                      context

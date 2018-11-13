@@ -74,6 +74,21 @@
          (finally (return result)))))))
 
 
+(defun neurons-in-columns (neurons columns column-size)
+  (lret ((result (make-array
+                  64 :element-type 'non-negative-fixnum
+                     :adjustable t
+                     :fill-pointer 0)))
+    (cl-ds.utils:on-ordered-intersection
+     (lambda (column neuron) (declare (ignore column))
+       (vector-push-extend neuron result))
+     columns
+     neurons
+     :same #'eql
+     :second-key (lambda (neuron)
+                   (floor neuron column-size)))))
+
+
 (defmethod select-active-neurons ((layer neuron-layer)
                                   (columns neuron-column)
                                   active-columns

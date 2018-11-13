@@ -30,10 +30,11 @@
                                   (columns neuron-column)
                                   active-synapses)
   (check-type active-synapses (simple-array fixnum (*)))
-  (cl-ds.utils:select-top (read-column-indices layer)
-                          (read-activated-columns-count layer)
-                          #'> :key
-                          (curry #'aref active-synapses)))
+  (~> (read-column-indices layer)
+      (cl-ds.utils:select-top (read-activated-columns-count layer)
+                              #'> :key
+                              (curry #'aref active-synapses))
+      (sort #'<)))
 
 
 (defmethod select-predictive-neurons ((layer neuron-layer)

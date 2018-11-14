@@ -74,8 +74,37 @@
          (finally (return result)))))))
 
 
+(defun selecting-the-most-active-neuron (layer columns input)
+  (nest
+   (vector-classes:with-data (((synapses-strength synapses-strength))
+                              layer neuron-index neuron-layer))
+   (vector-classes:with-data (((columns-input input))
+                              columns column-index neuron-column))
+   (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
+                              input input-index cl-htm.sdr:sdr))
+   (let ((column-size (/ (vector-classes:size layer)
+                         (vector-classes:size columns)))
+         (synapses-count (array-dimension synapses-strength 1))))
+   (lambda (column-index))
+   (iterate
+     (with column-start = (* column-index column-size))
+     (with result = 0)
+     (for neuron-index from column-start)
+     (repeat column-size)
+     (for value = (iterate
+                    (for k from 0 below synapses-count)
+                    (for input-index = (columns-input k))
+                    (when (active)
+                      (multiplying (synapses-strength k)))))
+     (maximize value into maxi)
+     (when (= maxi value)
+       (setf result neuron-index))
+     (finally (return result)))))
+
+
 (defmethod select-active-neurons ((layer neuron-layer)
                                   (columns neuron-column)
+                                  (input cl-htm.sdr:sdr)
                                   active-columns
                                   predictive-neurons)
   (let ((column-size (/ (vector-classes:size layer)
@@ -89,7 +118,10 @@
      active-columns
      predictive-neurons
      :same #'eql
-     :on-first-missing #'identity ; todo
+     :on-first-missing (compose (rcurry #'vector-push-extend active-neurons)
+                                (selecting-the-most-active-neuron layer
+                                                                  columns
+                                                                  input))
      :second-key (lambda (neuron) (floor neuron column-size)))
     active-neurons))
 

@@ -10,6 +10,7 @@
 
 (defgeneric select-active-neurons (layer columns
                                    active-columns
+                                   input
                                    predictive-neurons))
 
 (defgeneric select-active-columns (layer columns active-synapses))

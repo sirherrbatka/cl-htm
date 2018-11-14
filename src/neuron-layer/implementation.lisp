@@ -82,11 +82,15 @@
                               columns column-index neuron-column))
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               input input-index cl-htm.sdr:sdr))
-   (let ((column-size (/ (vector-classes:size layer)
-                         (vector-classes:size columns)))
-         (synapses-count (array-dimension synapses-strength 1))))
+   (let ((column-size (truncate (vector-classes:size layer)
+                                (vector-classes:size columns)))
+         (synapses-count (array-dimension synapses-strength 1)))
+     (declare (type non-negative-fixnum column-size synapses-count)))
    (lambda (column-index))
    (iterate
+     (declare (type non-negative-fixnum column-start result
+                    neuron-index)
+              (type single-float maxi value))
      (with column-start = (* column-index column-size))
      (with result = 0)
      (for neuron-index from column-start)
@@ -107,13 +111,18 @@
                                   (input cl-htm.sdr:sdr)
                                   active-columns
                                   predictive-neurons)
-  (let ((column-size (/ (vector-classes:size layer)
-                        (vector-classes:size columns)))
+  (check-type predictive-neurons (vector non-negative-fixnum))
+  (check-type active-columns (vector non-negative-fixnum))
+  (let ((column-size (truncate (vector-classes:size layer)
+                               (vector-classes:size columns)))
         (active-neurons (make-array
                          0 :element-type 'non-negative-fixnum
                            :adjustable t)))
+    (declare (type non-negative-fixnum column-size))
     (cl-ds.utils:on-ordered-intersection
-     (lambda (column neuron) (declare (ignore column))
+     (lambda (column neuron)
+       (declare (ignore column)
+                (type non-negative-fixnum neuron))
        (vector-push-extend neuron active-neurons))
      active-columns
      predictive-neurons
@@ -133,8 +142,8 @@
                             predictive-neurons
                             active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
-  (check-type active-neurons (vector non-negative-fixnum))
   (check-type active-columns (vector non-negative-fixnum))
+  (check-type active-neurons (vector non-negative-fixnum))
   (nest
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               input input-index cl-htm.sdr:sdr))

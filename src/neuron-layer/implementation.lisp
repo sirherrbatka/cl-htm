@@ -157,6 +157,7 @@
         ;; reinforce some of the neurons...
         (let* ((neuron active-neuron)
                (column-index (truncate neuron synapses-count)))
+          (declare (type non-negative-fixnum column-index neuron))
           (iterate
             (for i from 0 below synapses-count)
             (for input-index = (column-input i))

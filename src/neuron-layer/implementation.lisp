@@ -143,7 +143,7 @@
          (predictive-neurons (select-predictive-neurons layer
                                                         columns
                                                         active-columns))
-         (active-neurons (select-active-neurons layer columns
+         (active-neurons (select-active-neurons layer sdr columns
                                                 active-columns prev-data)))
     (update-synapses layer columns active-columns prev-data active-neurons)
     predictive-neurons))

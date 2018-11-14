@@ -136,6 +136,8 @@
   (check-type active-neurons (vector non-negative-fixnum))
   (check-type active-columns (vector non-negative-fixnum))
   (nest
+   (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
+                              input input-index cl-htm.sdr:sdr))
    (vector-classes:with-data (((column-input input))
                               columns column-index neuron-column))
    (vector-classes:with-data (((synapses-strength synapses-strength))
@@ -152,7 +154,11 @@
         ;; reinforce some of the neurons...
         (let* ((neuron active-neuron)
                (column-index (truncate neuron synapses-count)))
-          cl-ds.utils:todo))
+          (iterate
+            (for i from 0 below synapses-count)
+            (for input-index = (column-input i))
+            (unless (zerop (active))
+              (incf (synapses-strength i) p+)))))
       active-neurons
       predictive-neurons
       :same #'eql

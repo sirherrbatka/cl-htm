@@ -128,6 +128,7 @@
 
 (defmethod update-synapses ((layer neuron-layer)
                             (columns neuron-column)
+                            (input cl-htm.sdr:sdr)
                             active-columns
                             predictive-neurons
                             active-neurons)

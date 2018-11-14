@@ -126,6 +126,12 @@
     active-neurons))
 
 
+(defmethod update-synapses ((layer neuron-layer)
+                            (columns neuron-column)
+                            predictive-neurons
+                            active-neurons))
+
+
 (defmethod activate ((layer neuron-layer)
                      (sdr cl-htm.sdr:sdr)
                      context

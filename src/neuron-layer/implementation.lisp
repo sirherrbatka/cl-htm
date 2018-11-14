@@ -131,7 +131,18 @@
                             predictive-neurons
                             active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
-  (check-type active-neurons (vector non-negative-fixnum)))
+  (check-type active-neurons (vector non-negative-fixnum))
+  (cl-ds.utils:on-ordered-intersection
+   (lambda (active-neuron predictive-neuron)
+     ;; reinforce some of the neurons...
+     cl-ds.utils:todo)
+   active-neurons
+   predictive-neurons
+   :same #'eql
+   :on-second-missing (lambda (x) ; punish other neurons...
+                        cl-ds.utils:todo))
+  ;; decay everything
+  cl-ds.utils:todo)
 
 
 (defmethod activate ((layer neuron-layer)

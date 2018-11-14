@@ -74,32 +74,24 @@
          (finally (return result)))))))
 
 
-(defun neurons-in-columns (neurons columns column-size)
-  (lret ((result (make-array
-                  64 :element-type 'non-negative-fixnum
-                     :adjustable t
-                     :fill-pointer 0)))
-    (cl-ds.utils:on-ordered-intersection
-     (lambda (column neuron) (declare (ignore column))
-       (vector-push-extend neuron result))
-     columns
-     neurons
-     :same #'eql
-     :second-key (lambda (neuron)
-                   (floor neuron column-size)))))
-
-
 (defmethod select-active-neurons ((layer neuron-layer)
                                   (columns neuron-column)
                                   active-columns
                                   predictive-neurons)
-  (let ((neurons-in-active-columns (neurons-in-columns predictive-neurons
-                                                       active-columns)))
-    (iterate
-      (for neurons in-vector neurons-in-active-columns)
-      (if (emptyp neurons)
-          cl-ds.utils:todo
-          cl-ds.utils:todo))))
+  (let ((column-size (/ (vector-classes:size layer)
+                        (vector-classes:size columns)))
+        (active-neurons (make-array
+                         0 :element-type 'non-negative-fixnum
+                           :adjustable t)))
+    (cl-ds.utils:on-ordered-intersection
+     (lambda (column neuron) (declare (ignore column))
+       (vector-push-extend neuron active-neurons))
+     active-columns
+     predictive-neurons
+     :same #'eql
+     :on-first-missing #'identity ; todo
+     :second-key (lambda (neuron) (floor neuron column-size)))
+    active-neurons))
 
 
 (defmethod activate ((layer neuron-layer)
@@ -112,9 +104,6 @@
   ;; set active neurons
   ;; finally, return all predictive neurons
   (let* ((columns (read-columns layer))
-         (column-indices (read-column-indices layer))
-         (activate-neurons-count (read-activated-neurons-count columns))
-         (activated-columns-count (read-activated-columns-count columns))
          (active-synapses-for-columns (calculate-active-synapses-for-columns
                                        layer columns sdr))
          (active-columns (select-active-columns columns
@@ -122,10 +111,7 @@
          (predictive-neurons (select-predictive-neurons layer
                                                         columns
                                                         active-columns))
-         (active-neurons (select-active-neurons layer
-                                                columns
-                                                active-columns
-                                                prev-data)))
-    (cl-htm.sdr:set-active layer active-neurons 1)
+         (active-neurons (select-active-neurons layer columns
+                                                active-columns prev-data)))
     (update-synapses layer columns active-columns prev-data active-neurons)
     predictive-neurons))

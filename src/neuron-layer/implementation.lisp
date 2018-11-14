@@ -129,7 +129,9 @@
 (defmethod update-synapses ((layer neuron-layer)
                             (columns neuron-column)
                             predictive-neurons
-                            active-neurons))
+                            active-neurons)
+  (check-type predictive-neurons (vector non-negative-fixnum))
+  (check-type active-neurons (vector non-negative-fixnum)))
 
 
 (defmethod activate ((layer neuron-layer)

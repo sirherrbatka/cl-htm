@@ -128,21 +128,30 @@
 
 (defmethod update-synapses ((layer neuron-layer)
                             (columns neuron-column)
+                            active-columns
                             predictive-neurons
                             active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
   (check-type active-neurons (vector non-negative-fixnum))
-  (cl-ds.utils:on-ordered-intersection
-   (lambda (active-neuron predictive-neuron)
-     ;; reinforce some of the neurons...
-     cl-ds.utils:todo)
-   active-neurons
-   predictive-neurons
-   :same #'eql
-   :on-second-missing (lambda (x) ; punish other neurons...
-                        cl-ds.utils:todo))
-  ;; decay everything
-  cl-ds.utils:todo)
+  (check-type active-columns (vector non-negative-fixnum))
+  (vector-classes:with-data (((synapses-strength synapses-strength))
+                             layer neuron neuron-layer)
+    (let ((decay (read-decay layer))
+          (p+ (read-p+ layer))
+          (p- (read-p- layer)))
+      (cl-ds.utils:on-ordered-intersection
+       (lambda (active-neuron predictive-neuron)
+         (declare (ignore predictive-neuron))
+         ;; reinforce some of the neurons...
+         (let ((neuron active-neuron))
+           cl-ds.utils:todo))
+       active-neurons
+       predictive-neurons
+       :same #'eql
+       :on-second-missing (lambda (x) ; punish other neurons...
+                            cl-ds.utils:todo))
+      ;; decay everything
+      cl-ds.utils:todo)))
 
 
 (defmethod activate ((layer neuron-layer)

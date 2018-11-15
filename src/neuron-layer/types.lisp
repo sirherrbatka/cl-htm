@@ -39,14 +39,6 @@
   ((%column-indices :initarg :column-indices
                     :type (simple-array fixnum)
                     :reader read-column-indices)
-   (%threshold :initarg :threshold
-               :reader read-threshold
-               :type single-float
-               :documentation "Threshold for predictive state of neuron.")
-   (%activated-columns-count :initarg :activated-columns-count
-                             :reader read-activated-columns-count
-                             :type positive-fixnum
-                             :documentation "How many columns should become active?")
    (synapses-strength :array t
                       :type single-float
                       :dimensions-arg :synapses-strength

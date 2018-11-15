@@ -9,23 +9,34 @@
           :dimensions-arg :input-size)))
 
 
-(vector-classes:define-data neuron-layer (cl-htm.sdr:sdr)
-  ((%columns :initarg :columns
-             :type neuron-column
-             :reader read-columns
-             :documentation "All columns of this layer.")
-   (%p+ :initarg :p+
+(defclass fundamental-training-parameters ()
+  ())
+
+
+(defclass basic-training-parameters ()
+  ((%p+ :initarg :p+
         :documentation "Used to increase active synapses strength."
         :type single-float
-        :reader read-p+)
+        :reader p+)
    (%p- :initarg :p-
         :documentation "Used to decrease inactive synapses strength."
         :type single-float
-        :reader read-p-)
+        :reader p-)
    (%decay :initarg :decay
            :type single-float
-           :reader read-decay)
-   (%column-indices :initarg :column-indices
+           :reader decay)
+   (%threshold :initarg :threshold
+               :reader threshold
+               :type single-float
+               :documentation "Threshold for predictive state of neuron.")
+   (%activated-columns-count :initarg :activated-columns-count
+                             :reader activated-columns-count
+                             :type positive-fixnum
+                             :documentation "How many columns should become active?")))
+
+
+(vector-classes:define-data neuron-layer (cl-htm.sdr:sdr)
+  ((%column-indices :initarg :column-indices
                     :type (simple-array fixnum)
                     :reader read-column-indices)
    (%threshold :initarg :threshold

@@ -5,9 +5,10 @@
   :test 'vector=)
 
 
-(defmethod calculate-active-synapses-for-columns ((layer neuron-layer)
-                                                  (columns neuron-column)
-                                                  (input cl-htm.sdr:sdr))
+(defmethod calculate-active-synapses-for-columns
+    ((layer neuron-layer)
+     (input cl-htm.sdr:sdr)
+     (columns neuron-column))
   (nest
    (vector-classes:with-data (((column-input input))
                               columns i neuron-column))
@@ -27,11 +28,12 @@
 
 
 (defmethod select-active-columns ((layer neuron-layer)
+                                  (training-parameters fundamental-training-parameters)
                                   (columns neuron-column)
                                   active-synapses)
   (check-type active-synapses (simple-array fixnum (*)))
   (~> (read-column-indices layer)
-      (cl-ds.utils:select-top (read-activated-columns-count layer)
+      (cl-ds.utils:select-top (activated-columns-count training-parameters)
                               #'> :key
                               (curry #'aref active-synapses))
       (sort #'<))) ; could be some bucket sort to speed things up (but probabbly won't change that much)
@@ -39,6 +41,7 @@
 
 (defmethod select-predictive-neurons ((layer neuron-layer)
                                       (sdr cl-htm.sdr:sdr)
+                                      (training-parameters fundamental-training-parameters)
                                       (columns neuron-column)
                                       active-columns)
   (check-type active-columns simple-vector)
@@ -49,7 +52,7 @@
                               columns column-index neuron-column))
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               sdr input-index cl-htm.sdr:sdr))
-   (let ((threshold (read-threshold layer))
+   (let ((threshold (threshold training-parameters))
          (column-size (/ (vector-classes:size layer)
                          (vector-classes:size columns)))
          (result (make-array
@@ -136,8 +139,9 @@
 
 
 (defmethod update-synapses ((layer neuron-layer)
-                            (columns neuron-column)
                             (input cl-htm.sdr:sdr)
+                            (training-parameters fundamental-training-parameters)
+                            (columns neuron-column)
                             active-columns
                             predictive-neurons
                             active-neurons)
@@ -151,12 +155,12 @@
                               columns column-index neuron-column))
    (vector-classes:with-data (((synapses-strength synapses-strength))
                               layer neuron neuron-layer))
-   (let ((decay (read-decay layer))
+   (let ((decay (decay layer))
          (synapses-count (array-dimension synapses-strength 1))
          (column-size (truncate (the fixnum (vector-classes:size layer))
                                 (the fixnum (vector-classes:size columns))))
-         (p+ (read-p+ layer))
-         (p- (read-p- layer)))
+         (p+ (p+ layer))
+         (p- (p- layer)))
      (declare (type single-float decay p+ p-)
               (type non-negative-fixnum column-size synapses-count))
      (cl-ds.utils:on-ordered-intersection
@@ -183,7 +187,7 @@
 
 (defmethod activate ((layer neuron-layer)
                      (sdr cl-htm.sdr:sdr)
-                     context
+                     (training-parameters fundamental-training-parameters)
                      &optional (prev-data +empty-vector+))
   ;; calculate number of active synapses for each column
   ;; select top active columns
@@ -192,10 +196,12 @@
   ;; finally, return all predictive neurons
   (let* ((columns (read-columns layer))
          (active-synapses-for-columns (calculate-active-synapses-for-columns
-                                       layer columns sdr))
-         (active-columns (select-active-columns columns
-                                                active-synapses-for-columns))
+                                       layer sdr columns))
+         (active-columns (select-active-columns layer training-parameters
+                                                columns active-synapses-for-columns))
          (predictive-neurons (select-predictive-neurons layer
+                                                        sdr
+                                                        training-parameters
                                                         columns
                                                         active-columns))
          (active-neurons (select-active-neurons layer sdr columns

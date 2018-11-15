@@ -34,7 +34,7 @@
       (cl-ds.utils:select-top (read-activated-columns-count layer)
                               #'> :key
                               (curry #'aref active-synapses))
-      (sort #'<)))
+      (sort #'<))) ; could be some bucket sort to speed things up (but probabbly won't change that much)
 
 
 (defmethod select-predictive-neurons ((layer neuron-layer)

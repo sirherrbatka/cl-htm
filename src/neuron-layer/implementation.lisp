@@ -1,8 +1,9 @@
 (in-package #:cl-htm.nl)
 
 
-(define-constant +empty-vector+ (make-array 0 :element-type 'fixnum)
+(define-constant +empty-vector+ (make-array 0 :element-type 'non-negative-fixnum)
   :test 'vector=)
+(declaim (type (vector non-negative-fixnum) +empty-vector+))
 
 
 (defmethod calculate-active-synapses-for-columns

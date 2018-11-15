@@ -9,6 +9,7 @@
    #:basic-training-parameters
    #:neuron-layer
    #:neuron-column
+   #:columns
    #:activate
    #:update-synapses
    #:select-predictive-neurons

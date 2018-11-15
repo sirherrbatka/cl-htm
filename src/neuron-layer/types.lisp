@@ -6,7 +6,10 @@
           :type non-negative-fixnum
           :reader read-input
           :documentation "Indices of neurons (of input SDR) connected to this column."
-          :dimensions-arg :input-size)))
+          :dimensions-arg :input-size)
+   (%column-indices :initarg :column-indices
+                    :type (simple-array fixnum)
+                    :reader read-column-indices)))
 
 
 (defclass fundamental-training-parameters ()
@@ -36,9 +39,8 @@
 
 
 (vector-classes:define-data neuron-layer (cl-htm.sdr:sdr)
-  ((%column-indices :initarg :column-indices
-                    :type (simple-array fixnum)
-                    :reader read-column-indices)
+  ((%columns :initarg :columns
+             :reader columns)
    (synapses-strength :array t
                       :type single-float
                       :dimensions-arg :synapses-strength

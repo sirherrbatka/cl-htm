@@ -194,11 +194,13 @@
   ;; select predictive neurons
   ;; set active neurons
   ;; finally, return all predictive neurons
-  (let* ((columns (read-columns layer))
+  (let* ((columns (columns layer))
          (active-synapses-for-columns (calculate-active-synapses-for-columns
                                        layer sdr columns))
-         (active-columns (select-active-columns layer training-parameters
-                                                columns active-synapses-for-columns))
+         (active-columns (select-active-columns layer
+                                                training-parameters
+                                                columns
+                                                active-synapses-for-columns))
          (predictive-neurons (select-predictive-neurons layer
                                                         sdr
                                                         training-parameters

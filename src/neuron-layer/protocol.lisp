@@ -30,3 +30,5 @@
 (defgeneric threshold (training-parameters))
 
 (defgeneric activeted-columns-count (training-parameters))
+
+(defgeneric columns (layer))

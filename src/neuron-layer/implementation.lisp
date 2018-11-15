@@ -206,5 +206,6 @@
                                                         active-columns))
          (active-neurons (select-active-neurons layer sdr columns
                                                 active-columns prev-data)))
-    (update-synapses layer columns active-columns prev-data active-neurons)
+    (update-synapses layer sdr training-parameters columns
+                     active-columns prev-data active-neurons)
     predictive-neurons))

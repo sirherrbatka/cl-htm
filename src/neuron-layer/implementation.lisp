@@ -28,10 +28,11 @@
      (finally (return result)))))
 
 
-(defmethod select-active-columns ((layer neuron-layer)
-                                  (training-parameters cl-htm.training:fundamental-training-parameters)
-                                  (columns neuron-column)
-                                  active-synapses)
+(defmethod select-active-columns
+    ((layer neuron-layer)
+     (training-parameters cl-htm.training:fundamental-training-parameters)
+     (columns neuron-column)
+     active-synapses)
   (check-type active-synapses (simple-array fixnum (*)))
   (~> (read-column-indices columns)
       (cl-ds.utils:select-top (activated-columns-count training-parameters)
@@ -40,11 +41,12 @@
       (sort #'<))) ; could be some bucket sort to speed things up (but probabbly won't change that much)
 
 
-(defmethod select-predictive-neurons ((layer neuron-layer)
-                                      (sdr cl-htm.sdr:sdr)
-                                      (training-parameters cl-htm.training:fundamental-training-parameters)
-                                      (columns neuron-column)
-                                      active-columns)
+(defmethod select-predictive-neurons
+    ((layer neuron-layer)
+     (sdr cl-htm.sdr:sdr)
+     (training-parameters cl-htm.training:fundamental-training-parameters)
+     (columns neuron-column)
+     active-columns)
   (check-type active-columns simple-vector)
   (nest
    (vector-classes:with-data (((synapses-strength synapses-strength))

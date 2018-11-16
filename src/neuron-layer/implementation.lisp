@@ -188,14 +188,15 @@
 
 (defmethod activate ((layer neuron-layer)
                      (sdr cl-htm.sdr:sdr)
-                     (training-parameters fundamental-training-parameters)
-                     &optional (prev-data +empty-vector+))
+                     (context fundamental-training-context)
+                     (training-parameters fundamental-training-parameters))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons
   ;; set active neurons
   ;; finally, return all predictive neurons
   (let* ((columns (columns layer))
+         (prev-data (past-predictive-neurons context))
          (active-synapses-for-columns (calculate-active-synapses-for-columns
                                        layer sdr columns))
          (active-columns (select-active-columns layer

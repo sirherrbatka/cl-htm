@@ -1,8 +1,10 @@
 (in-package #:cl-htm.nl)
 
 
-(defgeneric activate (neuron-layer sdr training-parameters
-                      &optional prev-data))
+(defgeneric activate (neuron-layer
+                      sdr
+                      context
+                      training-parameters))
 
 (defgeneric update-synapses (layer input training-parameters
                              columns active-columns
@@ -32,3 +34,7 @@
 (defgeneric activeted-columns-count (training-parameters))
 
 (defgeneric columns (layer))
+
+(defgeneric past-predictive-neurons (context))
+
+(defgeneric (setf past-predictive-neurons) (new-value context))

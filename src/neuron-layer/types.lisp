@@ -16,6 +16,15 @@
   ())
 
 
+(defclass fundamental-training-context ()
+  ())
+
+
+(defclass basic-training-context ()
+  ((%part-predictive-neurons :initarg :part-predictive-neurons
+                             :accessor past-predictive-neurons)))
+
+
 (defclass basic-training-parameters ()
   ((%p+ :initarg :p+
         :documentation "Used to increase active synapses strength."

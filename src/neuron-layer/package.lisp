@@ -5,19 +5,21 @@
   (:use #:cl #:cl-htm.aux-package)
   (:nicknames #:cl-htm.nl)
   (:export
-   #:fundamental-training-parameters
-   #:basic-training-parameters
-   #:neuron-layer
-   #:neuron-column
-   #:columns
    #:activate
-   #:update-synapses
-   #:select-predictive-neurons
-   #:select-active-neurons
-   #:select-active-columns
+   #:activated-columns-count
+   #:basic-training-context
+   #:basic-training-parameters
    #:calculate-active-synapses-for-columns
+   #:columns
+   #:decay-
+   #:fundamental-training-context
+   #:fundamental-training-parameters
+   #:neuron-column
+   #:neuron-layer
    #:p+
    #:p-
-   #:decay-
+   #:select-active-columns
+   #:select-active-neurons
+   #:select-predictive-neurons
    #:threshold
-   #:activated-columns-count))
+   #:update-synapses))

@@ -163,27 +163,31 @@
          (column-size (truncate (the fixnum (vector-classes:size layer))
                                 (the fixnum (vector-classes:size columns)))))
      (declare (type single-float decay p+ p-)
-              (type non-negative-fixnum column-size synapses-count))
-     (cl-ds.utils:on-ordered-intersection
-      (lambda (active-neuron predictive-neuron)
-        (declare (ignore predictive-neuron)
-                 (type non-negative-fixnum active-neuron))
-        ;; reinforce some of the neurons...
-        (let* ((neuron active-neuron)
-               (column-index (truncate neuron synapses-count)))
-          (declare (type non-negative-fixnum column-index neuron))
-          (iterate
-            (for i from 0 below synapses-count)
-            (for input-index = (column-input i))
-            (unless (zerop (active))
-              (incf (synapses-strength i) p+)))))
-      active-neurons
-      predictive-neurons
-      :same #'eql
-      :on-first-missing (lambda (x) ; punish other neurons...
-                          cl-ds.utils:todo))
-     ;; decay everything
-     cl-ds.utils:todo)))
+              (type non-negative-fixnum column-size synapses-count)))
+   (flet ((change-synapses
+              (neuron &aux (column-index (truncate neuron synapses-count)))
+            (declare (type non-negative-fixnum column-index neuron))
+            (iterate
+              (for i from 0 below synapses-count)
+              (for input-index = (column-input i))
+              (if (zerop (active))
+                  (decf (synapses-strength i) p-)
+                  (incf (synapses-strength i) p+))))))
+   (cl-ds.utils:on-ordered-intersection
+    (lambda (active-neuron predictive-neuron)
+      (declare (ignore predictive-neuron))
+      (change-synapses active-neuron))
+    active-neurons
+    predictive-neurons
+    :same #'eql
+    :on-first-missing (lambda (neuron)
+                        (iterate
+                          (with column-index = (truncate neuron synapses-count))
+                          (for i from 0 below synapses-count)
+                          (for input-index = (column-input i))
+                          (unless (zerop (active))
+                            (decf (synapses-strength i) decay))))))
+  nil)
 
 
 (defmethod update-synapses ((training-parameters empty-training-parameters)

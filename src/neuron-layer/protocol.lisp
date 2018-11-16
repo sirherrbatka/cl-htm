@@ -6,7 +6,7 @@
                       context
                       training-parameters))
 
-(defgeneric update-synapses (layer input training-parameters
+(defgeneric update-synapses (training-parameters layer input
                              columns active-columns
                              predictive-neurons active-neurons))
 

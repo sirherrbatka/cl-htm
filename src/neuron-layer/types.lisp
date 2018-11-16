@@ -16,6 +16,10 @@
   ())
 
 
+(defclass empty-training-parameters ()
+  ())
+
+
 (defclass fundamental-training-context ()
   ())
 

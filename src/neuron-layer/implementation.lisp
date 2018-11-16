@@ -139,9 +139,9 @@
     active-neurons))
 
 
-(defmethod update-synapses ((layer neuron-layer)
+(defmethod update-synapses ((training-parameters empty-training-parameters)
+                            (layer neuron-layer)
                             (input cl-htm.sdr:sdr)
-                            (training-parameters fundamental-training-parameters)
                             (columns neuron-column)
                             active-columns
                             predictive-neurons
@@ -186,6 +186,16 @@
      cl-ds.utils:todo)))
 
 
+(defmethod update-synapses ((training-parameters empty-training-parameters)
+                            (layer neuron-layer)
+                            (input cl-htm.sdr:sdr)
+                            (columns neuron-column)
+                            active-columns
+                            predictive-neurons
+                            active-neurons)
+  nil)
+
+
 (defmethod activate ((layer neuron-layer)
                      (sdr cl-htm.sdr:sdr)
                      (context fundamental-training-context)
@@ -210,6 +220,6 @@
                                                         active-columns))
          (active-neurons (select-active-neurons layer sdr columns
                                                 active-columns prev-data)))
-    (update-synapses layer sdr training-parameters columns
+    (update-synapses training-parameters layer sdr columns
                      active-columns prev-data active-neurons)
     predictive-neurons))

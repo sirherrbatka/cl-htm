@@ -23,18 +23,4 @@
 
 (defgeneric calculate-active-synapses-for-columns (layer input columns))
 
-(defgeneric p+ (training-parameters))
-
-(defgeneric p- (training-parameters))
-
-(defgeneric decay (training-parameters))
-
-(defgeneric threshold (training-parameters))
-
-(defgeneric activeted-columns-count (training-parameters))
-
 (defgeneric columns (layer))
-
-(defgeneric past-predictive-neurons (context))
-
-(defgeneric (setf past-predictive-neurons) (new-value context))

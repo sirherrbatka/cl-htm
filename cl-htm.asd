@@ -23,6 +23,10 @@
                              (:file "protocol")
                              (:file "types")
                              (:file "implementation")))
+               (:module "training"
+                :components ((:file "package")
+                             (:file "protocol")
+                             (:file "types")))
                (:module "neuron-layer"
                 :components ((:file "package")
                              (:file "protocol")

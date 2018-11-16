@@ -29,11 +29,11 @@
 
 
 (defmethod select-active-columns ((layer neuron-layer)
-                                  (training-parameters fundamental-training-parameters)
+                                  (training-parameters cl-htm.training:fundamental-training-parameters)
                                   (columns neuron-column)
                                   active-synapses)
   (check-type active-synapses (simple-array fixnum (*)))
-  (~> (read-column-indices layer)
+  (~> (read-column-indices columns)
       (cl-ds.utils:select-top (activated-columns-count training-parameters)
                               #'> :key
                               (curry #'aref active-synapses))
@@ -42,7 +42,7 @@
 
 (defmethod select-predictive-neurons ((layer neuron-layer)
                                       (sdr cl-htm.sdr:sdr)
-                                      (training-parameters fundamental-training-parameters)
+                                      (training-parameters cl-htm.training:fundamental-training-parameters)
                                       (columns neuron-column)
                                       active-columns)
   (check-type active-columns simple-vector)
@@ -139,13 +139,14 @@
     active-neurons))
 
 
-(defmethod update-synapses ((training-parameters empty-training-parameters)
-                            (layer neuron-layer)
-                            (input cl-htm.sdr:sdr)
-                            (columns neuron-column)
-                            active-columns
-                            predictive-neurons
-                            active-neurons)
+(defmethod update-synapses
+    ((training-parameters cl-htm.training:fundamental-training-parameters)
+     (layer neuron-layer)
+     (input cl-htm.sdr:sdr)
+     (columns neuron-column)
+     active-columns
+     predictive-neurons
+     active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
   (check-type active-columns (vector non-negative-fixnum))
   (check-type active-neurons (vector non-negative-fixnum))
@@ -156,9 +157,9 @@
                               columns column-index neuron-column))
    (vector-classes:with-data (((synapses-strength synapses-strength))
                               layer neuron neuron-layer))
-   (let ((decay (decay training-parameters))
-         (p+ (p+ training-parameters))
-         (p- (p- training-parameters))
+   (let ((decay (cl-htm.training:decay training-parameters))
+         (p+ (cl-htm.training:p+ training-parameters))
+         (p- (cl-htm.training:p- training-parameters))
          (synapses-count (array-dimension synapses-strength 1))
          (column-size (truncate (the fixnum (vector-classes:size layer))
                                 (the fixnum (vector-classes:size columns)))))
@@ -191,27 +192,29 @@
   nil)
 
 
-(defmethod update-synapses ((training-parameters empty-training-parameters)
-                            (layer neuron-layer)
-                            (input cl-htm.sdr:sdr)
-                            (columns neuron-column)
-                            active-columns
-                            predictive-neurons
-                            active-neurons)
+(defmethod update-synapses
+    ((training-parameters cl-htm.training:empty-training-parameters)
+     (layer neuron-layer)
+     (input cl-htm.sdr:sdr)
+     (columns neuron-column)
+     active-columns
+     predictive-neurons
+     active-neurons)
   nil)
 
 
-(defmethod activate ((layer neuron-layer)
-                     (sdr cl-htm.sdr:sdr)
-                     (context fundamental-training-context)
-                     (training-parameters fundamental-training-parameters))
+(defmethod activate
+    ((layer neuron-layer)
+     (sdr cl-htm.sdr:sdr)
+     (context cl-htm.training:fundamental-training-context)
+     (training-parameters cl-htm.training:fundamental-training-parameters))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons
   ;; set active neurons
   ;; finally, return all predictive neurons
   (let* ((columns (columns layer))
-         (prev-data (past-predictive-neurons context))
+         (prev-data (cl-htm.training:past-predictive-neurons context))
          (active-synapses-for-columns (calculate-active-synapses-for-columns
                                        layer sdr columns))
          (active-columns (select-active-columns layer

@@ -186,7 +186,8 @@
                           (for i from 0 below synapses-count)
                           (for input-index = (column-input i))
                           (unless (zerop (active))
-                            (decf (synapses-strength i) decay))))))
+                            (decf (synapses-strength i) decay))))
+    :on-second-missing #'change-synapses))
   nil)
 
 

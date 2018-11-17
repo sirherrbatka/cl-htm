@@ -34,4 +34,6 @@
                              (:file "internal")
                              (:file "implementation")))
                (:module "model"
-                :components ((:file "package")))))
+                :components ((:file "package")
+                             (:file "protocol")
+                             (:file "types")))))

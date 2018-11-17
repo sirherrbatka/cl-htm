@@ -4,7 +4,7 @@
 (defpackage #:cl-htm.training
   (:use #:cl #:cl-htm.aux-package)
   (:export
-   #:activated-columns-count
+   #:activated-columns-fraction
    #:basic-training-context
    #:basic-training-parameters
    #:empty-training-parameters

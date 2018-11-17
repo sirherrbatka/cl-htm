@@ -34,11 +34,16 @@
      (columns neuron-column)
      active-synapses)
   (check-type active-synapses (simple-array fixnum (*)))
-  (~> (read-column-indices columns)
-      (cl-ds.utils:select-top (activated-columns-count training-parameters)
-                              #'> :key
-                              (curry #'aref active-synapses))
-      (sort #'<))) ; could be some bucket sort to speed things up (but probabbly won't change that much)
+  (let* ((activated-columns-fraction (cl-htm.training:activated-columns-fraction
+                                      training-parameters))
+         (activated-columns-count (~> (vector-classes:size columns)
+                                      (* activated-columns-fraction)
+                                      floor)))
+    (~> (read-column-indices columns)
+        (cl-ds.utils:select-top activated-columns-count
+                                #'> :key
+                                (curry #'aref active-synapses))
+        (sort #'<)))) ; could be some bucket sort to speed things up (but probabbly won't change that much)
 
 
 (defmethod select-predictive-neurons

@@ -9,7 +9,7 @@
 
 (defgeneric threshold (training-parameters))
 
-(defgeneric activeted-columns-count (training-parameters))
+(defgeneric activeted-columns-fraction (training-parameters))
 
 (defgeneric past-predictive-neurons (context))
 

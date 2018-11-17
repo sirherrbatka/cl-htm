@@ -34,7 +34,6 @@
                :reader threshold
                :type single-float
                :documentation "Threshold for predictive state of neuron.")
-   (%activated-columns-count :initarg :activated-columns-count
-                             :reader activated-columns-count
-                             :type positive-fixnum
-                             :documentation "How many columns should become active?")))
+   (%activated-columns-fraction :initarg :activated-columns-fraction
+                                :reader activated-columns-fraction
+                                :documentation "How many columns should become active?")))

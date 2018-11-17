@@ -1,8 +1,6 @@
 (in-package #:cl-htm.model)
 
 
-(defvar *no-training* (make 'cl-htm.training:empty-training-parameters))
-
 (defgeneric encode-data-point (input destination data-point))
 
 (defgeneric more-data-p (input data-point))
@@ -58,16 +56,17 @@
     (decode-sdrs decoder
                  (output-sdrs model))))
 
-(defgeneric predict-point (input decoder model data-point)
-  (:method ((input fundamental-input)
-            (decoder fundamental-decoder)
-            (model fundamental-model)
-            data-point)
-    (unwind-protect
-         (progn
-           (insert-point input model data-point *no-training*)
-           (decode decoder model))
-      (reset-model model))))
+(let ((no-training (make 'cl-htm.training:empty-training-parameters)))
+  (defgeneric predict-point (input decoder model data-point)
+    (:method ((input fundamental-input)
+              (decoder fundamental-decoder)
+              (model fundamental-model)
+              data-point)
+      (unwind-protect
+           (progn
+             (insert-point input model data-point no-training)
+             (decode decoder model))
+        (reset-model model)))))
 
 (defgeneric predict (input decoder model data)
   (:method ((input fundamental-input)

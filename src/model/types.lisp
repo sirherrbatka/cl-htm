@@ -23,7 +23,7 @@
                  :reader read-output-sdrs
                  :reader output-sdrs)
    (%training-parameters :initarg :training-parameters
-                         :reader training-parameters
+                         :reader read-training-parameters
                          :type cl-htm.training:fundamental-training-parameters)
    (%context :initarg :context
              :reader read-context
@@ -43,13 +43,13 @@
   ())
 
 
-(defclass fundamental-decoder-mode ()
+(defclass fundamental-mode ()
   ())
 
 
-(defclass train-decoder-mode (fundamental-decoder-mode)
+(defclass train-mode (fundamental-mode)
   ())
 
 
-(defclass predict-decoder-mode (fundamental-decoder-mode)
+(defclass predict-mode (fundamental-mode)
   ())

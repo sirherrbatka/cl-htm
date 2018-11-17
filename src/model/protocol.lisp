@@ -7,9 +7,9 @@
 
 (defgeneric reset-model (model))
 
-(defgeneric activate (model))
+(defgeneric activate (model mode))
 
-(defgeneric training-parameters (model))
+(defgeneric parameters (model mode))
 
 (defgeneric train-point (input decoder model data-point)
   (:method ((input fundamental-input)
@@ -32,10 +32,11 @@
 
 (defgeneric decode-sdrs (decoder sdrs))
 
-(defgeneric pass-to-decoder (decoder model mode)
+(defgeneric pass-to-decoder (decoder model mode data-point)
   (:method ((decoder fundamental-decoder)
             (model fundamental-model)
-            (mode predict-decoder-mode))
+            (mode predict-mode)
+            data-point)
     (decode-sdrs decoder
                  (output-sdrs model))))
 
@@ -47,13 +48,17 @@
             mode)
     (unwind-protect
          (iterate
-           (with destination = (output-sdrs model))
+           (with initial-data = data-point)
+           (with destination = (input-sdrs model))
            (while (more-data-p input data-point))
            (setf data-point (encode-data-point input
                                                destination
                                                data-point))
-           (activate model)
-           (finally (return (pass-to-decoder decoder model mode))))
+           (activate model mode)
+           (finally (return (pass-to-decoder decoder
+                                             model
+                                             mode
+                                             initial-data))))
       (reset-model model))))
 
 (defgeneric predict (input decoder model data)
@@ -61,7 +66,7 @@
             (decoder fundamental-decoder)
             (model fundamental-model)
             data)
-    (let ((mode (make 'predict-decoder-mode)))
+    (let ((mode (make 'predict-mode)))
       (cl-ds.alg:on-each
        (lambda (data-point)
          (insert-point input decoder model mode data-point))
@@ -72,7 +77,7 @@
             (decoder fundamental-decoder)
             (model fundamental-model)
             data)
-    (let ((mode (make 'train-decoder-mode)))
+    (let ((mode (make 'train-mode)))
       (cl-ds:traverse
        (lambda (data-point)
          (insert-point input decoder model mode data-point))

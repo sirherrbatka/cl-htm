@@ -5,6 +5,7 @@
   (:use #:cl #:cl-htm.aux-package)
   (:export
    #:activated-columns-fraction
+   #:reset-context
    #:basic-training-context
    #:basic-training-parameters
    #:empty-training-parameters

@@ -14,3 +14,5 @@
 (defgeneric past-predictive-neurons (context))
 
 (defgeneric (setf past-predictive-neurons) (new-value context))
+
+(defgeneric reset-context (context))

@@ -18,7 +18,14 @@
           :type list
           :reader read-sdrs)
    (%input-sdrs :initarg :input-sdr
-                :reader input-sdrs)))
+                :reader input-sdrs)
+   (%training-parameters :initarg :training-parameters
+                         :reader training-parameters
+                         :type cl-htm.training:fundamental-training-parameters)
+   (%context :initarg :context
+             :reader read-context
+             :type cl-htm.training:fundamental-training-context))
+  (:default-initargs :context (make 'cl-htm.training:basic-training-context)))
 
 
 (defclass fundamental-encoder ()

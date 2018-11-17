@@ -1,6 +1,11 @@
 (in-package :cl-htm.training)
 
 
+(define-constant +empty-vector+
+    (make-array 0 :element-type 'non-negative-fixnum)
+  :test #'vector=)
+
+
 (defclass fundamental-training-parameters ()
   ())
 
@@ -14,8 +19,9 @@
 
 
 (defclass basic-training-context ()
-  ((%part-predictive-neurons :initarg :part-predictive-neurons
-                             :accessor past-predictive-neurons)))
+  ((%past-predictive-neurons :initarg :past-predictive-neurons
+                             :accessor past-predictive-neurons))
+  (:default-initargs :past-predictive-neurons +empty-vector+))
 
 
 (defclass basic-training-parameters ()

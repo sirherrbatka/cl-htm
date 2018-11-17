@@ -41,3 +41,15 @@
 
 (defclass fundamental-discreete-decoder (fundamental-decoder)
   ())
+
+
+(defclass fundamental-decoder-mode ()
+  ())
+
+
+(defclass train-decoder-mode (fundamental-decoder-mode)
+  ())
+
+
+(defclass predict-decoder-mode (fundamental-decoder-mode)
+  ())

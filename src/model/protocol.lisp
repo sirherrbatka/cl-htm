@@ -5,32 +5,9 @@
 
 (defgeneric more-data-p (input data-point))
 
-(defgeneric encode-whole-data (input destination data-point)
-  (:method ((input fundamental-input)
-            (destination cl:sequence)
-            data-point)
-    (iterate
-      (while (more-data-p input data-point))
-      (setf data-point (encode-data-point input
-                                          destination
-                                          data-point)))))
-
 (defgeneric reset-model (model))
 
-(defgeneric activate (model parameters))
-
-(defgeneric insert-point (input
-                          model
-                          data-point
-                          training-parameters)
-  (:method ((input fundamental-input)
-            (model fundamental-model)
-            data-point
-            training-parameters)
-    (encode-whole-data input
-                       (input-sdrs model)
-                       data-point)
-    (activate model training-parameters)))
+(defgeneric activate (model))
 
 (defgeneric training-parameters (model))
 
@@ -40,8 +17,13 @@
             (model fundamental-model)
             data-point)
     (unwind-protect
-         (insert-point input model data-point
-                       (training-parameters model))
+         (iterate
+           (with destination = (output-sdrs model))
+           (while (more-data-p input data-point))
+           (setf data-point (encode-data-point input
+                                               destination
+                                               data-point))
+           (activate model))
       (reset-model model))))
 
 (defgeneric output-sdrs (model))
@@ -50,40 +32,49 @@
 
 (defgeneric decode-sdrs (decoder sdrs))
 
-(defgeneric decode (decoder model)
+(defgeneric pass-to-decoder (decoder model mode)
   (:method ((decoder fundamental-decoder)
-            (model fundamental-model))
+            (model fundamental-model)
+            (mode predict-decoder-mode))
     (decode-sdrs decoder
                  (output-sdrs model))))
 
-(let ((no-training (make 'cl-htm.training:empty-training-parameters)))
-  (defgeneric predict-point (input decoder model data-point)
-    (:method ((input fundamental-input)
-              (decoder fundamental-decoder)
-              (model fundamental-model)
-              data-point)
-      (unwind-protect
-           (progn
-             (insert-point input model data-point no-training)
-             (decode decoder model))
-        (reset-model model)))))
+(defgeneric insert-point (input decoder model mode data-point)
+  (:method ((input fundamental-input)
+            (decoder fundamental-decoder)
+            (model fundamental-model)
+            data-point
+            mode)
+    (unwind-protect
+         (iterate
+           (with destination = (output-sdrs model))
+           (while (more-data-p input data-point))
+           (setf data-point (encode-data-point input
+                                               destination
+                                               data-point))
+           (activate model)
+           (finally (return (pass-to-decoder decoder model mode))))
+      (reset-model model))))
 
 (defgeneric predict (input decoder model data)
   (:method ((input fundamental-input)
             (decoder fundamental-decoder)
             (model fundamental-model)
             data)
-    (cl-ds.alg:on-each
-     (lambda (data-point)
-       (predict-point input decoder model data-point))
-     data)))
+    (let ((mode (make 'predict-decoder-mode)))
+      (cl-ds.alg:on-each
+       (lambda (data-point)
+         (insert-point input decoder model mode data-point))
+       data))))
 
 (defgeneric train (input decoder model data)
   (:method ((input fundamental-input)
             (decoder fundamental-decoder)
             (model fundamental-model)
             data)
-    (cl-ds:traverse
-     (lambda (data-point)
-       (train-point input decoder model data-point))
-     data)))
+    (let ((mode (make 'train-decoder-mode)))
+      (cl-ds:traverse
+       (lambda (data-point)
+         (insert-point input decoder model mode data-point))
+       data))
+    model))

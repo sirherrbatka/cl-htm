@@ -74,10 +74,10 @@
             (decoder fundamental-decoder)
             (model fundamental-model)
             data)
-    (~>> data
-         (cl-ds.alg:on-each
-          (lambda (data-point)
-            (predict-point input decoder model data-point))))))
+    (cl-ds.alg:on-each
+     (lambda (data-point)
+       (predict-point input decoder model data-point))
+     data)))
 
 (defgeneric train (input decoder model data)
   (:method ((input fundamental-input)

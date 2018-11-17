@@ -36,4 +36,5 @@
                (:module "model"
                 :components ((:file "package")
                              (:file "protocol")
-                             (:file "types")))))
+                             (:file "types")
+                             (:file "implementation")))))

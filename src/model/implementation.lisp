@@ -34,13 +34,14 @@
                      (mode fundamental-mode)
                      (contexts list)
                      parameters)
-  (let* ((inputs (input-sdrs model))
-         (sdr-input (first inputs))
-         (sdrs (read-layers model)))
-    (iterate
-      (for sdr in sdrs)
-      (for prev-sdr previous sdr)
-      (for input initially sdr-input
-           then prev-sdr)
-      (for context in contexts)
-      (cl-htm.nl:activate sdr input context parameters))))
+  (iterate
+    (with inputs    = (input-sdrs model))
+    (with sdr-input = (first inputs))
+    (with sdrs      = (read-layers model))
+    (for sdr in sdrs)
+    (for prev-sdr previous sdr)
+    (for input initially sdr-input
+         then prev-sdr)
+    (for context in contexts)
+    (cl-htm.nl:activate sdr input context parameters)
+    (finally (return model))))

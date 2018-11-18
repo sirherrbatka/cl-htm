@@ -24,3 +24,5 @@
 (defgeneric calculate-active-synapses-for-columns (layer input columns))
 
 (defgeneric columns (layer))
+
+(defgeneric context (layer))

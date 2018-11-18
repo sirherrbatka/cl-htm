@@ -14,9 +14,9 @@
 
 
 (defclass basic-model (fundamental-model)
-  ((%sdrs :initarg :sdrs
-          :type list
-          :reader read-sdrs)
+  ((%layers :initarg :layers
+            :type list
+            :reader read-layers)
    (%input-sdrs :initarg :input-sdr
                 :reader input-sdrs)
    (%output-sdrs :initarg :output-sdrs

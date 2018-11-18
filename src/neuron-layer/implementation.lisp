@@ -238,3 +238,7 @@
     (update-synapses training-parameters layer sdr columns
                      active-columns prev-data active-neurons)
     predictive-neurons))
+
+
+(defmethod context ((layer neuron-layer))
+  (make 'cl-htm.training:basic-training-context))

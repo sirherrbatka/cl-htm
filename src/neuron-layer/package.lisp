@@ -9,6 +9,7 @@
    #:activated-columns-count
    #:calculate-active-synapses-for-columns
    #:columns
+   #:context
    #:neuron-column
    #:neuron-layer
    #:select-active-columns

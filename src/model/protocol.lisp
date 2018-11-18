@@ -37,8 +37,8 @@
     (unwind-protect
          (iterate
            (with initial-data = data-point)
-           (with destination = (input-sdrs model))
-           (with parameters = (parameters model mode))
+           (with destination  = (input-sdrs model))
+           (with parameters   = (parameters model mode))
            (while (more-data-p input data-point))
            (setf data-point (encode-data-point input
                                                destination

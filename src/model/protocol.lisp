@@ -5,7 +5,7 @@
 
 (defgeneric more-data-p (input data-point))
 
-(defgeneric reset-model (model))
+(defgeneric reset-model (model contexts))
 
 (defgeneric activate (model mode contexts))
 
@@ -69,10 +69,11 @@
             (decoder fundamental-decoder)
             (model fundamental-model)
             data)
-    (let ((mode (make 'predict-mode)))
+    (let ((mode (make 'predict-mode))
+          (contexts (contexts model)))
       (cl-ds.alg:on-each
        (lambda (data-point)
-         (insert-point input decoder model mode data-point))
+         (insert-point input decoder model mode data-point contexts))
        data))))
 
 (defgeneric train (input decoder model data)
@@ -80,9 +81,10 @@
             (decoder fundamental-decoder)
             (model fundamental-model)
             data)
-    (let ((mode (make 'train-mode)))
+    (let ((mode (make 'train-mode))
+          (contexts (contexts model)))
       (cl-ds:traverse
        (lambda (data-point)
-         (insert-point input decoder model mode data-point))
+         (insert-point input decoder model mode data-point contexts))
        data))
     model))

@@ -58,3 +58,7 @@
 
 (defclass predict-mode (fundamental-mode)
   ())
+
+
+(defclass adapt-mode (predict-mode)
+  ())

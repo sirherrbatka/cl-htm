@@ -20,3 +20,11 @@
 (defmethod contexts ((model basic-model))
   (~>> (read-layers model)
        (mapcar #'cl-htm.nl:context)))
+
+
+(defmethod reset-model ((model basic-model)
+                        (contexts list))
+  (map nil #'cl-htm.training:reset-context contexts)
+  (map nil #'cl-htm.sdr:clear-all-active (read-sdrs model))
+  (map nil #'cl-htm.sdr:clear-all-active (input-sdrs model))
+  model)

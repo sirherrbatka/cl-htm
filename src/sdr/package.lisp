@@ -6,7 +6,7 @@
   (:export
    #:active-neurons
    #:read-active-neurons
-   #:clear-active
+   #:clear-all-active
    #:set-active
    #:select-active
    #:sdr))

@@ -31,3 +31,11 @@
         (for i from 0 below (vector-classes:size sdr))
         (when (eql (active-neuron) value)
           (vector-push-extend i destination))))))
+
+
+(defmethod clone ((sdr sdr))
+  (lret ((result (vector-classes:make-data (type-of sdr)
+                                           (vector-classes:size sdr))))
+    (map-into (read-active-neurons result)
+              #'identity
+              (read-active-neurons sdr)))))

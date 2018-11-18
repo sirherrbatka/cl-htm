@@ -6,3 +6,5 @@
 (defgeneric set-active (sdr input value))
 
 (defgeneric select-active (sdr value &optional destination))
+
+(defgeneric clone (sdr))

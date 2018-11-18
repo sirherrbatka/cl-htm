@@ -7,26 +7,11 @@
 
 (defgeneric reset-model (model contexts))
 
-(defgeneric activate (model mode contexts))
+(defgeneric activate (model mode contexts parameters))
 
 (defgeneric parameters (model mode))
 
 (defgeneric contexts (model))
-
-(defgeneric train-point (input decoder model data-point)
-  (:method ((input fundamental-input)
-            (decoder fundamental-decoder)
-            (model fundamental-model)
-            data-point)
-    (unwind-protect
-         (iterate
-           (with destination = (output-sdrs model))
-           (while (more-data-p input data-point))
-           (setf data-point (encode-data-point input
-                                               destination
-                                               data-point))
-           (activate model))
-      (reset-model model))))
 
 (defgeneric output-sdrs (model))
 
@@ -53,16 +38,17 @@
          (iterate
            (with initial-data = data-point)
            (with destination = (input-sdrs model))
+           (with parameters = (parameters model mode))
            (while (more-data-p input data-point))
            (setf data-point (encode-data-point input
                                                destination
                                                data-point))
-           (activate model mode contexts)
+           (activate model mode contexts parameters)
            (finally (return (pass-to-decoder decoder
                                              model
                                              mode
                                              initial-data))))
-      (reset-model model))))
+      (reset-model model contexts))))
 
 (defgeneric predict (input decoder model data)
   (:method ((input fundamental-input)

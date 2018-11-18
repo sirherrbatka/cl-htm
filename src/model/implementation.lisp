@@ -25,6 +25,22 @@
 (defmethod reset-model ((model basic-model)
                         (contexts list))
   (map nil #'cl-htm.training:reset-context contexts)
-  (map nil #'cl-htm.sdr:clear-all-active (read-sdrs model))
+  (map nil #'cl-htm.sdr:clear-all-active (read-layers model))
   (map nil #'cl-htm.sdr:clear-all-active (input-sdrs model))
   model)
+
+
+(defmethod activate ((model basic-model)
+                     (mode fundamental-mode)
+                     (contexts list)
+                     parameters)
+  (let* ((inputs (input-sdrs model))
+         (sdr-input (first inputs))
+         (sdrs (read-layers model)))
+    (iterate
+      (for sdr in sdrs)
+      (for prev-sdr previous sdr)
+      (for input initially sdr-input
+           then prev-sdr)
+      (for context in contexts)
+      (cl-htm.nl:activate sdr input context parameters))))

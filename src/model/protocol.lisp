@@ -47,11 +47,8 @@
                                                destination
                                                data-point))
            (activate model mode contexts parameters sdrs)
-           (finally (return (pass-to-decoder decoder
-                                             model
-                                             mode
-                                             initial-data
-                                             sdrs))))
+           (finally (return (pass-to-decoder decoder model mode
+                                             initial-data sdrs))))
       (reset-model model contexts sdrs))))
 
 (defgeneric predict (input decoder model data)
@@ -64,7 +61,8 @@
           (contexts (contexts model)))
       (cl-ds.alg:on-each
        (lambda (data-point)
-         (insert-point input decoder model mode data-point contexts))
+         (insert-point input decoder model mode
+                       data-point contexts))
        data))))
 
 (defgeneric train (input decoder model data)
@@ -77,6 +75,7 @@
           (contexts (contexts model)))
       (cl-ds:traverse
        (lambda (data-point)
-         (insert-point input decoder model mode data-point contexts sdrs))
+         (insert-point input decoder model mode
+                       data-point contexts sdrs))
        data))
     model))

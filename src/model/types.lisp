@@ -21,10 +21,6 @@
    (%input-sdrs
     :initarg :input-sdr
     :reader input-sdrs)
-   (%output-sdrs
-    :initarg :output-sdrs
-    :reader read-output-sdrs
-    :reader output-sdrs)
    (%training-parameters
     :initarg :training-parameters
     :reader read-training-parameters

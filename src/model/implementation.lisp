@@ -33,15 +33,14 @@
 (defmethod activate ((model basic-model)
                      (mode fundamental-mode)
                      (contexts list)
-                     parameters)
+                     parameters
+                     sdrs)
   (iterate
-    (with inputs    = (input-sdrs model))
-    (with sdr-input = (first inputs))
-    (with sdrs      = (read-layers model))
+    (with input = (first sdrs))
+    (with sdrs  = (rest sdrs))
     (for sdr in sdrs)
-    (for prev-sdr previous sdr)
-    (for input initially sdr-input
-         then prev-sdr)
+    (for input previous sdr
+         initially input)
     (for context in contexts)
     (cl-htm.nl:activate sdr input context parameters)
     (finally (return model))))

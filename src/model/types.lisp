@@ -18,9 +18,9 @@
     :initarg :layers
     :type list
     :reader read-layers)
-   (%input-sdrs
-    :initarg :input-sdr
-    :reader input-sdrs)
+   (%input-sdr-size
+    :initarg :input-sdr-size
+    :reader read-input-sdr-size)
    (%training-parameters
     :initarg :training-parameters
     :reader read-training-parameters

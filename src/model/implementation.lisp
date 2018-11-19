@@ -36,11 +36,10 @@
                      parameters
                      sdrs)
   (iterate
-    (with input = (first sdrs))
     (with sdrs  = (rest sdrs))
     (for sdr in sdrs)
     (for input previous sdr
-         initially input)
+         initially (first sdrs))
     (for context in contexts)
     (cl-htm.nl:activate sdr input context parameters)
     (finally (return model))))

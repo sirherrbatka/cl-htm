@@ -199,6 +199,13 @@
   nil)
 
 
+(defmethod to-sdr ((neuron neuron-layer-weights))
+  (lret ((result (make 'neuron-layer :size (vector-classes:size neuron))))
+    (setf (slot-value result 'cl-htm.sdr:active-neurons)
+          (make-array (vector-classes:size neuron)
+                      :element-type 'bit))))
+
+
 (defmethod update-synapses
     ((training-parameters cl-htm.training:empty-training-parameters)
      (layer neuron-layer)

@@ -38,4 +38,4 @@
                                            (vector-classes:size sdr))))
     (map-into (read-active-neurons result)
               #'identity
-              (read-active-neurons sdr)))))
+              (read-active-neurons sdr))))

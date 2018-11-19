@@ -12,7 +12,7 @@
                     :reader read-column-indices)))
 
 
-(vector-classes:define-data neuron-layer (cl-htm.sdr:sdr)
+(vector-classes:define-data neuron-layer-weights ()
   ((%columns :initarg :columns
              :reader columns)
    (synapses-strength :array t
@@ -20,3 +20,8 @@
                       :dimensions-arg :synapses-strength
                       :documentation "Weights of synapses for each neuron."
                       :initform (cl-htm.utils:random-float))))
+
+
+(vector-classes:define-data neuron-layer (neuron-layer-weights
+                                          cl-htm.sdr:sdr)
+  ())

@@ -5,7 +5,7 @@
 
 (defgeneric more-data-p (input data-point))
 
-(defgeneric reset-model (model contexts))
+(defgeneric reset-model (model contexts sdrs))
 
 (defgeneric activate (model mode contexts parameters sdrs))
 
@@ -52,7 +52,7 @@
                                              mode
                                              initial-data
                                              sdrs))))
-      (reset-model model contexts))))
+      (reset-model model contexts sdrs))))
 
 (defgeneric predict (input decoder model data)
   (:method ((input fundamental-input)

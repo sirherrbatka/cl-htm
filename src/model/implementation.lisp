@@ -23,10 +23,10 @@
 
 
 (defmethod reset-model ((model basic-model)
-                        (contexts list))
+                        (contexts list)
+                        sdrs)
   (map nil #'cl-htm.training:reset-context contexts)
-  (map nil #'cl-htm.sdr:clear-all-active (read-layers model))
-  (map nil #'cl-htm.sdr:clear-all-active (input-sdrs model))
+  (map nil #'cl-htm.sdr:clear-all-active sdrs)
   model)
 
 

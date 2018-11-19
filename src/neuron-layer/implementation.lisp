@@ -203,7 +203,12 @@
   (lret ((result (make 'neuron-layer :size (vector-classes:size neuron))))
     (setf (slot-value result 'cl-htm.sdr:active-neurons)
           (make-array (vector-classes:size neuron)
-                      :element-type 'bit))))
+                      :element-type 'bit)
+
+          (slot-value result '%columns) (columns neuron)
+
+          (slot-value result 'synapses-strength)
+          (slot-value neuron 'synapses-strength))))
 
 
 (defmethod update-synapses

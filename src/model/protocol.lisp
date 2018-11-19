@@ -60,6 +60,7 @@
             (model fundamental-model)
             data)
     (let ((mode (make 'predict-mode))
+          (sdrs (sdrs model))
           (contexts (contexts model)))
       (cl-ds.alg:on-each
        (lambda (data-point)

@@ -44,3 +44,17 @@
     (for context in contexts)
     (cl-htm.nl:activate sdr input context parameters)
     (finally (return model))))
+
+
+(defmethod sdrs ((model basic-model))
+  (cons (vector-classes:make-data 'cl-htm.sdr:sdr
+                                  (read-input-sdr-size model))
+        (mapcar #'cl-htm.nl:to-sdr (read-layers model))))
+
+
+(defmethod input-sdr ((model basic-model) (sdrs list))
+  (first sdrs))
+
+
+(defmethod output-sdr ((model basic-model) (sdrs list))
+  (last sdrs))

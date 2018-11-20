@@ -60,7 +60,8 @@
 
 
 (defmethod contexts ((model basic-model))
-  (mapcar (rcurry #'context model) (read-layers model)))
+  (~>> model read-layers
+       (mapcar (rcurry #'context model))))
 
 
 (defmethod context ((layer cl-htm.nl:neuron-layer-weights) (model basic-model) )

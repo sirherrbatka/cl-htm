@@ -28,3 +28,5 @@
 (defgeneric context (layer))
 
 (defgeneric to-sdr (neuron-layer))
+
+(defgeneric layer (type size column-count))

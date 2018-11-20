@@ -10,6 +10,7 @@
    #:calculate-active-synapses-for-columns
    #:columns
    #:context
+   #:layer
    #:neuron-layer-weights
    #:to-sdr
    #:neuron-column

@@ -254,3 +254,25 @@
 
 (defmethod context ((layer neuron-layer))
   (make 'cl-htm.training:basic-training-context))
+
+
+(defmethod layer :before ((type symbol)
+                          size
+                          column-count)
+  (check-type size positive-integer)
+  (check-type column-count positive-integer)
+  )
+
+
+(defmethod layer ((type (eql 'neuron-layer-weights))
+                  size
+                  column-count)
+  (let ((column-size (/ size column-count)))
+    (check-type column-size positive-integer))
+  (vector-classes:make-data 'neuron-layer-weights
+                            size
+                            :columns (vector-classes:make-data
+                                      'neuron-column
+                                      column-count
+                                      :column-indices (coerce (iota size)
+                                                              '(vector fixnum)))))

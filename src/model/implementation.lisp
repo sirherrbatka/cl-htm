@@ -188,15 +188,16 @@
                         (mode fundamental-mode)
                         data-point)
   (ensure-data-wrapping data-point)
-  (< (cdr data-point) (read-encoded-duration input)))
+  (< (the fixnum (cdr data-point))
+     (the fixnum (read-encoded-duration input))))
 
 
 (defmethod more-data-p ((input random-vector-encoder)
                         (mode train-mode)
                         data-point)
   (ensure-data-wrapping data-point)
-  (< (cdr data-point)
-     (length (car data-point))))
+  (< (the fixnum (cdr data-point))
+     (the fixnum (length (car data-point)))))
 
 
 (defmethod encode-data-point ((input random-symbol-encoder)

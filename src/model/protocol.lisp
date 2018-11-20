@@ -35,3 +35,8 @@
 
 (defgeneric train (input decoder
                    model data))
+
+(defgeneric make-model (model-class
+                        layers
+                        input-size
+                        training-parameters))

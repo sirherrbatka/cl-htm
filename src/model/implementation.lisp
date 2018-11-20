@@ -207,3 +207,15 @@
          (value (aref data index)))
     (call-next-method input destination value)
     (cons data (1+ index))))
+
+
+(defmethod make-model
+    ((model-class (eql 'basic-model))
+     (layers list)
+     input-size
+     (training-parameters cl-htm.training:fundamental-training-parameters))
+  (check-type input-size non-negative-integer)
+  (make 'basic-model
+        :layers layers
+        :input-size input-size
+        :training-parameters training-parameters))

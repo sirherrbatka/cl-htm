@@ -147,3 +147,7 @@
   (lret ((result (make-array (list count 2) :element-type 'fixnum)))
     (map-into (cl-ds.utils:unfold-table result)
               (curry #'random most-positive-fixnum))))
+
+
+(defmethod initialize-instance :after ((instance random-symbol-encoder) &key &allow-other-keys)
+  (setf (slot-value instance '%hashes) (make-hash-array (read-count instance))))

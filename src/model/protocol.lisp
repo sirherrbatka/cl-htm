@@ -7,7 +7,8 @@
 
 (defgeneric reset-model (model contexts sdrs))
 
-(defgeneric activate (model mode contexts parameters sdrs))
+(defgeneric activate (model mode contexts
+                      parameters sdrs))
 
 (defgeneric sdrs (model))
 
@@ -23,10 +24,14 @@
 
 (defgeneric decode-sdr (decoder sdr))
 
-(defgeneric pass-to-decoder (decoder model mode data-point sdrs))
+(defgeneric pass-to-decoder (decoder model mode
+                             data-point sdrs))
 
-(defgeneric insert-point (input decoder model mode data-point contexts sdrs))
+(defgeneric insert-point (input decoder model mode
+                          data-point contexts sdrs))
 
-(defgeneric predict (input decoder model data))
+(defgeneric predict (input decoder
+                     model data))
 
-(defgeneric train (input decoder model data))
+(defgeneric train (input decoder
+                   model data))

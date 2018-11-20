@@ -53,3 +53,13 @@
 
 (defclass adapt-mode (predict-mode)
   ())
+
+
+(defclass random-symbol-encoder (fundamental-encoder)
+  ((%hashes :initarg :hashes
+            :reader read-hashes)
+   (%count :initarg :count
+           :reader read-count)
+   (%hash-function :initarg :hash-function
+                   :reader read-hash-function
+                   :initform #'sxhash)))

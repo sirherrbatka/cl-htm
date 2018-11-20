@@ -194,5 +194,6 @@
 (defmethod encode-data-point ((input random-symbol-encoder)
                               (destination cl-htm.sdr:sdr)
                               data-point)
-  (let ((data (car data-point)))
-    (call-next-method input destination data)))
+  (bind (((data . index) (car data-point))
+         (value (aref data index)))
+    (call-next-method input destination value)))

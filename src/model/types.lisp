@@ -24,12 +24,7 @@
    (%training-parameters
     :initarg :training-parameters
     :reader read-training-parameters
-    :type cl-htm.training:fundamental-training-parameters)
-   (%context
-    :initarg :context
-    :reader read-context
-    :type cl-htm.training:fundamental-training-context))
-  (:default-initargs :context (make 'cl-htm.training:basic-training-context)))
+    :type cl-htm.training:fundamental-training-parameters)))
 
 
 (defclass fundamental-encoder ()

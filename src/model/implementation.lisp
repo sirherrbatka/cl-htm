@@ -18,7 +18,7 @@
 
 
 (defmethod contexts ((model basic-model))
-  (~>> (read-layers model)
+  (~>> model read-layers
        (mapcar #'cl-htm.nl:context)))
 
 

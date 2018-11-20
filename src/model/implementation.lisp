@@ -57,3 +57,70 @@
 
 (defmethod output-sdr ((model basic-model) (sdrs list))
   (last sdrs))
+
+
+(defmethod contexts ((model basic-model))
+  (mapcar (rcurry #'context model) (read-layers model)))
+
+
+(defmethod context ((layer cl-htm.nl:neuron-layer-weights) (model basic-model) )
+  (make 'cl-htm.training:basic-training-context))
+
+
+(defmethod pass-to-decoder ((decoder fundamental-decoder)
+                            (model fundamental-model)
+                            (mode predict-mode)
+                            data-point
+                            sdrs)
+  (decode-sdr decoder (output-sdr model sdrs)))
+
+
+(defmethod insert-point ((input fundamental-input)
+                         (decoder fundamental-decoder)
+                         (model fundamental-model)
+                         data-point
+                         mode
+                         contexts
+                         sdrs)
+  (unwind-protect
+       (iterate
+         (with initial-data = data-point)
+         (with destination  = (input-sdr model sdrs))
+         (with parameters   = (parameters model mode))
+         (while (more-data-p input data-point))
+         (setf data-point (encode-data-point input
+                                             destination
+                                             data-point))
+         (activate model mode contexts parameters sdrs)
+         (finally (return (pass-to-decoder decoder model mode
+                                           initial-data sdrs))))
+    (reset-model model contexts sdrs)))
+
+
+(defmethod predict ((input fundamental-input)
+                    (decoder fundamental-decoder)
+                    (model fundamental-model)
+                    data)
+  (let ((mode (make 'predict-mode))
+        (sdrs (sdrs model))
+        (contexts (contexts model)))
+    (cl-ds.alg:on-each
+     (lambda (data-point)
+       (insert-point input decoder model mode
+                     data-point contexts))
+     data)))
+
+
+(defmethod train ((input fundamental-input)
+                  (decoder fundamental-decoder)
+                  (model fundamental-model)
+                  data)
+  (let ((mode (make 'train-mode))
+        (sdrs (sdrs model))
+        (contexts (contexts model)))
+    (cl-ds:traverse
+     (lambda (data-point)
+       (insert-point input decoder model mode
+                     data-point contexts sdrs))
+     data))
+  model)

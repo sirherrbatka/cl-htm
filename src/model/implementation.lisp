@@ -151,3 +151,29 @@
 
 (defmethod initialize-instance :after ((instance random-symbol-encoder) &key &allow-other-keys)
   (setf (slot-value instance '%hashes) (make-hash-array (read-count instance))))
+
+
+(defmethod encode-data-point ((input random-symbol-encoder)
+                              (destination cl-htm.sdr:sdr)
+                              data-point)
+  (vector-classes:with-data (((in cl-htm.sdr:active-neurons))
+                             input
+                             j
+                             cl-htm.sdr:sdr)
+    (iterate
+      (with hashes = (read-hashes input))
+      (with hash = (~> input read-hash-function
+                       (funcall data-point)
+                       (ldb (byte 32 0) _)))
+      (with size = (array-dimension in 0))
+      (with count = (read-count input))
+      (for i from 0 below count)
+      (for j = (hashval hashes size i hash))
+      (setf (in) 1))
+    nil))
+
+
+(defmethod more-data-p ((input random-symbol-encoder)
+                        (mode fundamental-mode)
+                        data-point)
+  (not (null data-point)))

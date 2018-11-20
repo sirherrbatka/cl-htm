@@ -57,8 +57,10 @@
 
 (defclass random-symbol-encoder (fundamental-encoder) ;or atom-encoder?
   ((%hashes :initarg :hashes
+            :type simple-array
             :reader read-hashes)
    (%count :initarg :count
+           :type non-negative-fixnum
            :reader read-count)
    (%hash-function :initarg :hash-function
                    :reader read-hash-function

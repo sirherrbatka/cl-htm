@@ -107,7 +107,7 @@
     (cl-ds.alg:on-each
      (lambda (data-point)
        (insert-point input decoder model mode
-                     data-point contexts))
+                     data-point contexts sdrs))
      data)))
 
 

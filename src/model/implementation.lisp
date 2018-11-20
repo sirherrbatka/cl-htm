@@ -191,9 +191,18 @@
   (< (cdr data-point) (read-encoded-duration input)))
 
 
+(defmethod more-data-p ((input random-vector-encoder)
+                        (mode train-mode)
+                        data-point)
+  (ensure-data-wrapping data-point)
+  (< (cdr data-point)
+     (length (car data-point))))
+
+
 (defmethod encode-data-point ((input random-symbol-encoder)
                               (destination cl-htm.sdr:sdr)
                               data-point)
   (bind (((data . index) (car data-point))
          (value (aref data index)))
-    (call-next-method input destination value)))
+    (call-next-method input destination value)
+    (cons data (1+ index))))

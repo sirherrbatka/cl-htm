@@ -55,7 +55,7 @@
   ())
 
 
-(defclass random-symbol-encoder (fundamental-encoder)
+(defclass random-symbol-encoder (fundamental-encoder) ;or atom-encoder?
   ((%hashes :initarg :hashes
             :reader read-hashes)
    (%count :initarg :count
@@ -63,3 +63,8 @@
    (%hash-function :initarg :hash-function
                    :reader read-hash-function
                    :initform #'sxhash)))
+
+
+(defclass random-vector-encoder (random-symbol-encoder)
+  ((%encoded-length :initarg :encoded-duration
+                    :reader read-encoded-length)))

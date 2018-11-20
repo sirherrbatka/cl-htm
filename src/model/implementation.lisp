@@ -177,3 +177,22 @@
                         (mode fundamental-mode)
                         data-point)
   (not (null data-point)))
+
+
+(defmacro ensure-data-wrapping (data-point)
+  `(when (typep ,data-point 'vector)
+     (setf ,data-point (cons ,data-point 0))))
+
+
+(defmethod more-data-p ((input random-vector-encoder)
+                        (mode fundamental-mode)
+                        data-point)
+  (ensure-data-wrapping data-point)
+  (< (cdr data-point) (read-encoded-duration input)))
+
+
+(defmethod encode-data-point ((input random-symbol-encoder)
+                              (destination cl-htm.sdr:sdr)
+                              data-point)
+  (let ((data (car data-point)))
+    (call-next-method input destination data)))

@@ -3,7 +3,7 @@
 
 (defgeneric encode-data-point (input destination data-point))
 
-(defgeneric more-data-p (input data-point))
+(defgeneric more-data-p (input mode data-point))
 
 (defgeneric reset-model (model contexts sdrs))
 

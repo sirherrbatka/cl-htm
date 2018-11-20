@@ -36,7 +36,7 @@
                      parameters
                      sdrs)
   (iterate
-    (with sdrs  = (rest sdrs))
+    (with sdrs = (rest sdrs))
     (for sdr in sdrs)
     (for input previous sdr
          initially (first sdrs))
@@ -88,7 +88,7 @@
          (with initial-data = data-point)
          (with destination  = (input-sdr model sdrs))
          (with parameters   = (parameters model mode))
-         (while (more-data-p input data-point))
+         (while (more-data-p input mode data-point))
          (setf data-point (encode-data-point input
                                              destination
                                              data-point))

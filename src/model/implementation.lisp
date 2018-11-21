@@ -25,7 +25,7 @@
 (defmethod reset-model ((model basic-model)
                         sdrs
                         contexts)
-  (cl-htm.sdr:clear-all-active (first sdrs))
+  (~> sdrs first cl-htm.sdr:clear-all-active)
   (iterate
     (for sdr in (rest sdrs))
     (for context in contexts)

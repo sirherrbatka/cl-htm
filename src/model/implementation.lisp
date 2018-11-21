@@ -31,6 +31,7 @@
     (for context in contexts)
     (~> context cl-htm.training:active-neurons
         (cl-htm.sdr:set-active sdr _ 0)))
+  (map nil #'cl-htm.training:reset-context contexts)
   model)
 
 
@@ -88,19 +89,27 @@
                          mode
                          contexts
                          sdrs)
-  (unwind-protect
-       (iterate
-         (with initial-data = data-point)
-         (with destination  = (input-sdr model sdrs))
-         (with parameters   = (parameters model mode))
-         (while (more-data-p input mode data-point))
-         (setf data-point (encode-data-point input
-                                             destination
-                                             data-point))
-         (activate model mode contexts parameters sdrs)
-         (finally (return (pass-to-decoder decoder model mode
-                                           initial-data sdrs))))
-    (reset-model model sdrs contexts)))
+  (iterate
+    (with initial-data = data-point)
+    (with destination  = (input-sdr model sdrs))
+    (with parameters   = (parameters model mode))
+    (while (more-data-p input mode data-point))
+    (setf data-point (encode-data-point input
+                                        destination
+                                        data-point))
+    (activate model mode contexts parameters sdrs)
+    (unless (more-data-p input mode data-point)
+      (~> sdrs first cl-htm.sdr:clear-all-active)
+      (map nil
+           (lambda (sdr context)
+             (~> context cl-htm.training:active-neurons
+                 (cl-htm.sdr:set-active sdr _ 0)))
+           (rest sdrs)
+           contexts))
+    (finally (return
+               (prog1 (pass-to-decoder decoder model mode
+                                       initial-data sdrs)
+                 (reset-model model sdrs contexts))))))
 
 
 (defmethod predict ((input fundamental-input)

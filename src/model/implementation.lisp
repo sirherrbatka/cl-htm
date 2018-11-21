@@ -25,7 +25,13 @@
 (defmethod reset-model ((model basic-model)
                         sdrs
                         contexts)
-  (map nil #'cl-htm.sdr:clear-all-active sdrs)
+  (cl-htm.sdr:clear-all-active (first sdrs))
+  (iterate
+    (for sdr in (rest sdrs))
+    (for context in contexts)
+    (cl-htm.sdr:set-active sdr
+                           (cl-htm.training:active-neurons context)
+                           0))
   model)
 
 

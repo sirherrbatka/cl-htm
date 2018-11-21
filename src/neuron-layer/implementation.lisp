@@ -258,21 +258,39 @@
 
 (defmethod layer :before ((type symbol)
                           size
-                          column-count)
+                          column-count
+                          synapses-count
+                          input-size)
   (check-type size positive-integer)
-  (check-type column-count positive-integer)
-  )
+  (check-type input-size positive-integer)
+  (check-type synapses-count positive-integer)
+  (check-type column-count positive-integer))
 
 
 (defmethod layer ((type (eql 'neuron-layer-weights))
                   size
-                  column-count)
+                  column-count
+                  synapses-count
+                  input-size)
   (let ((column-size (/ size column-count)))
     (check-type column-size positive-integer))
-  (vector-classes:make-data 'neuron-layer-weights
-                            size
-                            :columns (vector-classes:make-data
-                                      'neuron-column
-                                      column-count
-                                      :column-indices (coerce (iota size)
-                                                              '(vector fixnum)))))
+  (lret ((result (vector-classes:make-data
+                  'neuron-layer-weights
+                  size
+                  :synapses-strength (list synapses-count)
+                  :columns (vector-classes:make-data
+                            'neuron-column
+                            column-count
+                            :input-size (list synapses-count)
+                            :column-indices (coerce (iota size)
+                                                    '(vector fixnum))))))
+    (vector-classes:with-data (((input input))
+                               (columns result)
+                               i
+                               neuron-column)
+      (iterate
+        (for i from 0 below (vector-classes:size (columns result)))
+        (iterate
+          (for j from 0 below synapses-count)
+          (for index = (random input-size))
+          (setf (input j) index))))))

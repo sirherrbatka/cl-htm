@@ -29,4 +29,4 @@
 
 (defgeneric to-sdr (neuron-layer))
 
-(defgeneric layer (type size column-count))
+(defgeneric layer (type size column-count synapses-count input-size))

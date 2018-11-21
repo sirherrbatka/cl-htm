@@ -31,11 +31,11 @@
 
 (defgeneric to-sdr (neuron-layer))
 
-(defgeneric layer (type &rest args))
+(defgeneric layer (type &key))
 
 (defgeneric make-weights (type input-size &key))
 
-(defgeneric effective-layers (declared-layers))
+(defgeneric effective-layers (declared-layers initial-size))
 
 (defgeneric effective-layer (declared-layer prev-layer))
 

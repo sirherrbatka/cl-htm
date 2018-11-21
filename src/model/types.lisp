@@ -5,10 +5,6 @@
   ())
 
 
-(defclass sequence-input (fundamental-input)
-  ())
-
-
 (defclass fundamental-model ()
   ())
 
@@ -27,7 +23,7 @@
     :type cl-htm.training:fundamental-training-parameters)))
 
 
-(defclass fundamental-encoder ()
+(defclass fundamental-encoder (fundamental-input)
   ())
 
 

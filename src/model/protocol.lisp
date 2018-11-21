@@ -37,6 +37,6 @@
                    model data))
 
 (defgeneric make-model (model-class
-                        layers
                         input-size
-                        training-parameters))
+                        training-parameters
+                        layers))

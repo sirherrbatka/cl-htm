@@ -52,7 +52,7 @@
      (training-parameters cl-htm.training:fundamental-training-parameters)
      (columns neuron-column)
      active-columns)
-  (check-type active-columns simple-vector)
+  (check-type active-columns vector)
   (nest
    (vector-classes:with-data (((synapses-strength synapses-strength))
                               layer neuron-index neuron-layer))
@@ -60,7 +60,7 @@
                               columns column-index neuron-column))
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               sdr input-index cl-htm.sdr:sdr))
-   (let ((threshold (threshold training-parameters))
+   (let ((threshold (cl-htm.training:threshold training-parameters))
          (column-size (/ (vector-classes:size layer)
                          (vector-classes:size columns)))
          (result (make-array
@@ -124,7 +124,7 @@
                                   predictive-neurons
                                   active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
-  (check-type active-columns (vector non-negative-fixnum))
+  (check-type active-columns vector)
   (let ((column-size (truncate (vector-classes:size layer)
                                (vector-classes:size columns))))
     (declare (type non-negative-fixnum column-size))
@@ -154,7 +154,7 @@
      predictive-neurons
      active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
-  (check-type active-columns (vector non-negative-fixnum))
+  (check-type active-columns vector)
   (check-type active-neurons (vector non-negative-fixnum))
   (nest
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
@@ -200,8 +200,11 @@
 
 
 (defmethod to-sdr ((neuron neuron-layer-weights))
-  (lret ((result (make 'neuron-layer :size (vector-classes:size neuron))))
-    (setf (slot-value result 'cl-htm.sdr:active-neurons)
+  (lret ((result (make 'neuron-layer)))
+    (setf (slot-value result 'vector-classes::%size)
+          (vector-classes:size neuron)
+
+          (slot-value result 'cl-htm.sdr:active-neurons)
           (make-array (vector-classes:size neuron)
                       :element-type 'bit)
 
@@ -266,9 +269,9 @@
 
 
 (defmethod layer :before ((type symbol)
-                          &key column-count synapses-count input-size)
+                          &key size column-count synapses-count input-size)
   (check-type size positive-integer)
-  (check-type input-size positive-integer)
+  (check-type input-size (or null positive-integer))
   (check-type synapses-count positive-integer)
   (check-type column-count positive-integer))
 
@@ -294,7 +297,7 @@
                             'neuron-column
                             column-count
                             :input-size (list synapses-count)
-                            :column-indices (coerce (iota size)
+                            :column-indices (coerce (iota column-count)
                                                     '(vector fixnum))))))
     (vector-classes:with-data (((input input))
                                (columns result)
@@ -311,10 +314,10 @@
 
 
 (defmethod effective-layer ((layer layer)
-                            (prev (eql nil)))
+                            (prev integer))
   (apply #'make-weights
          (read-type layer)
-         (access-input-size layer)
+         prev
          (read-arguments layer)))
 
 
@@ -326,8 +329,9 @@
          (read-arguments layer)))
 
 
-(defmethod effective-layers ((declared-layers list))
+(defmethod effective-layers ((declared-layers list)
+                             initial-size)
   (iterate
     (for layer in declared-layers)
-    (for prev-layer previous layer)
-    (collect (effective-layer layer prev-layer))))
+    (for prev-layer previous layer initially initial-size)
+    (collect (effective-layer layer initial-size))))

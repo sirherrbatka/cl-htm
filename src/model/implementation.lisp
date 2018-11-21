@@ -41,8 +41,8 @@
                      parameters
                      sdrs)
   (iterate
-    (with sdrs = (rest sdrs))
-    (for sdr in sdrs)
+    (with layers = (rest sdrs))
+    (for sdr in layers)
     (for input previous sdr
          initially (first sdrs))
     (for context in contexts)
@@ -76,6 +76,14 @@
 
 (defmethod pass-to-decoder ((decoder fundamental-decoder)
                             (model fundamental-model)
+                            (mode train-mode)
+                            data-point
+                            sdrs)
+  nil)
+
+
+(defmethod pass-to-decoder ((decoder fundamental-decoder)
+                            (model fundamental-model)
                             (mode predict-mode)
                             data-point
                             sdrs)
@@ -85,8 +93,8 @@
 (defmethod insert-point ((input fundamental-input)
                          (decoder fundamental-decoder)
                          (model fundamental-model)
-                         data-point
                          mode
+                         data-point
                          contexts
                          sdrs)
   (iterate
@@ -173,7 +181,7 @@
                               (destination cl-htm.sdr:sdr)
                               data-point)
   (vector-classes:with-data (((in cl-htm.sdr:active-neurons))
-                             input
+                             destination
                              j
                              cl-htm.sdr:sdr)
     (iterate
@@ -217,10 +225,11 @@
      (the fixnum (length (car data-point)))))
 
 
-(defmethod encode-data-point ((input random-symbol-encoder)
+(defmethod encode-data-point ((input random-vector-encoder)
                               (destination cl-htm.sdr:sdr)
                               data-point)
-  (bind (((data . index) (car data-point))
+  (ensure-data-wrapping data-point)
+  (bind (((data . index) data-point)
          (value (aref data index)))
     (call-next-method input destination value)
     (cons data (1+ index))))
@@ -228,11 +237,11 @@
 
 (defmethod make-model
     ((model-class (eql 'basic-model))
-     layers
      input-size
-     (training-parameters cl-htm.training:fundamental-training-parameters))
+     (training-parameters cl-htm.training:fundamental-training-parameters)
+     layers)
   (check-type input-size non-negative-integer)
   (make 'basic-model
-        :layers (cl-htm.nl:effective-layers layers)
-        :input-size input-size
+        :layers (cl-htm.nl:effective-layers layers input-size)
+        :input-sdr-size input-size
         :training-parameters training-parameters))

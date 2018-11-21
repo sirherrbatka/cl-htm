@@ -165,7 +165,8 @@
                              cl-htm.sdr:sdr)
     (iterate
       (with hashes = (read-hashes input))
-      (with hash = (~> input read-hash-function
+      (with hash-function = (read-hash-function input))
+      (with hash = (~> hash-function
                        (funcall data-point)
                        (ldb (byte 32 0) _)))
       (with size = (array-dimension in 0))

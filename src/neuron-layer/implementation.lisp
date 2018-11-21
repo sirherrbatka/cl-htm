@@ -267,11 +267,17 @@
   (check-type column-count positive-integer))
 
 
-(defmethod layer ((type (eql 'neuron-layer-weights))
-                  size
-                  column-count
-                  synapses-count
-                  input-size)
+(defmethod layer (type &rest args)
+  (make 'layer :arguments args
+               :type type))
+
+
+(defmethod make-weights ((type (eql 'neuron-layer-weights))
+                         input-size
+                         &key size column-count synapses-count)
+  (check-type column-count positive-fixnum)
+  (check-type synapses-count positive-fixnum)
+  (check-type size positive-fixnum)
   (let ((column-size (/ size column-count)))
     (check-type column-size positive-integer))
   (lret ((result (vector-classes:make-data
@@ -289,8 +295,33 @@
                                i
                                neuron-column)
       (iterate
+        (with indices = (~> input-size iota (coerce '(vector fixnum))))
         (for i from 0 below (vector-classes:size (columns result)))
+
         (iterate
           (for j from 0 below synapses-count)
-          (for index = (random input-size))
+          (for index in-vector (shuffle indices))
           (setf (input j) index))))))
+
+
+(defmethod effective-layer ((layer layer)
+                            (prev (eql nil)))
+  (apply #'make-weights
+         (read-type layer)
+         (access-input-size layer)
+         (read-arguments layer)))
+
+
+(defmethod effective-layer ((layer layer)
+                            (prev neuron-layer-weights))
+  (apply #'make-weights
+         (read-type layer)
+         (vector-classes:size prev)
+         (read-arguments layer)))
+
+
+(defmethod effective-layers ((declared-layers list))
+  (iterate
+    (for layer in declared-layers)
+    (for prev-layer previous layer)
+    (collect (effective-layer layer prev-layer))))

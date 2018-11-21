@@ -211,11 +211,11 @@
 
 (defmethod make-model
     ((model-class (eql 'basic-model))
-     (layers list)
+     layers
      input-size
      (training-parameters cl-htm.training:fundamental-training-parameters))
   (check-type input-size non-negative-integer)
   (make 'basic-model
-        :layers layers
+        :layers (cl-htm.nl:effective-layers layers)
         :input-size input-size
         :training-parameters training-parameters))

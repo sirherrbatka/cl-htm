@@ -13,6 +13,11 @@
    #:layer
    #:neuron-layer-weights
    #:to-sdr
+   #:make-weights
+   #:effective-layer
+   #:effective-layers
+   #:layers
+   #:layer
    #:neuron-column
    #:neuron-layer
    #:select-active-columns

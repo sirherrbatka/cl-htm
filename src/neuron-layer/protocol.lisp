@@ -29,4 +29,13 @@
 
 (defgeneric to-sdr (neuron-layer))
 
-(defgeneric layer (type size column-count synapses-count input-size))
+(defgeneric layer (type &rest args))
+
+(defgeneric make-weights (type input-size &key))
+
+(defgeneric effective-layers (declared-layers))
+
+(defgeneric effective-layer (declared-layer prev-layer))
+
+(defun layers (&rest arguments)
+  (apply #'list arguments))

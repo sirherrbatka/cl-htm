@@ -25,3 +25,13 @@
 (vector-classes:define-data neuron-layer (neuron-layer-weights
                                           cl-htm.sdr:sdr)
   ())
+
+
+(defclass layer ()
+  ((%input-size :initarg :input-size
+                :initform nil
+                :accessor access-input-size)
+   (%type :initarg :type
+          :reader read-type)
+   (%arguments :initarg :arguments
+               :reader read-arguments)))

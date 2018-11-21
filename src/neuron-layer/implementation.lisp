@@ -136,7 +136,8 @@
      active-columns
      predictive-neurons
      :same #'eql
-     :on-first-missing (compose (rcurry #'vector-push-extend active-neurons)
+     :on-first-missing (compose (rcurry #'vector-push-extend
+                                        active-neurons)
                                 (selecting-the-most-active-neuron layer
                                                                   columns
                                                                   input))
@@ -188,7 +189,8 @@
     :same #'eql
     :on-first-missing (lambda (neuron)
                         (iterate
-                          (with column-index = (truncate neuron synapses-count))
+                          (with column-index =
+                                (truncate neuron synapses-count))
                           (for i from 0 below synapses-count)
                           (for input-index = (column-input i))
                           (unless (zerop (active))
@@ -233,19 +235,24 @@
   (let* ((columns (columns layer))
          (prev-data (cl-htm.training:past-predictive-neurons context))
          (active-neurons (cl-htm.training:active-neurons context))
-         (active-synapses-for-columns (calculate-active-synapses-for-columns
-                                       layer sdr columns))
-         (active-columns (select-active-columns layer
-                                                training-parameters
-                                                columns
-                                                active-synapses-for-columns))
-         (predictive-neurons (select-predictive-neurons layer
-                                                        sdr
-                                                        training-parameters
-                                                        columns
-                                                        active-columns)))
+         (active-synapses-for-columns
+           (calculate-active-synapses-for-columns
+            layer sdr columns))
+         (active-columns (select-active-columns
+                          layer
+                          training-parameters
+                          columns
+                          active-synapses-for-columns))
+         (predictive-neurons (select-predictive-neurons
+                              layer
+                              sdr
+                              training-parameters
+                              columns
+                              active-columns)))
     (setf (fill-pointer active-neurons) 0
-          (cl-htm.training:past-predictive-neurons context) predictive-neurons)
+
+          (cl-htm.training:past-predictive-neurons context)
+          predictive-neurons)
     (select-active-neurons
      layer sdr columns
      active-columns prev-data

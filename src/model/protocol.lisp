@@ -5,7 +5,7 @@
 
 (defgeneric more-data-p (input mode data-point))
 
-(defgeneric reset-model (model sdrs))
+(defgeneric reset-model (model sdrs contexts))
 
 (defgeneric activate (model mode contexts
                       parameters sdrs))

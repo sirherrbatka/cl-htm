@@ -23,7 +23,8 @@
 
 
 (defmethod reset-model ((model basic-model)
-                        sdrs)
+                        sdrs
+                        contexts)
   (map nil #'cl-htm.sdr:clear-all-active sdrs)
   model)
 
@@ -94,7 +95,7 @@
          (activate model mode contexts parameters sdrs)
          (finally (return (pass-to-decoder decoder model mode
                                            initial-data sdrs))))
-    (reset-model model sdrs)))
+    (reset-model model sdrs contexts)))
 
 
 (defmethod predict ((input fundamental-input)

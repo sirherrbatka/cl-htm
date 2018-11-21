@@ -13,9 +13,10 @@
 (defgeneric select-predictive-neurons (layer sdr training-parameters
                                        columns active-columns))
 
-(defgeneric select-active-neurons (layer columns
-                                   active-columns
+(defgeneric select-active-neurons (layer
+                                   columns
                                    input
+                                   active-columns
                                    predictive-neurons
                                    active-neurons))
 

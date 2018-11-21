@@ -267,10 +267,7 @@
 
 
 (defmethod layer :before ((type symbol)
-                          size
-                          column-count
-                          synapses-count
-                          input-size)
+                          &key column-count synapses-count input-size)
   (check-type size positive-integer)
   (check-type input-size positive-integer)
   (check-type synapses-count positive-integer)

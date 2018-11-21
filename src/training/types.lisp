@@ -20,8 +20,14 @@
 
 (defclass basic-training-context ()
   ((%past-predictive-neurons :initarg :past-predictive-neurons
-                             :accessor past-predictive-neurons))
-  (:default-initargs :past-predictive-neurons +empty-vector+))
+                             :accessor past-predictive-neurons)
+   (%active-neurons :initarg :active-neurons
+                    :reader active-neurons))
+  (:default-initargs
+   :past-predictive-neurons +empty-vector+
+   :active-neurons (make-array 0 :element-type 'non-negative-fixnum
+                                 :fill-pointer 0
+                                 :adjustable t)))
 
 
 (defclass basic-training-parameters ()

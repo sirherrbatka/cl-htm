@@ -121,14 +121,12 @@
                                   (columns neuron-column)
                                   (input cl-htm.sdr:sdr)
                                   active-columns
-                                  predictive-neurons)
+                                  predictive-neurons
+                                  active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
   (check-type active-columns (vector non-negative-fixnum))
   (let ((column-size (truncate (vector-classes:size layer)
-                               (vector-classes:size columns)))
-        (active-neurons (make-array
-                         0 :element-type 'non-negative-fixnum
-                           :adjustable t)))
+                               (vector-classes:size columns))))
     (declare (type non-negative-fixnum column-size))
     (cl-ds.utils:on-ordered-intersection
      (lambda (column neuron)
@@ -234,6 +232,7 @@
   ;; finally, return all predictive neurons
   (let* ((columns (columns layer))
          (prev-data (cl-htm.training:past-predictive-neurons context))
+         (active-neurons (cl-htm.training:active-neurons context))
          (active-synapses-for-columns (calculate-active-synapses-for-columns
                                        layer sdr columns))
          (active-columns (select-active-columns layer
@@ -244,12 +243,16 @@
                                                         sdr
                                                         training-parameters
                                                         columns
-                                                        active-columns))
-         (active-neurons (select-active-neurons layer sdr columns
-                                                active-columns prev-data)))
+                                                        active-columns)))
+    (setf (fill-pointer active-neurons) 0
+          (cl-htm.training:past-predictive-neurons context) predictive-neurons)
+    (select-active-neurons
+     layer sdr columns
+     active-columns prev-data
+     (cl-htm.training:active-neurons context))
     (update-synapses training-parameters layer sdr columns
                      active-columns prev-data active-neurons)
-    predictive-neurons))
+    layer))
 
 
 (defmethod context ((layer neuron-layer))

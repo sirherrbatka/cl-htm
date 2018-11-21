@@ -10,6 +10,7 @@
    #:basic-training-parameters
    #:empty-training-parameters
    #:decay
+   #:active-neurons
    #:past-predictive-neurons
    #:fundamental-training-context
    #:fundamental-training-parameters

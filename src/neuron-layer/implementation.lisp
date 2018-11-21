@@ -253,10 +253,9 @@
 
           (cl-htm.training:past-predictive-neurons context)
           predictive-neurons)
-    (select-active-neurons
-     layer sdr columns
-     active-columns prev-data
-     (cl-htm.training:active-neurons context))
+    (select-active-neurons layer columns sdr
+                           active-columns prev-data
+                           active-neurons)
     (update-synapses training-parameters layer sdr columns
                      active-columns prev-data active-neurons)
     layer))

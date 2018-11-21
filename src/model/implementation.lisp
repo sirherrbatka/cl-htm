@@ -150,8 +150,10 @@
               (curry #'random most-positive-fixnum))))
 
 
-(defmethod initialize-instance :after ((instance random-symbol-encoder) &key &allow-other-keys)
-  (setf (slot-value instance '%hashes) (make-hash-array (read-count instance))))
+(defmethod initialize-instance :after
+    ((instance random-symbol-encoder) &key &allow-other-keys)
+  (setf (slot-value instance '%hashes)
+        (make-hash-array (read-count instance))))
 
 
 (defmethod encode-data-point ((input random-symbol-encoder)

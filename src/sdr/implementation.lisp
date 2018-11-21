@@ -2,9 +2,11 @@
 
 
 (defmethod clear-all-active ((sdr sdr))
+  (declare (optimize (speed 3)))
   (vector-classes:with-data (((active-neuron active-neurons)) sdr i sdr)
     (iterate
-      (for i from 0 below (vector-classes:size sdr))
+      (declare (type fixnum i))
+      (for i from 0 below (the fixnum (vector-classes:size sdr)))
       (setf (active-neuron) 0)
       (finally (return sdr)))))
 

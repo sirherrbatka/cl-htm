@@ -29,9 +29,8 @@
   (iterate
     (for sdr in (rest sdrs))
     (for context in contexts)
-    (cl-htm.sdr:set-active sdr
-                           (cl-htm.training:active-neurons context)
-                           0))
+    (~> context cl-htm.training:active-neurons
+        (cl-htm.sdr:set-active sdr _ 0)))
   model)
 
 

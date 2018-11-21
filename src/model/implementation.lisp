@@ -64,7 +64,8 @@
        (mapcar (rcurry #'context model))))
 
 
-(defmethod context ((layer cl-htm.nl:neuron-layer-weights) (model basic-model) )
+(defmethod context ((layer cl-htm.nl:neuron-layer-weights)
+                    (model basic-model))
   (make 'cl-htm.training:basic-training-context))
 
 

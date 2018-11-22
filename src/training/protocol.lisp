@@ -1,15 +1,15 @@
 (in-package :cl-htm.training)
 
 
-(defgeneric p+ (training-parameters))
+(defgeneric p+ (parameters))
 
-(defgeneric p- (training-parameters))
+(defgeneric p- (parameters))
 
-(defgeneric decay (training-parameters))
+(defgeneric decay (parameters))
 
-(defgeneric threshold (training-parameters))
+(defgeneric threshold (parameters))
 
-(defgeneric activeted-columns-fraction (training-parameters))
+(defgeneric activeted-columns-fraction (parameters))
 
 (defgeneric past-predictive-neurons (context))
 

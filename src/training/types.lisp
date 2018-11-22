@@ -6,19 +6,15 @@
   :test #'vector=)
 
 
-(defclass fundamental-training-parameters ()
+(defclass fundamental-parameters ()
   ())
 
 
-(defclass empty-training-parameters ()
+(defclass fundamental-context ()
   ())
 
 
-(defclass fundamental-training-context ()
-  ())
-
-
-(defclass basic-training-context (fundamental-training-context)
+(defclass basic-context (fundamental-context)
   ((%past-predictive-neurons :initarg :past-predictive-neurons
                              :accessor past-predictive-neurons)
    (%active-neurons :initarg :active-neurons
@@ -30,7 +26,7 @@
                                  :adjustable t)))
 
 
-(defclass basic-training-parameters (fundamental-training-parameters)
+(defclass training-parameters (fundamental-parameters)
   ((%p+ :initarg :p+
         :documentation "Used to increase active synapses strength."
         :type single-float

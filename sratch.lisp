@@ -1,5 +1,5 @@
 (defparameter *training-parameters*
-  (make-instance 'cl-htm.training:basic-training-parameters
+  (make-instance 'cl-htm.training:basic-parameters
                  :activated-columns-fraction 1/3
                  :threshold 0.6
                  :p- 0.001

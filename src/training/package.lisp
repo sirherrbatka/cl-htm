@@ -6,14 +6,13 @@
   (:export
    #:activated-columns-fraction
    #:reset-context
-   #:basic-training-context
-   #:basic-training-parameters
-   #:empty-training-parameters
+   #:basic-context
+   #:basic-parameters
    #:decay
    #:active-neurons
    #:past-predictive-neurons
-   #:fundamental-training-context
-   #:fundamental-training-parameters
+   #:fundamental-context
+   #:fundamental-parameters
    #:p+
    #:p-
    #:threshold))

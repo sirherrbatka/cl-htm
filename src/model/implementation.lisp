@@ -71,7 +71,7 @@
 
 (defmethod context ((layer cl-htm.nl:neuron-layer-weights)
                     (model basic-model))
-  (make 'cl-htm.training:basic-training-context))
+  (make 'cl-htm.training:basic-context))
 
 
 (defmethod pass-to-decoder ((decoder fundamental-decoder)
@@ -236,7 +236,7 @@
 (defmethod make-model
     ((model-class (eql 'basic-model))
      input-size
-     (training-parameters cl-htm.training:fundamental-training-parameters)
+     (training-parameters cl-htm.training:fundamental-parameters)
      layers
      &key input decoder)
   (check-type input-size non-negative-integer)

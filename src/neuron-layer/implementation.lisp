@@ -179,7 +179,9 @@
               (for input-index = (column-input i))
               (if (zerop (active))
                   (setf (synapses-strength i)
-                        (max single-float-epsilon (- (synapses-strength i) p-)))
+                        (~> (synapses-strength i)
+                            (- p-)
+                            (max single-float-epsilon)))
                   (incf (synapses-strength i) p+))))))
    (cl-ds.utils:on-ordered-intersection
     (lambda (active-neuron predictive-neuron)

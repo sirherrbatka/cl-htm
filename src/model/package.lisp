@@ -18,6 +18,8 @@
    #:fundamental-mode
    #:fundamental-model
    #:input-sdr
+   #:input
+   #:decoder
    #:insert-point
    #:make-model
    #:more-data-p

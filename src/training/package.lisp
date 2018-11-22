@@ -4,15 +4,15 @@
 (defpackage #:cl-htm.training
   (:use #:cl #:cl-htm.aux-package)
   (:export
-   #:activated-columns-fraction
-   #:reset-context
-   #:basic-context
-   #:basic-parameters
-   #:decay
-   #:active-neurons
-   #:past-predictive-neurons
-   #:fundamental-context
-   #:fundamental-parameters
-   #:p+
-   #:p-
-   #:threshold))
+    #:active-neurons
+    #:activated-columns-fraction
+    #:basic-context
+    #:basic-parameters
+    #:decay
+    #:fundamental-context
+    #:fundamental-parameters
+    #:p+
+    #:p-
+    #:past-predictive-neurons
+    #:reset-context
+    #:threshold))

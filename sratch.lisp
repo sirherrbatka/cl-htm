@@ -18,14 +18,24 @@
 
 (defparameter *encoder* (make-instance
                          'cl-htm.model:random-vector-encoder
-                         :encoded-length 2
+                         :encoded-length 1
                          :times 1
                          :count 40))
 
 (defparameter *decoder* (make-instance 'cl-htm.model:fundamental-decoder))
 
-(cl-htm.model:insert-point *encoder* *decoder*
-                           *model* (make-instance 'cl-htm.model:train-mode)
-                           (vector 10)
-                           (cl-htm.model:contexts *model*)
-                           (cl-htm.model:sdrs *model*))
+(progn
+  (defparameter *contexts* (cl-htm.model:contexts *model*))
+  (defparameter *sdrs* (cl-htm.model:sdrs *model*))
+
+  (cl-htm.model:insert-point *encoder* *decoder*
+                             *model* (make-instance 'cl-htm.model:train-mode)
+                             (vector 10)
+                             *contexts*
+                             *sdrs*)
+
+  (cl-htm.model:insert-point *encoder* *decoder*
+                             *model* (make-instance 'cl-htm.model:train-mode)
+                             (vector 15)
+                             *contexts*
+                             *sdrs*))

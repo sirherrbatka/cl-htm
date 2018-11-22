@@ -81,8 +81,8 @@
                         (when (active)
                           (summing (synapses-strength k)))))
          (when (> value threshold)
-           (vector-push-extend neuron-index result))
-         (finally (return result)))))))
+           (vector-push-extend neuron-index result))))
+     result)))
 
 
 (defun selecting-the-most-active-neuron (layer columns input)
@@ -153,6 +153,7 @@
      active-columns
      predictive-neurons
      active-neurons)
+  (declare (optimize (debug 3)))
   (check-type predictive-neurons (vector non-negative-fixnum))
   (check-type active-columns vector)
   (check-type active-neurons (vector non-negative-fixnum))

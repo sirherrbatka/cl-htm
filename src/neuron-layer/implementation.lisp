@@ -86,6 +86,7 @@
 
 
 (defun selecting-the-most-active-neuron (layer columns input)
+  (declare (optimize (debug 3)))
   (nest
    (vector-classes:with-data (((synapses-strength synapses-strength))
                               layer neuron-index neuron-layer))
@@ -99,8 +100,7 @@
      (declare (type non-negative-fixnum column-size synapses-count)))
    (lambda (column-index))
    (iterate
-     (declare (type non-negative-fixnum column-start result
-                    neuron-index)
+     (declare (type fixnum column-start result neuron-index)
               (type single-float maxi value))
      (with column-start = (* column-index column-size))
      (with result = 0)
@@ -136,8 +136,7 @@
      active-columns
      predictive-neurons
      :same #'eql
-     :on-first-missing (compose (rcurry #'vector-push-extend
-                                        active-neurons)
+     :on-first-missing (compose (rcurry #'vector-push-extend active-neurons)
                                 (selecting-the-most-active-neuron layer
                                                                   columns
                                                                   input))
@@ -164,16 +163,18 @@
                               columns column-index neuron-column))
    (vector-classes:with-data (((synapses-strength synapses-strength))
                               layer neuron neuron-layer))
-   (let ((decay (cl-htm.training:decay training-parameters))
-         (p+ (cl-htm.training:p+ training-parameters))
-         (p- (cl-htm.training:p- training-parameters))
-         (synapses-count (array-dimension synapses-strength 1))
-         (column-size (truncate (the fixnum (vector-classes:size layer))
-                                (the fixnum (vector-classes:size columns)))))
+   (let* ((decay (cl-htm.training:decay training-parameters))
+          (p+ (cl-htm.training:p+ training-parameters))
+          (p- (cl-htm.training:p- training-parameters))
+          (synapses-count (array-dimension synapses-strength 1))
+          (column-count (vector-classes:size columns))
+          (column-size (truncate (the fixnum (vector-classes:size layer))
+                                 column-count)))
      (declare (type single-float decay p+ p-)
-              (type non-negative-fixnum column-size synapses-count)))
+              (type non-negative-fixnum column-size synapses-count
+                    column-count)))
    (flet ((change-synapses
-              (neuron &aux (column-index (truncate neuron synapses-count)))
+              (neuron &aux (column-index (truncate neuron column-size)))
             (declare (type non-negative-fixnum column-index neuron))
             (iterate
               (for i from 0 below synapses-count)
@@ -198,7 +199,10 @@
                           (for i from 0 below synapses-count)
                           (for input-index = (column-input i))
                           (unless (zerop (active))
-                            (decf (synapses-strength i) decay))))
+                            (setf (synapses-strength i)
+                                  (~> (synapses-strength i)
+                                      (- decay)
+                                      (max single-float-epsilon))))))
     :on-second-missing #'change-synapses))
   nil)
 
@@ -263,6 +267,12 @@
     (select-active-neurons layer columns sdr
                            active-columns prev-data
                            active-neurons)
+    (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
+                               layer
+                               i
+                               neuron-layer)
+      (map nil (lambda (i) (setf (neuron) 1))
+           active-neurons))
     (update-synapses training-parameters layer sdr columns
                      active-columns prev-data active-neurons)
     layer))

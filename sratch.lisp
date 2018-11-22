@@ -18,7 +18,7 @@
 
 (defparameter *encoder* (make-instance
                          'cl-htm.model:random-vector-encoder
-                         :encoded-duration 2
+                         :encoded-length 2
                          :times 1
                          :count 40))
 

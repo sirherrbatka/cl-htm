@@ -120,10 +120,9 @@
                  (reset-model model sdrs contexts))))))
 
 
-(defmethod predict ((input fundamental-input)
-                    (decoder fundamental-decoder)
-                    (model fundamental-model)
-                    data)
+(defmethod predict ((model fundamental-model)
+                    data
+                    &key (input (input model)) (decoder (decoder model)))
   (let ((mode (make 'predict-mode))
         (sdrs (sdrs model))
         (contexts (contexts model)))
@@ -134,10 +133,9 @@
      data)))
 
 
-(defmethod train ((input fundamental-input)
-                  (decoder fundamental-decoder)
-                  (model fundamental-model)
-                  data)
+(defmethod train ((model fundamental-model)
+                  data
+                  &key (input (input model)) (decoder (decoder model)))
   (let ((mode (make 'train-mode))
         (sdrs (sdrs model))
         (contexts (contexts model)))
@@ -239,9 +237,12 @@
     ((model-class (eql 'basic-model))
      input-size
      (training-parameters cl-htm.training:fundamental-training-parameters)
-     layers)
+     layers
+     &key input decoder)
   (check-type input-size non-negative-integer)
   (make 'basic-model
         :layers (cl-htm.nl:effective-layers layers input-size)
+        :input input
+        :decoder decoder
         :input-sdr-size input-size
         :training-parameters training-parameters))

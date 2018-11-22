@@ -30,13 +30,20 @@
 (defgeneric insert-point (input decoder model mode
                           data-point contexts sdrs))
 
-(defgeneric predict (input decoder
-                     model data))
+(defgeneric predict (model data &key input decoder))
 
-(defgeneric train (input decoder
-                   model data))
+(defgeneric train (model data &key input decoder))
 
 (defgeneric make-model (model-class
                         input-size
                         training-parameters
-                        layers))
+                        layers
+                        &key input decoder))
+
+(defgeneric input (model))
+
+(defgeneric (setf input) (value model))
+
+(defgeneric decoder (model))
+
+(defgeneric (setf decoder) (value model))

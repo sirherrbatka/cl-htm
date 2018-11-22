@@ -17,6 +17,10 @@
    (%input-sdr-size
     :initarg :input-sdr-size
     :reader read-input-sdr-size)
+   (%input :initarg :input
+           :accessor input)
+   (%decoder :initarg :decoder
+             :accessor decoder)
    (%training-parameters
     :initarg :training-parameters
     :reader read-training-parameters
@@ -64,5 +68,5 @@
 
 
 (defclass random-vector-encoder (random-symbol-encoder)
-  ((%encoded-length :initarg :encoded-duration
+  ((%encoded-length :initarg :encoded-length
                     :reader read-encoded-length)))

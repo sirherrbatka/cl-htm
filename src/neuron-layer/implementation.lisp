@@ -30,7 +30,7 @@
 
 (defmethod select-active-columns
     ((layer neuron-layer)
-     (training-parameters cl-htm.training:fundamental-training-parameters)
+     (training-parameters cl-htm.training:fundamental-parameters)
      (columns neuron-column)
      active-synapses)
   (check-type active-synapses (simple-array fixnum (*)))
@@ -49,7 +49,7 @@
 (defmethod select-predictive-neurons
     ((layer neuron-layer)
      (sdr cl-htm.sdr:sdr)
-     (training-parameters cl-htm.training:fundamental-training-parameters)
+     (training-parameters cl-htm.training:fundamental-parameters)
      (columns neuron-column)
      active-columns)
   (check-type active-columns vector)
@@ -146,7 +146,7 @@
 
 
 (defmethod update-synapses
-    ((training-parameters cl-htm.training:fundamental-training-parameters)
+    ((training-parameters cl-htm.training:fundamental-parameters)
      (layer neuron-layer)
      (input cl-htm.sdr:sdr)
      (columns neuron-column)
@@ -191,7 +191,7 @@
     :on-first-missing (lambda (neuron)
                         (iterate
                           (with column-index =
-                                (truncate neuron synapses-count))
+                                (truncate neuron column-size))
                           (for i from 0 below synapses-count)
                           (for input-index = (column-input i))
                           (unless (zerop (active))
@@ -229,8 +229,8 @@
 (defmethod activate
     ((layer neuron-layer)
      (sdr cl-htm.sdr:sdr)
-     (context cl-htm.training:fundamental-training-context)
-     (training-parameters cl-htm.training:fundamental-training-parameters))
+     (context cl-htm.training:fundamental-context)
+     (training-parameters cl-htm.training:fundamental-parameters))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons

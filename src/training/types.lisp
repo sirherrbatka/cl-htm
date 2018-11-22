@@ -26,7 +26,7 @@
                                  :adjustable t)))
 
 
-(defclass training-parameters (fundamental-parameters)
+(defclass basic-parameters (fundamental-parameters)
   ((%p+ :initarg :p+
         :documentation "Used to increase active synapses strength."
         :type single-float

@@ -24,7 +24,7 @@
    (%training-parameters
     :initarg :training-parameters
     :reader read-training-parameters
-    :type cl-htm.training:fundamental-training-parameters)))
+    :type cl-htm.training:fundamental-parameters)))
 
 
 (defclass fundamental-encoder (fundamental-input)

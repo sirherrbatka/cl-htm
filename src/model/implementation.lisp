@@ -1,7 +1,7 @@
 (in-package #:cl-htm.model)
 
 
-(let ((no-training (make 'cl-htm.training:empty-training-parameters)))
+(let ((no-training (make 'cl-htm.training:no-training-parameters)))
   (defmethod parameters ((model fundamental-model)
                          (mode predict-mode))
     no-training))
@@ -14,7 +14,7 @@
 
 (defmethod parameters ((model fundamental-model)
                        (mode predict-mode))
-  (make 'cl-htm.training:empty-training-parameters))
+  (make 'cl-htm.training:no-training-parameters))
 
 
 (defmethod contexts ((model basic-model))

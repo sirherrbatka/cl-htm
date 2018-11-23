@@ -223,7 +223,7 @@
 
 
 (defmethod update-synapses
-    ((training-parameters cl-htm.training:empty-training-parameters)
+    ((training-parameters cl-htm.training:no-training-parameters)
      (layer neuron-layer)
      (input cl-htm.sdr:sdr)
      (columns neuron-column)
@@ -279,7 +279,7 @@
 
 
 (defmethod context ((layer neuron-layer))
-  (make 'cl-htm.training:basic-training-context))
+  (make 'cl-htm.training:basic-context))
 
 
 (defmethod layer :before ((type symbol)

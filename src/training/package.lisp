@@ -14,5 +14,6 @@
     #:p+
     #:p-
     #:past-predictive-neurons
+    #:no-training-parameters
     #:reset-context
     #:threshold))

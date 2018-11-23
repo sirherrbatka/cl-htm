@@ -45,3 +45,7 @@
    (%activated-columns-fraction :initarg :activated-columns-fraction
                                 :reader activated-columns-fraction
                                 :documentation "How many columns should become active?")))
+
+
+(defclass no-training-parameters (basic-parameters)
+  ())

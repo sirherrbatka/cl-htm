@@ -4,19 +4,20 @@
 (defpackage #:cl-htm.training
   (:use #:cl #:cl-htm.aux-package)
   (:export
-    #:active-neurons
-    #:activated-columns-fraction
-    #:basic-context
-    #:basic-parameters
-    #:decay
-    #:fundamental-context
-    #:fundamental-parameters
-    #:p+
-    #:p-
-    #:past-predictive-neurons
-    #:adapt-mode
-    #:predict-mode
-    #:train-mode
-    #:fundamental-mode
-    #:reset-context
-    #:threshold))
+   #:activated-columns-fraction
+   #:adapt-mode
+   #:basic-context
+   #:basic-parameters
+   #:decay
+   #:fundamental-context
+   #:fundamental-mode
+   #:fundamental-parameters
+   #:maximum-synaps-weight
+   #:p+
+   #:p-
+   #:past-predictive-neurons
+   #:predict-mode
+   #:reset-context
+   #:threshold
+   #:train-mode
+   #:active-neurons))

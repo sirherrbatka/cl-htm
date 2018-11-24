@@ -46,6 +46,9 @@
     :reader threshold
     :type single-float
     :documentation "Threshold for predictive state of neuron.")
+   (%maximum-weight :initarg :maximum-weight
+                    :reader maximum-weight
+                    :type float)
    (%activated-columns-fraction
     :initarg :activated-columns-fraction
     :reader activated-columns-fraction

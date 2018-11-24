@@ -16,3 +16,5 @@
 (defgeneric (setf past-predictive-neurons) (new-value context))
 
 (defgeneric reset-context (context))
+
+(defgeneric maximum-weight (parameters))

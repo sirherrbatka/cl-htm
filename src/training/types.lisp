@@ -46,13 +46,21 @@
     :reader threshold
     :type single-float
     :documentation "Threshold for predictive state of neuron.")
-   (%maximum-weight :initarg :maximum-weight
-                    :reader maximum-weight
-                    :type float)
+   (%maximum-weight
+    :initarg :maximum-weight
+    :reader maximum-weight
+    :type single-float)
+   (%minimum-weight
+    :initarg :minimum-weight
+    :reader minimum-weight
+    :type single-float)
    (%activated-columns-fraction
     :initarg :activated-columns-fraction
     :reader activated-columns-fraction
-    :documentation "How many columns should become active?")))
+    :documentation "How many columns should become active?"))
+  (:default-initargs
+   :minimum-weight single-float-epsilon
+   :maximum-weight 1.0))
 
 
 (defclass fundamental-mode ()

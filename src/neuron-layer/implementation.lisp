@@ -145,7 +145,7 @@
 
 
 (defmethod update-synapses
-    ((training-parameters cl-htm.training:fundamental-parameters)
+    ((parameters cl-htm.training:fundamental-parameters)
      (layer neuron-layer)
      (input cl-htm.sdr:sdr)
      (mode cl-htm.training:train-mode)
@@ -164,15 +164,19 @@
                               columns column-index neuron-column))
    (vector-classes:with-data (((synapses-strength synapses-strength))
                               layer neuron neuron-layer))
-   (let* ((decay (cl-htm.training:decay training-parameters))
-          (p+ (cl-htm.training:p+ training-parameters))
-          (p- (cl-htm.training:p- training-parameters))
+   (let* ((decay (cl-htm.training:decay parameters))
+          (p+ (cl-htm.training:p+ parameters))
+          (p- (cl-htm.training:p- parameters))
           (synapses-count (array-dimension synapses-strength 1))
           (column-count (vector-classes:size columns))
+          (maximum-weight (cl-htm.training:maximum-weight parameters))
+          (minimum-weight (cl-htm.training:minimum-weight parameters))
           (column-size (truncate (the fixnum (vector-classes:size layer))
                                  column-count)))
-     (declare (type single-float decay p+ p-)
-              (type non-negative-fixnum column-size synapses-count
+     (declare (type single-float decay p+ p- maximum-weight
+                    minimum-weight)
+              (type non-negative-fixnum column-size
+                    synapses-count
                     column-count)))
    (flet ((change-synapses
               (neuron &aux (column-index (truncate neuron column-size)))
@@ -184,8 +188,11 @@
                   (setf (synapses-strength i)
                         (~> (synapses-strength i)
                             (- p-)
-                            (max single-float-epsilon)))
-                  (incf (synapses-strength i) p+))))))
+                            (max minimum-weight)))
+                  (setf (synapses-strength i)
+                        (~> (synapses-strength i)
+                            (+ p+)
+                            (min maximum-weight))))))))
    (cl-ds.utils:on-ordered-intersection
     (lambda (active-neuron predictive-neuron)
       (declare (ignore predictive-neuron))
@@ -203,7 +210,7 @@
                             (setf (synapses-strength i)
                                   (~> (synapses-strength i)
                                       (- decay)
-                                      (max single-float-epsilon))))))
+                                      (max minimum-weight))))))
     :on-second-missing #'change-synapses))
   nil)
 

@@ -18,3 +18,5 @@
 (defgeneric reset-context (context))
 
 (defgeneric maximum-weight (parameters))
+
+(defgeneric minimum-weight (parameters))

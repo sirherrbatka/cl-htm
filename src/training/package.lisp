@@ -12,7 +12,8 @@
    #:fundamental-context
    #:fundamental-mode
    #:fundamental-parameters
-   #:maximum-synaps-weight
+   #:maximum-weight
+   #:minimum-weight
    #:p+
    #:p-
    #:past-predictive-neurons

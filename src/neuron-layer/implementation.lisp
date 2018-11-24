@@ -72,6 +72,7 @@
      (declare (type fixnum column-size synapses-count)
               (type (vector non-negative-fixnum) result)
               (type single-float threshold))
+     ;; can be parallel, perhaps...
      (iterate
        (declare (type fixnum i column-index column-start))
        (for i from 0)

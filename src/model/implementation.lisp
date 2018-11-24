@@ -197,8 +197,7 @@
 
 
 (defmethod more-data-p ((input random-vector-encoder)
-                        (mode cl-htm.training:fundamental-mode
-                      )
+                        (mode cl-htm.training:fundamental-mode)
                         data-point)
   (ensure-data-wrapping data-point)
   (< (the fixnum (cdr data-point))

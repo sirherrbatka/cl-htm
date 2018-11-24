@@ -35,6 +35,7 @@
                        :decoder *decoder*))
 
 (progn
+  (sb-sprof:reset)
   (sb-sprof:start-profiling)
   (cl-htm.model:train *model* (cl-ds:xpr (:i 100000)
                                 (unless (zerop i)

@@ -4,9 +4,10 @@
 (defgeneric activate (neuron-layer
                       sdr
                       context
-                      training-parameters))
+                      training-parameters
+                      mode))
 
-(defgeneric update-synapses (training-parameters layer input
+(defgeneric update-synapses (training-parameters layer input mode
                              columns active-columns
                              predictive-neurons active-neurons))
 

@@ -14,6 +14,9 @@
     #:p+
     #:p-
     #:past-predictive-neurons
-    #:no-training-parameters
+    #:adapt-mode
+    #:predict-mode
+    #:train-mode
+    #:fundamental-mode
     #:reset-context
     #:threshold))

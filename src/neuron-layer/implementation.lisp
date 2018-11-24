@@ -148,6 +148,7 @@
     ((training-parameters cl-htm.training:fundamental-parameters)
      (layer neuron-layer)
      (input cl-htm.sdr:sdr)
+     (mode cl-htm.training:train-mode)
      (columns neuron-column)
      active-columns
      predictive-neurons
@@ -223,9 +224,10 @@
 
 
 (defmethod update-synapses
-    ((training-parameters cl-htm.training:no-training-parameters)
+    ((training-parameters cl-htm.training:fundamental-parameters)
      (layer neuron-layer)
      (input cl-htm.sdr:sdr)
+     (mode cl-htm.training:predict-mode)
      (columns neuron-column)
      active-columns
      predictive-neurons
@@ -237,7 +239,8 @@
     ((layer neuron-layer)
      (sdr cl-htm.sdr:sdr)
      (context cl-htm.training:fundamental-context)
-     (training-parameters cl-htm.training:fundamental-parameters))
+     (training-parameters cl-htm.training:fundamental-parameters)
+     (mode cl-htm.training:fundamental-mode))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons
@@ -273,7 +276,7 @@
                                neuron-layer)
       (map nil (lambda (i) (setf (neuron) 1))
            active-neurons))
-    (update-synapses training-parameters layer sdr columns
+    (update-synapses training-parameters layer sdr mode columns
                      active-columns prev-data active-neurons)
     layer))
 

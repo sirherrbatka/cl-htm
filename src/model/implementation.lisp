@@ -3,17 +3,17 @@
 
 (let ((no-training (make 'cl-htm.training:no-training-parameters)))
   (defmethod parameters ((model fundamental-model)
-                         (mode predict-mode))
+                         (mode cl-ds.training:predict-mode))
     no-training))
 
 
 (defmethod parameters ((model basic-model)
-                       (mode train-mode))
+                       (mode cl-ds.training:train-mode))
   (read-training-parameters model))
 
 
 (defmethod parameters ((model fundamental-model)
-                       (mode predict-mode))
+                       (mode cl-ds.training:predict-mode))
   (make 'cl-htm.training:no-training-parameters))
 
 
@@ -46,7 +46,7 @@
     (for input previous sdr
          initially (first sdrs))
     (for context in contexts)
-    (cl-htm.nl:activate sdr input context parameters)
+    (cl-htm.nl:activate sdr input context parameters mode)
     (finally (return model))))
 
 
@@ -76,7 +76,7 @@
 
 (defmethod pass-to-decoder ((decoder fundamental-decoder)
                             (model fundamental-model)
-                            (mode train-mode)
+                            (mode cl-ds.training:train-mode)
                             data-point
                             sdrs)
   nil)
@@ -84,7 +84,7 @@
 
 (defmethod pass-to-decoder ((decoder fundamental-decoder)
                             (model fundamental-model)
-                            (mode predict-mode)
+                            (mode cl-ds.training:predict-mode)
                             data-point
                             sdrs)
   (decode-sdr decoder (output-sdr model sdrs)))
@@ -123,7 +123,7 @@
 (defmethod predict ((model fundamental-model)
                     data
                     &key (input (input model)) (decoder (decoder model)))
-  (let ((mode (make 'predict-mode))
+  (let ((mode (make 'cl-ds.training:predict-mode))
         (sdrs (sdrs model))
         (contexts (contexts model)))
     (cl-ds.alg:on-each
@@ -136,7 +136,7 @@
 (defmethod train ((model fundamental-model)
                   data
                   &key (input (input model)) (decoder (decoder model)))
-  (let ((mode (make 'train-mode))
+  (let ((mode (make 'cl-ds.training:train-mode))
         (sdrs (sdrs model))
         (contexts (contexts model)))
     (cl-ds:traverse
@@ -216,7 +216,7 @@
 
 
 (defmethod more-data-p ((input random-vector-encoder)
-                        (mode train-mode)
+                        (mode cl-ds.training:train-mode)
                         data-point)
   (ensure-data-wrapping data-point)
   (< (the fixnum (cdr data-point))

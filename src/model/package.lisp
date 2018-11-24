@@ -5,7 +5,6 @@
   (:use #:cl #:cl-htm.aux-package)
   (:export
    #:activate
-   #:adapt-mode
    #:basic-model
    #:context
    #:contexts
@@ -15,7 +14,6 @@
    #:fundamental-discreete-decoder
    #:fundamental-encoder
    #:fundamental-input
-   #:fundamental-mode
    #:fundamental-model
    #:input-sdr
    #:input
@@ -27,11 +25,9 @@
    #:parameters
    #:pass-to-decoder
    #:predict
-   #:predict-mode
    #:random-symbol-encoder
    #:random-vector-encoder
    #:reset-model
    #:sdrs
    #:sequence-input
-   #:train
-   #:train-mode))
+   #:train))

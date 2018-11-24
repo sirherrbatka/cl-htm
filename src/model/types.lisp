@@ -39,22 +39,6 @@
   ())
 
 
-(defclass fundamental-mode ()
-  ())
-
-
-(defclass train-mode (fundamental-mode)
-  ())
-
-
-(defclass predict-mode (fundamental-mode)
-  ())
-
-
-(defclass adapt-mode (predict-mode)
-  ())
-
-
 (defclass random-symbol-encoder (fundamental-encoder) ;or atom-encoder?
   ((%hashes :initarg :hashes
             :type simple-array

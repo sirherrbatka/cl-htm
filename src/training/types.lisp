@@ -27,25 +27,42 @@
 
 
 (defclass basic-parameters (fundamental-parameters)
-  ((%p+ :initarg :p+
-        :documentation "Used to increase active synapses strength."
-        :type single-float
-        :reader p+)
-   (%p- :initarg :p-
-        :documentation "Used to decrease inactive synapses strength."
-        :type single-float
-        :reader p-)
-   (%decay :initarg :decay
-           :type single-float
-           :reader decay)
-   (%threshold :initarg :threshold
-               :reader threshold
-               :type single-float
-               :documentation "Threshold for predictive state of neuron.")
-   (%activated-columns-fraction :initarg :activated-columns-fraction
-                                :reader activated-columns-fraction
-                                :documentation "How many columns should become active?")))
+  ((%p+
+    :initarg :p+
+    :documentation "Used to increase active synapses strength."
+    :type single-float
+    :reader p+)
+   (%p-
+    :initarg :p-
+    :documentation "Used to decrease inactive synapses strength."
+    :type single-float
+    :reader p-)
+   (%decay
+    :initarg :decay
+    :type single-float
+    :reader decay)
+   (%threshold
+    :initarg :threshold
+    :reader threshold
+    :type single-float
+    :documentation "Threshold for predictive state of neuron.")
+   (%activated-columns-fraction
+    :initarg :activated-columns-fraction
+    :reader activated-columns-fraction
+    :documentation "How many columns should become active?")))
 
 
-(defclass no-training-parameters (basic-parameters)
+(defclass fundamental-mode ()
+  ())
+
+
+(defclass train-mode (fundamental-mode)
+  ())
+
+
+(defclass predict-mode (fundamental-mode)
+  ())
+
+
+(defclass adapt-mode (predict-mode)
   ())

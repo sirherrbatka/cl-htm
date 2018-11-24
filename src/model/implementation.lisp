@@ -7,14 +7,8 @@
     no-training))
 
 
-(defmethod parameters ((model basic-model)
-                       (mode cl-htm.training:train-mode))
+(defmethod parameters ((model basic-model))
   (read-training-parameters model))
-
-
-(defmethod parameters ((model fundamental-model)
-                       (mode cl-htm.training:predict-mode))
-  (make 'cl-htm.training:no-training-parameters))
 
 
 (defmethod contexts ((model basic-model))
@@ -100,7 +94,7 @@
   (iterate
     (with initial-data = data-point)
     (with destination  = (input-sdr model sdrs))
-    (with parameters   = (parameters model mode))
+    (with parameters   = (parameters model))
     (while (more-data-p input mode data-point))
     (setf data-point (encode-data-point input
                                         destination

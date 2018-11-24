@@ -12,7 +12,7 @@
 
 (defgeneric sdrs (model))
 
-(defgeneric parameters (model mode))
+(defgeneric parameters (model))
 
 (defgeneric context (layer model))
 

@@ -11,6 +11,9 @@
                          :encoded-length 3
                          :count 80))
 
+(defparameter *decoder* (make-instance
+                         'cl-htm.model:fundamental-decoder))
+
 (defparameter *model* (cl-htm.model:make-model
                        'cl-htm.model:basic-model
                        400
@@ -31,7 +34,10 @@
                        :input *encoder*
                        :decoder *decoder*))
 
-(cl-htm.model:train *model* (cl-ds:xpr (:i 100000)
-                              (unless (zerop i)
-                                (cl-ds:send-recur (vector 1 2 3)
-                                                  :i (1- i)))))
+(progn
+  (sb-sprof:start-profiling)
+  (cl-htm.model:train *model* (cl-ds:xpr (:i 100000)
+                                (unless (zerop i)
+                                  (cl-ds:send-recur (vector 1 2 3)
+                                                    :i (1- i)))))
+  (sb-sprof:stop-profiling))

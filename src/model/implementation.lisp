@@ -1,12 +1,6 @@
 (in-package #:cl-htm.model)
 
 
-(let ((no-training (make 'cl-htm.training:no-training-parameters)))
-  (defmethod parameters ((model fundamental-model)
-                         (mode cl-htm.training:predict-mode))
-    no-training))
-
-
 (defmethod parameters ((model basic-model))
   (read-training-parameters model))
 
@@ -30,7 +24,7 @@
 
 
 (defmethod activate ((model basic-model)
-                     (mode fundamental-mode)
+                     (mode cl-htm.training:fundamental-mode)
                      (contexts list)
                      parameters
                      sdrs)
@@ -191,7 +185,8 @@
 
 
 (defmethod more-data-p ((input random-symbol-encoder)
-                        (mode fundamental-mode)
+                        (mode cl-htm.training:fundamental-mode
+                      )
                         data-point)
   (not (null data-point)))
 
@@ -202,7 +197,8 @@
 
 
 (defmethod more-data-p ((input random-vector-encoder)
-                        (mode fundamental-mode)
+                        (mode cl-htm.training:fundamental-mode
+                      )
                         data-point)
   (ensure-data-wrapping data-point)
   (< (the fixnum (cdr data-point))

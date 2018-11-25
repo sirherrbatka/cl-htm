@@ -73,27 +73,28 @@
               (type (vector non-negative-fixnum) result)
               (type single-float threshold))
      ;; can be parallel, perhaps...
-     (iterate
-       (declare (type fixnum i column-index column-start))
-       (for i from 0)
-       (for column-index in-vector active-columns)
-       (for column-start = (* column-index column-size))
-       (iterate
-         (declare (type fixnum neuron-index)
-                  (type single-float value))
-         (for neuron-index from column-start)
-         (repeat column-size)
-         (for value = (iterate
-                        (declare (type fixnum k input-index)
-                                 (type single-float sum))
-                        (with sum = 0.0)
-                        (for k from 0 below synapses-count)
-                        (for input-index = (columns-input k))
-                        (when (active)
-                          (incf sum (synapses-strength k)))
-                        (finally (return sum))))
-         (when (> value threshold)
-           (vector-push-extend neuron-index result))))
+     (map nil
+          (lambda (column-index)
+            (declare (type fixnum column-index))
+            (iterate
+              (declare (type fixnum neuron-index column-start)
+                       (type single-float value))
+              (with column-start = (* column-index column-size))
+              (for neuron-index from column-start)
+              (repeat column-size)
+              (for value =
+                   (iterate
+                     (declare (type fixnum k input-index)
+                              (type single-float sum))
+                     (with sum = 0.0)
+                     (for k from 0 below synapses-count)
+                     (for input-index = (columns-input k))
+                     (when (active)
+                       (incf sum (synapses-strength k)))
+                     (finally (return sum))))
+              (when (> value threshold)
+                (vector-push-extend neuron-index result))))
+      active-columns)
      result)))
 
 

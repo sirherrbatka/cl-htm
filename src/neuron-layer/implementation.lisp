@@ -73,25 +73,25 @@
               (type (vector non-negative-fixnum) result)
               (type single-float threshold))
      ;; can be parallel, perhaps...
-     (map nil
-          (lambda (column-index)
-            (declare (type fixnum column-index))
-            (iterate
-              (declare (type fixnum neuron-index column-start)
-                       (type single-float value))
-              (with column-start = (* column-index column-size))
-              (for neuron-index from column-start)
-              (repeat column-size)
-              (iterate
-                (declare (type fixnum k input-index)
-                         (type single-float sum))
-                (with sum = 0.0)
-                (for k from 0 below synapses-count)
-                (for input-index = (columns-input k))
-                (incf sum (* (active) (synapses-strength k)))
-                (when (> sum threshold)
-                  (vector-push-extend neuron-index result)
-                  (leave)))))
+     (map
+      nil
+      (lambda (column-index)
+        (declare (type fixnum column-index))
+        (iterate
+          (declare (type fixnum neuron-index column-start))
+          (with column-start = (* column-index column-size))
+          (for neuron-index from column-start)
+          (repeat column-size)
+          (iterate
+            (declare (type fixnum k input-index)
+                     (type single-float sum))
+            (with sum = 0.0)
+            (for k from 0 below synapses-count)
+            (for input-index = (columns-input k))
+            (incf sum (* (active) (synapses-strength k)))
+            (when (> sum threshold)
+              (vector-push-extend neuron-index result)
+              (leave)))))
       active-columns)
      result)))
 

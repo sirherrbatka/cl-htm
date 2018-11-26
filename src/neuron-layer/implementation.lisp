@@ -191,11 +191,10 @@
           (minimum-weight (cl-htm.training:minimum-weight parameters))
           (column-size (truncate (the fixnum (vector-classes:size layer))
                                  column-count)))
-     (declare (type single-float decay p+ p- maximum-weight
-                    minimum-weight)
+     (declare (type single-float decay p+ p-
+                    maximum-weight minimum-weight)
               (type non-negative-fixnum column-size
-                    synapses-count
-                    column-count)))
+                    synapses-count column-count)))
    (flet ((change-synapses
               (neuron &aux (column-index (truncate neuron column-size)))
             (declare (type non-negative-fixnum column-index neuron))
@@ -220,7 +219,9 @@
     predictive-neurons
     :same #'eql
     :on-first-missing (lambda (neuron)
+                        (declare (type fixnum neuron))
                         (iterate
+                          (declare (type fixnum column-index i input-index))
                           (with column-index =
                                 (truncate neuron column-size))
                           (for i from 0 below synapses-count)

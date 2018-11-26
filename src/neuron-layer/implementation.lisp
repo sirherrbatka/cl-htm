@@ -10,12 +10,15 @@
     ((layer neuron-layer)
      (input cl-htm.sdr:sdr)
      (columns neuron-column))
+  (declare (optimize (speed 3) (safety 0)
+                     (space 0) (debug 0)))
   (nest
    (vector-classes:with-data (((column-input input))
                               columns i neuron-column))
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               input j cl-htm.sdr:sdr))
    (iterate
+     (declare (type fixnum i size syn-count))
      (with size = (vector-classes:size columns))
      (with syn-count = (array-dimension column-input 1))
      (with result = (make-array size :element-type 'fixnum))

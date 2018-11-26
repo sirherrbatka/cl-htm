@@ -42,7 +42,7 @@
     (~> (read-column-indices columns)
         (cl-ds.utils:select-top activated-columns-count
                                 #'> :key
-                                (curry #'aref active-synapses))
+                                (lambda (x) (aref active-synapses x)))
         (sort #'<)))) ; could be some bucket sort to speed things up (but probabbly won't change that much)
 
 
@@ -142,7 +142,7 @@
                                   predictive-neurons
                                   active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
-  (check-type active-columns vector)
+  (check-type active-columns (simple-array fixnum (*)))
   (let ((column-size (truncate (vector-classes:size layer)
                                (vector-classes:size columns))))
     (declare (type non-negative-fixnum column-size))
@@ -173,7 +173,7 @@
      active-neurons)
   (declare (optimize (speed 3)))
   (check-type predictive-neurons (vector non-negative-fixnum))
-  (check-type active-columns vector)
+  (check-type active-columns (simple-array fixnum (*)))
   (check-type active-neurons (vector non-negative-fixnum))
   (nest
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
@@ -290,6 +290,7 @@
                               training-parameters
                               columns
                               active-columns)))
+    (declare (type (simple-array fixnum (*)) active-columns))
     (setf (fill-pointer active-neurons) 0
 
           (cl-htm.training:past-predictive-neurons context)

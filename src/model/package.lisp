@@ -15,7 +15,6 @@
    #:fundamental-encoder
    #:fundamental-input
    #:fundamental-model
-   #:input-sdr
    #:input
    #:decoder
    #:insert-point

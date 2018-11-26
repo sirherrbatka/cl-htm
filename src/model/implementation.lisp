@@ -14,11 +14,6 @@
                         sdrs
                         contexts)
   (~> sdrs first cl-htm.sdr:clear-all-active)
-  (iterate
-    (for sdr in (rest sdrs))
-    (for context in contexts)
-    (~> context cl-htm.training:active-neurons
-        (cl-htm.sdr:set-active sdr _ 0)))
   (map nil #'cl-htm.training:reset-context contexts)
   model)
 
@@ -30,26 +25,23 @@
                      sdrs)
   (iterate
     (with layers = (rest sdrs))
-    (for sdr in layers)
-    (for input previous sdr
-         initially (first sdrs))
+    (with input = (first sdrs))
+    (for layer in layers)
     (for context in contexts)
-    (cl-htm.nl:activate sdr input context parameters mode)
+    (cl-htm.nl:activate layer input context parameters mode)
     (finally (return model))))
 
 
 (defmethod sdrs ((model basic-model))
-  (cons (vector-classes:make-data 'cl-htm.sdr:sdr
-                                  (read-input-sdr-size model))
-        (mapcar #'cl-htm.nl:to-sdr (read-layers model))))
-
-
-(defmethod input-sdr ((model basic-model) (sdrs list))
-  (first sdrs))
+  (let* ((layers (mapcar #'cl-htm.nl:to-sdr (read-layers model)))
+         (max-size (reduce #'max layers :key #'vector-classes:size
+                           :initial-value (read-input-sdr-size model))))
+    (cons (vector-classes:make-data 'cl-htm.sdr:sdr max-size)
+          layers)))
 
 
 (defmethod output-sdr ((model basic-model) (sdrs list))
-  (last sdrs))
+  (first sdrs))
 
 
 (defmethod contexts ((model basic-model))
@@ -90,18 +82,10 @@
     (with destination  = (input-sdr model sdrs))
     (with parameters   = (parameters model))
     (while (more-data-p input mode data-point))
-    (setf data-point (encode-data-point input
-                                        destination
-                                        data-point))
+    (setf data-point (encode-data-point input destination data-point))
     (activate model mode contexts parameters sdrs)
-    (unless (more-data-p input mode data-point)
-      (~> sdrs first cl-htm.sdr:clear-all-active)
-      (map nil
-           (lambda (sdr context)
-             (~> context cl-htm.training:active-neurons
-                 (cl-htm.sdr:set-active sdr _ 0)))
-           (rest sdrs)
-           contexts))
+    (when (more-data-p input mode data-point)
+      (~> sdrs first cl-htm.sdr:clear-all-active))
     (finally (return
                (prog1 (pass-to-decoder decoder model mode
                                        initial-data sdrs)

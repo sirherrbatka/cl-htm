@@ -240,10 +240,6 @@
     (setf (slot-value result 'vector-classes::%size)
           (vector-classes:size neuron)
 
-          (slot-value result 'cl-htm.sdr:active-neurons)
-          (make-array (vector-classes:size neuron)
-                      :element-type 'bit)
-
           (slot-value result '%columns) (columns neuron)
 
           (slot-value result 'synapses-strength)
@@ -298,15 +294,16 @@
     (select-active-neurons layer columns sdr
                            active-columns prev-data
                            active-neurons)
-    (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
-                               layer
-                               i
-                               neuron-layer)
-      (map nil (lambda (i) (setf (neuron) 1))
-           active-neurons))
     (update-synapses training-parameters layer sdr mode columns
                      active-columns prev-data active-neurons)
-    layer))
+    (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
+                               sdr
+                               i
+                               cl-htm.sdr:sdr)
+      (cl-htm.sdr:clear-all-active sdr)
+      (map nil (lambda (i) (setf (neuron) 1))
+           active-neurons))
+    sdr))
 
 
 (defmethod context ((layer neuron-layer))

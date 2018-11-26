@@ -22,8 +22,7 @@
                       :initform (cl-htm.utils:random-float))))
 
 
-(vector-classes:define-data neuron-layer (neuron-layer-weights
-                                          cl-htm.sdr:sdr)
+(vector-classes:define-data neuron-layer (neuron-layer-weights)
   ())
 
 

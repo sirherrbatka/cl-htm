@@ -20,8 +20,6 @@
 
 (defgeneric output-sdr (model sdrs))
 
-(defgeneric input-sdr (model sdrs))
-
 (defgeneric decode-sdr (decoder sdr))
 
 (defgeneric pass-to-decoder (decoder model mode

@@ -40,8 +40,9 @@
   (sb-sprof:reset)
   (sb-sprof:start-profiling)
   (time
-   (cl-htm.model:train *model* (cl-ds:xpr (:i 100000)
-                                 (unless (zerop i)
-                                   (cl-ds:send-recur (vector 1 2 3)
-                                                     :i (1- i))))))
+   (cl-htm.model:train *model*
+                       (cl-ds:xpr (:i 100000)
+                         (unless (zerop i)
+                           (cl-ds:send-recur (vector 1 2 3)
+                                             :i (1- i))))))
   (sb-sprof:stop-profiling))

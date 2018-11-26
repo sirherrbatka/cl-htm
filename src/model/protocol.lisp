@@ -18,7 +18,7 @@
 
 (defgeneric contexts (model))
 
-(defgeneric output-sdr (model sdrs))
+(defgeneric input/output-sdr (model sdrs))
 
 (defgeneric decode-sdr (decoder sdr))
 

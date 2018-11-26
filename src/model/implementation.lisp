@@ -40,7 +40,7 @@
           layers)))
 
 
-(defmethod output-sdr ((model basic-model) (sdrs list))
+(defmethod input/output-sdr ((model basic-model) (sdrs list))
   (first sdrs))
 
 
@@ -67,7 +67,7 @@
                             (mode cl-htm.training:predict-mode)
                             data-point
                             sdrs)
-  (decode-sdr decoder (output-sdr model sdrs)))
+  (decode-sdr decoder (input/output-sdr model sdrs)))
 
 
 (defmethod insert-point ((input fundamental-input)
@@ -79,7 +79,7 @@
                          sdrs)
   (iterate
     (with initial-data = data-point)
-    (with destination  = (input-sdr model sdrs))
+    (with destination  = (input/output-sdr model sdrs))
     (with parameters   = (parameters model))
     (while (more-data-p input mode data-point))
     (setf data-point (encode-data-point input destination data-point))
@@ -214,7 +214,7 @@
      &key input decoder)
   (check-type input-size non-negative-integer)
   (let* ((layers (cl-htm.nl:declared-layers layers input-size))
-         (output-size (~> layers last vector-classes:size)))
+         (output-size (~> layers last-elt vector-classes:size)))
     (make 'basic-model
           :layers layers
           :input input

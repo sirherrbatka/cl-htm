@@ -372,6 +372,6 @@
 
 (defmethod declared-layers ((layers list) initial-size)
   (iterate
-    (for layer in declared-layers)
+    (for layer in layers)
     (for prev-layer previous layer initially initial-size)
     (collect (to-declared-layer layer initial-size))))

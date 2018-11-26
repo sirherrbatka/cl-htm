@@ -21,7 +21,7 @@
    #:insert-point
    #:make-model
    #:more-data-p
-   #:output-sdr
+   #:input/output-sdr
    #:parameters
    #:pass-to-decoder
    #:predict

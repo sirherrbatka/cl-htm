@@ -34,7 +34,6 @@
                        :input *encoder*
                        :decoder *decoder*))
 
-(lparallel:check-kernel)
 (require :sb-sprof)
 (progn
   (sb-sprof:reset)

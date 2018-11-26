@@ -40,6 +40,7 @@
                                       (* activated-columns-fraction)
                                       floor)))
     (~> (read-column-indices columns)
+        copy-array
         (cl-ds.utils:select-top activated-columns-count
                                 #'> :key
                                 (lambda (x) (aref active-synapses x)))
@@ -53,7 +54,7 @@
      (columns neuron-column)
      active-columns)
   (declare (optimize (speed 3)))
-  (check-type active-columns vector)
+  (check-type active-columns (simple-array fixnum (*)))
   (nest
    (vector-classes:with-data (((synapses-strength synapses-strength))
                               layer neuron-index neuron-layer))

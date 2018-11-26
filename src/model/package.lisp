@@ -16,6 +16,7 @@
    #:fundamental-input
    #:fundamental-model
    #:input
+   #:output-size
    #:decoder
    #:insert-point
    #:make-model
@@ -27,6 +28,6 @@
    #:random-symbol-encoder
    #:random-vector-encoder
    #:reset-model
-   #:sdrs
+   #:layers
    #:sequence-input
    #:train))

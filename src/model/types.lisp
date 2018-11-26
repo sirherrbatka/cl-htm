@@ -17,6 +17,9 @@
    (%input-sdr-size
     :initarg :input-sdr-size
     :reader read-input-sdr-size)
+   (%output-size
+    :initarg :output-size
+    :reader output-size)
    (%input :initarg :input
            :accessor input)
    (%decoder :initarg :decoder

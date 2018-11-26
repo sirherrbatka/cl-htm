@@ -30,15 +30,15 @@
 
 (defgeneric context (layer))
 
-(defgeneric to-sdr (neuron-layer))
+(defgeneric to-effective-layer (neuron-layer))
 
 (defgeneric layer (type &key))
 
 (defgeneric make-weights (type input-size &key))
 
-(defgeneric effective-layers (declared-layers initial-size))
+(defgeneric declared-layers (layers initial-size))
 
-(defgeneric effective-layer (declared-layer prev-layer))
+(defgeneric to-declared-layer (declared-layer prev-layer))
 
 (defun layers (&rest arguments)
   (apply #'list arguments))

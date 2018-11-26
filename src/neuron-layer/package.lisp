@@ -12,10 +12,10 @@
    #:context
    #:layer
    #:neuron-layer-weights
-   #:to-sdr
+   #:to-effective-layer
    #:make-weights
-   #:effective-layer
-   #:effective-layers
+   #:to-declared-layer
+   #:declared-layers
    #:layers
    #:layer
    #:neuron-column

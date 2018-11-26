@@ -235,7 +235,7 @@
   nil)
 
 
-(defmethod to-sdr ((neuron neuron-layer-weights))
+(defmethod to-effective-layer ((neuron neuron-layer-weights))
   (lret ((result (make 'neuron-layer)))
     (setf (slot-value result 'vector-classes::%size)
           (vector-classes:size neuron)
@@ -355,25 +355,23 @@
           (setf (input j) index))))))
 
 
-(defmethod effective-layer ((layer layer)
-                            (prev integer))
+(defmethod to-declared-layer ((layer layer) (prev integer))
   (apply #'make-weights
          (read-type layer)
          prev
          (read-arguments layer)))
 
 
-(defmethod effective-layer ((layer layer)
-                            (prev neuron-layer-weights))
+(defmethod to-declared-layer ((layer layer)
+                              (prev neuron-layer-weights))
   (apply #'make-weights
          (read-type layer)
          (vector-classes:size prev)
          (read-arguments layer)))
 
 
-(defmethod effective-layers ((declared-layers list)
-                             initial-size)
+(defmethod declared-layers ((layers list) initial-size)
   (iterate
     (for layer in declared-layers)
     (for prev-layer previous layer initially initial-size)
-    (collect (effective-layer layer initial-size))))
+    (collect (to-declared-layer layer initial-size))))

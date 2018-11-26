@@ -10,7 +10,7 @@
 (defgeneric activate (model mode contexts
                       parameters sdrs))
 
-(defgeneric sdrs (model))
+(defgeneric layers (model))
 
 (defgeneric parameters (model))
 

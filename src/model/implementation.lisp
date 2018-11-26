@@ -32,8 +32,8 @@
     (finally (return model))))
 
 
-(defmethod sdrs ((model basic-model))
-  (let* ((layers (mapcar #'cl-htm.nl:to-sdr (read-layers model)))
+(defmethod layers ((model basic-model))
+  (let* ((layers (mapcar #'cl-htm.nl:to-effective-layer (read-layers model)))
          (max-size (reduce #'max layers :key #'vector-classes:size
                            :initial-value (read-input-sdr-size model))))
     (cons (vector-classes:make-data 'cl-htm.sdr:sdr max-size)
@@ -96,7 +96,7 @@
                     data
                     &key (input (input model)) (decoder (decoder model)))
   (let ((mode (make 'cl-htm.training:predict-mode))
-        (sdrs (sdrs model))
+        (sdrs (layers model))
         (contexts (contexts model)))
     (cl-ds.alg:on-each
      (lambda (data-point)
@@ -109,7 +109,7 @@
                   data
                   &key (input (input model)) (decoder (decoder model)))
   (let ((mode (make 'cl-htm.training:train-mode))
-        (sdrs (sdrs model))
+        (sdrs (layers model))
         (contexts (contexts model)))
     (cl-ds:traverse
      (lambda (data-point)
@@ -213,9 +213,12 @@
      layers
      &key input decoder)
   (check-type input-size non-negative-integer)
-  (make 'basic-model
-        :layers (cl-htm.nl:effective-layers layers input-size)
-        :input input
-        :decoder decoder
-        :input-sdr-size input-size
-        :training-parameters training-parameters))
+  (let* ((layers (cl-htm.nl:declared-layers layers input-size))
+         (output-size (~> layers last vector-classes:size)))
+    (make 'basic-model
+          :layers layers
+          :input input
+          :output-size output-size
+          :decoder decoder
+          :input-sdr-size input-size
+          :training-parameters training-parameters)))

@@ -53,7 +53,7 @@
      (training-parameters cl-htm.training:fundamental-parameters)
      (columns neuron-column)
      active-columns)
-  (declare (optimize (speed 3)))
+  (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)))
   (check-type active-columns (simple-array fixnum (*)))
   (nest
    (vector-classes:with-data (((synapses-strength synapses-strength))
@@ -89,16 +89,17 @@
             (with sum = 0.0)
             (for k from 0 below synapses-count)
             (for input-index = (columns-input k))
-            (incf sum (* (active) (synapses-strength k)))
-            (when (> sum threshold)
-              (vector-push-extend neuron-index result)
-              (leave)))))
+            (unless (zerop (active))
+              (incf sum (synapses-strength k))
+              (when (> sum threshold)
+                (vector-push-extend neuron-index result)
+                (leave))))))
       active-columns)
      result)))
 
 
 (defun selecting-the-most-active-neuron (layer columns input)
-  (declare (optimize (speed 3)))
+  (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)))
   (nest
    (vector-classes:with-data (((synapses-strength synapses-strength))
                               layer neuron-index neuron-layer))
@@ -120,14 +121,15 @@
        (with result = 0)
        (for neuron-index from column-start)
        (repeat column-size)
-       (for value = (iterate
-                      (declare (type fixnum k input-index)
-                               (type single-float sum))
-                      (with sum = 0.0)
-                      (for k from 0 below synapses-count)
-                      (for input-index = (columns-input k))
-                      (incf sum (* (active) (synapses-strength k)))
-                      (finally (return sum))))
+       (for value =
+            (iterate
+              (declare (type fixnum k input-index)
+                       (type single-float sum))
+              (with sum = 0.0)
+              (for k from 0 below synapses-count)
+              (for input-index = (columns-input k))
+              (incf sum (* (active) (synapses-strength k)))
+              (finally (return sum))))
        (maximize value into maxi)
        (when (= maxi value)
          (setf result neuron-index))
@@ -170,7 +172,7 @@
      active-columns
      predictive-neurons
      active-neurons)
-  (declare (optimize (speed 3)))
+  (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)))
   (check-type predictive-neurons (vector non-negative-fixnum))
   (check-type active-columns (simple-array fixnum (*)))
   (check-type active-neurons (vector non-negative-fixnum))

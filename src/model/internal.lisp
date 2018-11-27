@@ -2,7 +2,21 @@
 
 
 (defun jaccard-metric (vect1 vect2)
-  cl-ds.utils:todo)
+  (let* ((union 0)
+         (intersection 0)
+         (increase-union (lambda (x)
+                           (declare (ignore x))
+                           (incf union))))
+    (declare (type fixnum union intersection))
+    (cl-ds.utils:on-ordered-intersection
+     (lambda (a b)
+       (declare (ignore a b))
+       (incf union)
+       (incf intersection))
+     vect1 vect2
+     :on-first-missing increase-union
+     :on-second-missing increase-union)
+    (- 1.0 (/ intersection union))))
 
 
 (defclass all-outputs ()

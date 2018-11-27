@@ -87,7 +87,7 @@
     (setf data-point (encode-data-point input destination data-point))
     (activate model mode contexts parameters sdrs)
     (when (more-data-p input mode data-point)
-      (~> destination cl-htm.sdr:clear-all-active))
+      (cl-htm.sdr:clear-all-active destination))
     (finally (return
                (prog1 (pass-to-decoder decoder model mode
                                        initial-data sdrs

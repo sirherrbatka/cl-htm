@@ -31,9 +31,9 @@
   outputs)
 
 
-(defun add-data-point (outputs contexts data-point)
+(defun add-data-point (outputs context data-point)
   cl-ds.utils:todo)
 
 
-(defun prediction (contexts output)
+(defun prediction (context output)
   cl-ds.utils:todo)

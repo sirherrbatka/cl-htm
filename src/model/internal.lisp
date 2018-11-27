@@ -30,7 +30,7 @@
    (%buffer
     :initarg :buffer
     :initform (vect)
-    :reader read-buffer
+    :accessor access-buffer
     :documentation "Temporary buffer for all outputs, before creating metric dictionary.")
    (%close-limit
     :initarg :close-limit
@@ -39,7 +39,8 @@
 
 
 (defun clear-buffer (outputs)
-  cl-ds.utils:todo)
+  (setf (access-buffer outputs) (vect))
+  outputs)
 
 
 (defun fill-dictionary (outputs)
@@ -49,7 +50,7 @@
 
 
 (defun add-data-point (outputs context data-point)
-  (let* ((buffer (read-buffer outputs))
+  (let* ((buffer (access-buffer outputs))
          (neurons (cl-htm.training:active-neurons context))
          (copy (make-array (length neurons) :element-type 'fixnum))
          (new-entry (cons copy data-point)))

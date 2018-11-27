@@ -38,4 +38,5 @@
                 :components ((:file "package")
                              (:file "protocol")
                              (:file "types")
+                             (:file "internal")
                              (:file "implementation")))))

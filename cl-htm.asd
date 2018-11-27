@@ -6,10 +6,11 @@
   :version "0.0.0"
   :license "BSD simplified"
   :author "Marek Kochanowicz"
-  :depends-on ( :iterate            :vector-classes
-                :serapeum           :prove
-                :cl-data-structures :alexandria
-                :lparallel          :metabang-bind)
+  :depends-on ( :iterate              :vector-classes
+                :serapeum             :prove
+                :cl-data-structures   :alexandria
+                :lparallel            :metabang-bind
+                :cl-custom-hash-table)
   :defsystem-depends-on (:prove-asdf)
   :serial T
   :pathname "src"

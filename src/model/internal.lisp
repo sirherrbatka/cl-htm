@@ -1,6 +1,16 @@
 (in-package #:cl-htm.model)
 
 
+(defun hash-vector (vector)
+  cl-ds.utils:todo)
+
+
+(cl-custom-hash-table:define-custom-hash-table-constructor
+    make-vector-hashtable
+  :test vector=
+  :hash-function hash-vector)
+
+
 (defun jaccard-metric (vect1 vect2)
   (declare (optimize (speed 3) (debug 0)
                      (safety 1) (space 0))

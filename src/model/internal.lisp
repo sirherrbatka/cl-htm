@@ -1,8 +1,18 @@
 (in-package #:cl-htm.model)
 
+(define-constant +offset-basis+ 2166136261)
+(define-constant +prime+ 16777619)
 
 (defun hash-vector (vector)
-  cl-ds.utils:todo)
+  (declare (type (simple-array fixnum (*)) vector)
+           (optimize (speed 3)))
+  (iterate
+    (declare (type fixnum hash number))
+    (with hash = +offset-basis+)
+    (for number in-vector vector)
+    (setf hash (logxor (ldb (byte 32 0) (* +prime+ hash))
+                       number))
+    (finally (return hash))))
 
 
 (cl-custom-hash-table:define-custom-hash-table-constructor

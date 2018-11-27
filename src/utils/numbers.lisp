@@ -14,3 +14,7 @@
       (for v from from below to)
       (setf (aref result i) v))
     result))
+
+
+(defun random-synapses-strength (&key (from 0) (to 50))
+  (random-in-range from to))

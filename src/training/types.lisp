@@ -30,37 +30,37 @@
   ((%p+
     :initarg :p+
     :documentation "Used to increase active synapses strength."
-    :type single-float
+    :type fixnum
     :reader p+)
    (%p-
     :initarg :p-
     :documentation "Used to decrease inactive synapses strength."
-    :type single-float
+    :type fixnum
     :reader p-)
    (%decay
     :initarg :decay
-    :type single-float
+    :type fixnum
     :reader decay)
    (%threshold
     :initarg :threshold
     :reader threshold
-    :type single-float
+    :type fixnum
     :documentation "Threshold for predictive state of neuron.")
    (%maximum-weight
     :initarg :maximum-weight
     :reader maximum-weight
-    :type single-float)
+    :type fixnum)
    (%minimum-weight
     :initarg :minimum-weight
     :reader minimum-weight
-    :type single-float)
+    :type fixnum)
    (%activated-columns-fraction
     :initarg :activated-columns-fraction
     :reader activated-columns-fraction
     :documentation "How many columns should become active?"))
   (:default-initargs
-   :minimum-weight single-float-epsilon
-   :maximum-weight 1.0))
+   :minimum-weight 5
+   :maximum-weight 100))
 
 
 (defclass fundamental-mode ()

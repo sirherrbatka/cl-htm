@@ -5,4 +5,5 @@
   (:use #:cl #:cl-htm.aux-package)
   (:export
    #:random-float
+   #:random-synapses-strength
    #:vector-iota))

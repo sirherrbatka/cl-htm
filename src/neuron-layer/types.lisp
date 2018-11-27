@@ -16,10 +16,10 @@
   ((%columns :initarg :columns
              :reader columns)
    (synapses-strength :array t
-                      :type single-float
+                      :type fixnum
                       :dimensions-arg :synapses-strength
                       :documentation "Weights of synapses for each neuron."
-                      :initform (cl-htm.utils:random-float))))
+                      :initform (cl-htm.utils:random-synapses-strength))))
 
 
 (vector-classes:define-data neuron-layer (neuron-layer-weights)

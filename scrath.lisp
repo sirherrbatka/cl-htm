@@ -1,10 +1,10 @@
 (defparameter *training-parameters*
   (make-instance 'cl-htm.training:basic-parameters
                  :activated-columns-fraction 1/3
-                 :threshold 0.2
-                 :p- 0.01
-                 :p+ 0.03
-                 :decay 0.00001))
+                 :threshold 80
+                 :p- 10
+                 :p+ 30
+                 :decay 5))
 
 (defparameter *encoder* (make-instance
                          'cl-htm.model:random-vector-encoder

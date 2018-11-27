@@ -75,7 +75,7 @@
          (synapses-count (array-dimension synapses-strength 1)))
      (declare (type fixnum column-size synapses-count)
               (type (vector non-negative-fixnum) result)
-              (type single-float threshold))
+              (type fixnum threshold))
      ;; can be parallel, perhaps...
      (map
       nil
@@ -87,9 +87,8 @@
           (for neuron-index from column-start)
           (repeat column-size)
           (iterate
-            (declare (type fixnum k input-index)
-                     (type single-float sum))
-            (with sum = 0.0)
+            (declare (type fixnum sum k input-index))
+            (with sum = 0)
             (for k from 0 below synapses-count)
             (for input-index = (columns-input k))
             (unless (zerop (active))
@@ -119,16 +118,15 @@
      (iterate
        (declare (type fixnum result column-start result neuron-index
                       column-size synapses-count)
-                (type single-float maxi value))
+                (type fixnum maxi value))
        (with column-start = (the fixnum (* column-index column-size)))
        (with result = 0)
        (for neuron-index from column-start)
        (repeat column-size)
        (for value =
             (iterate
-              (declare (type fixnum k input-index)
-                       (type single-float sum))
-              (with sum = 0.0)
+              (declare (type fixnum sum k input-index))
+              (with sum = 0)
               (for k from 0 below synapses-count)
               (for input-index = (columns-input k))
               (incf sum (* (active) (synapses-strength k)))
@@ -195,7 +193,7 @@
           (minimum-weight (cl-htm.training:minimum-weight parameters))
           (column-size (truncate (the fixnum (vector-classes:size layer))
                                  column-count)))
-     (declare (type single-float decay p+ p-
+     (declare (type fixnum decay p+ p-
                     maximum-weight minimum-weight)
               (type non-negative-fixnum column-size
                     synapses-count column-count)))

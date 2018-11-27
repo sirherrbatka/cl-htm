@@ -2,12 +2,15 @@
 
 
 (defun jaccard-metric (vect1 vect2)
-  (let* ((union 0)
-         (intersection 0)
+  (declare (optimize (speed 3) (debug 0)
+                     (safety 1) (space 0))
+           (type (simple-array fixnum (*)) vect1 vect2))
+  (let* ((union 0.0)
+         (intersection 0.0)
          (increase-union (lambda (x)
                            (declare (ignore x))
                            (incf union))))
-    (declare (type fixnum union intersection))
+    (declare (type single-float union intersection))
     (cl-ds.utils:on-ordered-intersection
      (lambda (a b)
        (declare (ignore a b))

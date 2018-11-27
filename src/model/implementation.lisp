@@ -58,7 +58,8 @@
                             (model fundamental-model)
                             (mode cl-htm.training:train-mode)
                             data-point
-                            sdrs)
+                            sdrs
+                            contexts)
   nil)
 
 
@@ -66,7 +67,8 @@
                             (model fundamental-model)
                             (mode cl-htm.training:predict-mode)
                             data-point
-                            sdrs)
+                            sdrs
+                            contexts)
   (decode-sdr decoder (input/output-sdr model sdrs)))
 
 
@@ -88,7 +90,8 @@
       (~> destination cl-htm.sdr:clear-all-active))
     (finally (return
                (prog1 (pass-to-decoder decoder model mode
-                                       initial-data sdrs)
+                                       initial-data sdrs
+                                       contexts)
                  (reset-model model sdrs contexts))))))
 
 

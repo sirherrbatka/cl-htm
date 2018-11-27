@@ -23,7 +23,7 @@
 (defgeneric decode-sdr (decoder sdr))
 
 (defgeneric pass-to-decoder (decoder model mode
-                             data-point sdrs))
+                             data-point sdrs contexts))
 
 (defgeneric insert-point (input decoder model mode
                           data-point contexts sdrs))

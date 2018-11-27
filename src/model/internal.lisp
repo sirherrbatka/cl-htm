@@ -25,7 +25,8 @@
 (defclass all-outputs ()
   ((%stored-outputs
     :initarg :stored-outputs
-    :reader read-stored-outputs
+    :accessor access-stored-outputs
+    :initform nil
     :documentation "Metric dictionary, mapping outputs to values.")
    (%buffer
     :initarg :buffer
@@ -43,10 +44,20 @@
   outputs)
 
 
+(defun make-counting-dictionary (outputs)
+  cl-ds.utils:todo)
+
+
+(defun make-metric-dictionary (outputs counting-dictionary)
+  cl-ds.utils:todo)
+
+
 (defun fill-dictionary (outputs)
-  cl-ds.utils:todo
-  (clear-buffer outputs)
-  outputs)
+  (let* ((counting-dictionary (make-counting-dictionary outputs))
+         (metric-dictionary (make-metric-dictionary outputs counting-dictionary)))
+    (setf (access-stored-outputs outputs) metric-dictionary)
+    (clear-buffer outputs)
+    outputs))
 
 
 (defun add-data-point (outputs context data-point)

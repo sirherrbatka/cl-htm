@@ -1,6 +1,10 @@
 (in-package #:cl-htm.model)
 
 
+(defun jaccard-metric (vect1 vect2)
+  cl-ds.utils:todo)
+
+
 (defclass all-outputs ()
   ((%stored-outputs
     :initarg :stored-outputs
@@ -32,8 +36,4 @@
 
 
 (defun prediction (contexts output)
-  cl-ds.utils:todo)
-
-
-(defun jaccard-metric (vect1 vect2)
   cl-ds.utils:todo)

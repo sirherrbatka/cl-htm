@@ -32,7 +32,13 @@
 
 
 (defun add-data-point (outputs context data-point)
-  cl-ds.utils:todo)
+  (let* ((buffer (read-buffer outputs))
+         (neurons (cl-htm.training:active-neurons context))
+         (copy (make-array (length neurons) :element-type 'fixnum))
+         (new-entry (cons copy data-point)))
+    (map-into copy #'identity neurons)
+    (vector-push-extend new-entry buffer))
+  outputs)
 
 
 (defun prediction (context output)

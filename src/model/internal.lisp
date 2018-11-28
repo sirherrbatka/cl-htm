@@ -72,7 +72,9 @@
     (iterate
       (with test = (read-test outputs))
       (for (neurons . data) in-vector (access-buffer outputs))
-      (for inner-hashtable = )
+      (for inner-hashtable = (gethash neurons
+                                      result
+                                      (make-hash-table :test test)))
       (incf (gethash inner-hashtable data))
       (setf (gethash result neurons) inner-hashtable))))
 

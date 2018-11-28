@@ -6,13 +6,12 @@
 (defun hash-vector (vector)
   (declare (type (simple-array fixnum (*)) vector)
            (optimize (speed 3)))
-  (iterate
-    (declare (type fixnum hash number))
-    (with hash = +offset-basis+)
-    (for number in-vector vector)
-    (setf hash (logxor (ldb (byte 32 0) (* +prime+ hash))
-                       number))
-    (finally (return hash))))
+  (reduce (lambda (hash number)
+            (declare (fixnum hash number))
+            (logxor (ldb (byte 32 0) (* +prime+ hash))
+                    number))
+          vector
+          :initial-value +offset-basis+))
 
 
 (cl-custom-hash-table:define-custom-hash-table-constructor

@@ -172,8 +172,7 @@
 
 
 (defmethod more-data-p ((input random-symbol-encoder)
-                        (mode cl-htm.training:fundamental-mode
-                      )
+                        (mode cl-htm.training:fundamental-mode)
                         data-point)
   (not (null data-point)))
 

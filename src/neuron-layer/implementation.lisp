@@ -65,37 +65,47 @@
                               columns column-index neuron-column))
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               sdr input-index cl-htm.sdr:sdr))
-   (let ((threshold (cl-htm.training:threshold training-parameters))
-         (column-size (/ (the fixnum (vector-classes:size layer))
-                         (the fixnum (vector-classes:size columns))))
-         (result (make-array
-                  0 :adjustable t
-                    :fill-pointer 0
-                    :element-type 'non-negative-fixnum))
-         (synapses-count (array-dimension synapses-strength 1)))
-     (declare (type fixnum column-size synapses-count)
-              (type (vector non-negative-fixnum) result)
-              (type fixnum threshold))
+   (let* ((threshold (cl-htm.training:threshold training-parameters))
+          (column-size (/ (the fixnum (vector-classes:size layer))
+                          (the fixnum (vector-classes:size columns))))
+          (result (make-array
+                   (truncate column-size 10)
+                   :adjustable t
+                   :fill-pointer 0
+                   :element-type 'non-negative-fixnum))
+          (synapses-count (array-dimension synapses-strength 1))
+          (synapses-array (make-array synapses-count :element-type 'fixnum))
+          (array-pointer synapses-count))
+     (declare (type fixnum threshold array-pointer
+                    column-size synapses-count)
+              (type (vector non-negative-fixnum) result))
      ;; can be parallel, perhaps...
      (map
       nil
       (lambda (column-index)
         (declare (type fixnum column-index))
+        (setf array-pointer 0)
         (iterate
-          (declare (type fixnum neuron-index column-start))
+          (declare (type fixnum k input-index))
+          (for k from 0 below synapses-count)
+          (for input-index = (columns-input k))
+          (unless (zerop (active))
+            (setf (aref synapses-array array-pointer) k)
+            (incf array-pointer)))
+        (iterate
+          (declare (type fixnum i neuron-index column-start))
           (with column-start = (* column-index column-size))
           (for neuron-index from column-start)
-          (repeat column-size)
+          (for i from 0 below column-size)
           (iterate
-            (declare (type fixnum sum k input-index))
+            (declare (type fixnum sum k i))
             (with sum = 0)
-            (for k from 0 below synapses-count)
-            (for input-index = (columns-input k))
-            (unless (zerop (active))
-              (incf sum (synapses-strength k))
-              (when (> sum threshold)
-                (vector-push-extend neuron-index result)
-                (leave))))))
+            (for i from 0 below array-pointer)
+            (for k = (aref synapses-array i))
+            (incf sum (synapses-strength k))
+            (when (> sum threshold)
+              (vector-push-extend neuron-index result)
+              (leave)))))
       active-columns)
      result)))
 

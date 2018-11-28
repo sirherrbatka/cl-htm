@@ -82,7 +82,7 @@
 
 
 (defun fill-dictionary (outputs)
-  (setf (access-metric-dictionary) (make-metric-dictionary outputs))
+  (setf (access-metric-dictionary outputs) (make-metric-dictionary outputs))
   outputs)
 
 

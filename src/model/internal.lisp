@@ -67,18 +67,6 @@
   outputs)
 
 
-(defun make-counting-dictionary (outputs)
-  (lret ((result (make-vector-hashtable)))
-    (iterate
-      (with test = (read-test outputs))
-      (for (neurons . data) in-vector (access-buffer outputs))
-      (for inner-hashtable = (gethash neurons
-                                      result
-                                      (make-hash-table :test test)))
-      (incf (gethash inner-hashtable data))
-      (setf (gethash result neurons) inner-hashtable))))
-
-
 (defun make-metric-dictionary (outputs)
   (let* ((counting-dictionary (read-buffer outputs))
          (size (hash-table-count counting-dictionary))
@@ -113,6 +101,7 @@
 
 
 (defun prediction (context output)
-  (cl-ds:near (access-stored-outputs output)
-              (list (cl-htm.training:active-neurons context))
-              (access-close-limit output)))
+  (~>> (access-close-limit output)
+       (cl-ds:near (access-stored-outputs output)
+                   (list (cl-htm.training:active-neurons context)))
+       (cl-ds.alg:on-each #'rest)))

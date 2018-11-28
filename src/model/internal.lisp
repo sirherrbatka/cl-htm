@@ -48,6 +48,10 @@
     :accessor access-stored-outputs
     :initform nil
     :documentation "Metric dictionary, mapping outputs to values.")
+   (%test
+    :initarg :test
+    :reader read-test
+    :documentation "Test for hash table.")
    (%buffer
     :initarg :buffer
     :initform (vect)
@@ -65,7 +69,12 @@
 
 
 (defun make-counting-dictionary (outputs)
-  cl-ds.utils:todo)
+  (lret ((result (make-vector-hashtable)))
+    (iterate
+      (for (neurons . data) in-vector (access-buffer outputs))
+      (for inner-hashtable = (gethash result neurons))
+      (incf (gethash inner-hashtable data))
+      (setf (gethash result neurons) inner-hashtable))))
 
 
 (defun make-metric-dictionary (outputs counting-dictionary)

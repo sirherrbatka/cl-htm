@@ -71,21 +71,30 @@
 (defun make-counting-dictionary (outputs)
   (lret ((result (make-vector-hashtable)))
     (iterate
+      (with test = (read-test outputs))
       (for (neurons . data) in-vector (access-buffer outputs))
-      (for inner-hashtable = (gethash result neurons))
+      (for inner-hashtable = (gethash result neurons
+                                      (make-hash-table :test test)))
       (incf (gethash inner-hashtable data))
       (setf (gethash result neurons) inner-hashtable))))
 
 
 (defun make-metric-dictionary (outputs counting-dictionary)
-  cl-ds.utils:todo)
+  (let* ((size (hash-table-count counting-dictionary))
+         (vector (make-array size)))
+    (iterate
+      (for i from 0)
+      (for (neurons data) in-hashtable counting-dictionary)
+      (setf (aref vector i) (hash-table-alist data)))
+    cl-ds.utils:todo))
 
 
 (defun fill-dictionary (outputs)
-  (let* ((counting-dictionary (make-counting-dictionary outputs))
-         (metric-dictionary (make-metric-dictionary outputs counting-dictionary)))
-    (setf (access-stored-outputs outputs) metric-dictionary)
+  (let* ((counting-dictionary (make-counting-dictionary outputs)))
     (clear-buffer outputs)
+    (setf (access-stored-outputs outputs) (make-metric-dictionary
+                                           outputs
+                                           counting-dictionary))
     outputs))
 
 

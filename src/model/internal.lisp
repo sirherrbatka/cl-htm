@@ -54,7 +54,7 @@
     :documentation "Test for hash table.")
    (%buffer
     :initarg :buffer
-    :initform (vect)
+    :initform (make-vector-hashtable)
     :accessor access-buffer
     :documentation "Temporary buffer for all outputs, before creating metric dictionary.")
    (%close-limit
@@ -73,38 +73,41 @@
     (iterate
       (with test = (read-test outputs))
       (for (neurons . data) in-vector (access-buffer outputs))
-      (for inner-hashtable = (gethash result neurons
-                                      (make-hash-table :test test)))
+      (for inner-hashtable = )
       (incf (gethash inner-hashtable data))
       (setf (gethash result neurons) inner-hashtable))))
 
 
-(defun make-metric-dictionary (outputs counting-dictionary)
-  (let* ((size (hash-table-count counting-dictionary))
+(defun make-metric-dictionary (outputs)
+  (let* ((counting-dictionary (read-buffer outputs))
+         (size (hash-table-count counting-dictionary))
          (vector (make-array size)))
     (iterate
       (for i from 0)
       (for (neurons data) in-hashtable counting-dictionary)
-      (setf (aref vector i) (hash-table-alist data)))
-    cl-ds.utils:todo))
+      (setf (aref vector i) (cons neurons (hash-table-alist data))))
+    (cl-ds:make-from-traversable 'cl-ds.ms.egnat:mutable-egnat-metric-set
+                                 vector
+                                 (compose #'vector= #'car)
+                                 (fork #'jaccard-metric #'car #'car))))
 
 
 (defun fill-dictionary (outputs)
-  (let* ((counting-dictionary (make-counting-dictionary outputs)))
-    (clear-buffer outputs)
-    (setf (access-stored-outputs outputs) (make-metric-dictionary
-                                           outputs
-                                           counting-dictionary))
-    outputs))
+  (setf (access-metric-dictionary) (make-metric-dictionary outputs))
+  outputs)
 
 
 (defun add-data-point (outputs context data-point)
   (let* ((buffer (access-buffer outputs))
          (neurons (cl-htm.training:active-neurons context))
-         (copy (make-array (length neurons) :element-type 'fixnum))
-         (new-entry (cons copy data-point)))
-    (map-into copy #'identity neurons)
-    (vector-push-extend new-entry buffer))
+         (copy (map-into (make-array (length neurons) :element-type 'fixnum)
+                         #'identity
+                         neurons))
+         (test (read-test outputs))
+         (inner (gethash copy buffer
+                         (make-hash-table :test test))))
+    (incf (gethash inner data-point))
+    (setf (gethash copy buffer) inner))
   outputs)
 
 

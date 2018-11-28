@@ -111,4 +111,6 @@
 
 
 (defun prediction (context output)
-  cl-ds.utils:todo)
+  (cl-ds:near (access-stored-outputs output)
+              (list (cl-htm.training:active-neurons context))
+              (access-close-limit output)))

@@ -63,13 +63,14 @@
   nil)
 
 
-(defmethod pass-to-decoder ((decoder fundamental-decoder)
+(defmethod pass-to-decoder ((decoder fundamental-discreete-decoder)
                             (model fundamental-model)
                             (mode cl-htm.training:predict-mode)
                             data-point
                             sdrs
                             contexts)
-  (decode-sdr decoder (input/output-sdr model sdrs)))
+  (~>> decoder read-outputs
+       (prediction (last-elt contexts))))
 
 
 (defmethod insert-point ((input fundamental-input)

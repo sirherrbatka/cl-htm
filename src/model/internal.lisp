@@ -102,6 +102,7 @@
 
 (defun prediction (context output)
   (~>> (access-close-limit output)
-       (cl-ds:near (access-stored-outputs output)
-                   (list (cl-htm.training:active-neurons context)))
+       (cl-ds:near
+        (access-stored-outputs output)
+        (list (cl-htm.training:past-predictive-neurons context)))
        (cl-ds.alg:on-each #'rest)))

@@ -39,7 +39,8 @@
 
 
 (defclass fundamental-discreete-decoder (fundamental-decoder)
-  ())
+  ((%outputs :initarg :outputs
+             :reader read-outputs)))
 
 
 (defclass random-symbol-encoder (fundamental-encoder) ;or atom-encoder?

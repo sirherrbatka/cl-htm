@@ -19,7 +19,7 @@
                               input j cl-htm.sdr:sdr))
    (let* ((size (vector-classes:size columns))
           (syn-count (array-dimension column-input 1))
-          (result (make-array size :element-type 'fixnum)))
+          (result (make-array size :element-type 'non-negative-fixnum)))
      (declare (type fixnum syn-count size))
      (iterate
        (declare (type fixnum i))
@@ -30,7 +30,8 @@
       (lambda (i)
         (declare (type fixnum i))
         (iterate
-          (declare (type fixnum k sum))
+          (declare (type fixnum k)
+                   (type non-negative-fixnum sum))
           (with sum = 0)
           (for k from 0 below syn-count)
           (for j = (column-input k))
@@ -44,7 +45,7 @@
      (training-parameters cl-htm.training:fundamental-parameters)
      (columns neuron-column)
      active-synapses)
-  (check-type active-synapses (simple-array fixnum (*)))
+  (check-type active-synapses (simple-array non-negative-fixnum (*)))
   (let* ((activated-columns-fraction (cl-htm.training:activated-columns-fraction
                                       training-parameters))
          (activated-columns-count (~> (vector-classes:size columns)

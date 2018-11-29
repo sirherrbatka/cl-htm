@@ -16,7 +16,7 @@
   ((%columns :initarg :columns
              :reader columns)
    (synapses-strength :array t
-                      :type fixnum
+                      :type non-negative-fixnum
                       :dimensions-arg :synapses-strength
                       :documentation "Weights of synapses for each neuron."
                       :initform (cl-htm.utils:random-synapses-strength))))

@@ -5,6 +5,7 @@
   (:use #:cl #:cl-htm.aux-package)
   (:export
    #:active-neurons
+   #:dense-active-neurons
    #:read-active-neurons
    #:clear-all-active
    #:clone

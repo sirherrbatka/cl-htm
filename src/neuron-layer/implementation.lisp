@@ -17,18 +17,26 @@
                               columns i neuron-column))
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               input j cl-htm.sdr:sdr))
-   (iterate
-     (declare (type fixnum i size syn-count))
-     (with size = (vector-classes:size columns))
-     (with syn-count = (array-dimension column-input 1))
-     (with result = (make-array size :element-type 'fixnum))
-     (for i from 0 below size)
-     (setf (aref result i)
-           (iterate
-             (for k from 0 below syn-count)
-             (for j = (column-input k))
-             (sum (active))))
-     (finally (return result)))))
+   (let* ((size (vector-classes:size columns))
+          (syn-count (array-dimension column-input 1))
+          (result (make-array size :element-type 'fixnum)))
+     (declare (type fixnum syn-count size))
+     (iterate
+       (declare (type fixnum i))
+       (for i from 0 below size)
+       (setf (aref result i) i))
+     (map-into
+      result
+      (lambda (i)
+        (declare (type fixnum i))
+        (iterate
+          (declare (type fixnum k sum))
+          (with sum = 0)
+          (for k from 0 below syn-count)
+          (for j = (column-input k))
+          (incf sum (active))
+          (finally (return sum))))
+      result))))
 
 
 (defmethod select-active-columns
@@ -166,6 +174,7 @@
                                   active-neurons)
   (check-type predictive-neurons (vector non-negative-fixnum))
   (check-type active-columns (simple-array fixnum (*)))
+  (setf (fill-pointer active-neurons) 0)
   (let ((column-size (truncate (vector-classes:size layer)
                                (vector-classes:size columns))))
     (declare (type non-negative-fixnum column-size))
@@ -310,9 +319,7 @@
                               columns
                               active-columns)))
     (declare (type (simple-array fixnum (*)) active-columns))
-    (setf (fill-pointer active-neurons) 0
-
-          (cl-htm.training:past-predictive-neurons context)
+    (setf (cl-htm.training:past-predictive-neurons context)
           predictive-neurons)
     (select-active-neurons layer columns sdr
                            active-columns prev-data
@@ -324,6 +331,7 @@
                                i
                                cl-htm.sdr:sdr)
       (cl-htm.sdr:clear-all-active sdr)
+      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons)
       (map nil (lambda (i) (setf (neuron) 1))
            active-neurons))
     sdr))

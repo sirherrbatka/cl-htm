@@ -1,6 +1,6 @@
 (defparameter *training-parameters*
   (make-instance 'cl-htm.training:basic-parameters
-                 :activated-columns-fraction 1/3
+                 :activated-columns-fraction 0.02
                  :threshold 80
                  :p- 10
                  :p+ 30
@@ -9,28 +9,28 @@
 (defparameter *encoder* (make-instance
                          'cl-htm.model:random-vector-encoder
                          :encoded-length 3
-                         :count 80))
+                         :count 40))
 
 (defparameter *decoder* (make-instance
                          'cl-htm.model:fundamental-decoder))
 
 (defparameter *model* (cl-htm.model:make-model
                        'cl-htm.model:basic-model
-                       400
+                       2000
                        *training-parameters*
                        (cl-htm.nl:layers
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 10
-                                         :column-count 20
-                                         :size 800)
+                                         :synapses-count 20
+                                         :column-count 100
+                                         :size 2000)
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 10
-                                         :column-count 20
-                                         :size 400)
+                                         :synapses-count 20
+                                         :column-count 1000
+                                         :size 2000)
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 10
-                                         :column-count 20
-                                         :size 200))
+                                         :synapses-count 20
+                                         :column-count 1000
+                                         :size 2000))
                        :input *encoder*
                        :decoder *decoder*))
 

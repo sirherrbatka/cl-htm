@@ -325,7 +325,8 @@
                               training-parameters
                               columns
                               active-columns)))
-    (declare (type (simple-array fixnum (*)) active-columns))
+    (declare (type (simple-array fixnum (*)) active-columns)
+             (type (simple-array bt:lock (*)) all-locks locks))
     (setf (cl-htm.training:past-predictive-neurons context)
           predictive-neurons)
     (select-active-neurons layer columns sdr

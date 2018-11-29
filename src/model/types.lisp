@@ -43,6 +43,11 @@
              :reader read-outputs)))
 
 
+(defclass fundamental-vector-decoder (fundamental-discreete-decoder)
+  ((%prediction-index :initarg :prediction-index
+                      :reader read-prediction-index)))
+
+
 (defclass random-symbol-encoder (fundamental-encoder) ;or atom-encoder?
   ((%hashes :initarg :hashes
             :type simple-array

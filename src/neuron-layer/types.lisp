@@ -7,6 +7,10 @@
           :reader read-input
           :documentation "Indices of neurons (of input SDR) connected to this column."
           :dimensions-arg :input-size)
+   (locks :array t
+          :initform (bt:make-lock)
+          :type bt:lock
+          :reader read-locks)
    (%column-indices :initarg :column-indices
                     :type (simple-array fixnum)
                     :reader read-column-indices)))

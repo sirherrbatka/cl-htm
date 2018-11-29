@@ -313,6 +313,12 @@
                           training-parameters
                           columns
                           active-synapses-for-columns))
+         (all-locks (read-locks columns))
+         (locks (map 'vector
+                     (lambda (i)
+                       (lret ((lock (aref all-locks i)))
+                         (bt:acquire-lock lock)))
+                     active-columns))
          (predictive-neurons (select-predictive-neurons
                               layer
                               sdr
@@ -327,6 +333,7 @@
                            active-neurons)
     (update-synapses training-parameters layer sdr mode columns
                      active-columns prev-data active-neurons)
+    (map nil #'bt:release-lock locks)
     (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
                                sdr
                                i

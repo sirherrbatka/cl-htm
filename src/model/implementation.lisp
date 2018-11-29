@@ -113,13 +113,20 @@
                   data
                   &key (input (input model)) (decoder (decoder model)))
   (let ((mode (make 'cl-htm.training:train-mode))
-        (sdrs (layers model))
-        (contexts (contexts model)))
-    (cl-ds:traverse
-     (lambda (data-point)
-       (insert-point input decoder model mode
-                     data-point contexts sdrs))
-     data))
+        (all-futures nil))
+    (~>> (cl-ds:chunked data 1000)
+         (cl-ds:traverse
+          (lambda (subrange)
+            (push (lparallel:future
+                    (let ((contexts (contexts model))
+                          (sdrs (layers model)))
+                      (cl-ds:traverse
+                       (lambda (data-point)
+                         (insert-point input decoder model mode
+                                       data-point contexts sdrs))
+                       subrange)))
+                  all-futures))))
+    (map nil #'lparallel:force all-futures))
   model)
 
 

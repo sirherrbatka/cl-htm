@@ -115,14 +115,13 @@
   (let ((mode (make 'cl-htm.training:train-mode)))
     (~>> (cl-ds:chunked data 1024)
          (cl-ds.alg:on-each
-          (lambda (subrange)
-            (let ((contexts (contexts model))
-                  (sdrs (layers model)))
-              (cl-ds:traverse
-               (lambda (data-point)
-                 (insert-point input decoder model mode
-                               data-point contexts sdrs))
-               subrange))))
+          (lambda (subrange
+                   &aux (contexts (contexts model)) (sdrs (layers model)))
+            (cl-ds:traverse
+             (lambda (data-point)
+               (insert-point input decoder model mode
+                             data-point contexts sdrs))
+             subrange)))
          (cl-ds.threads:in-parallel _ :chunk-size-hint 1)
          (cl-ds:traverse #'identity)))
   model)

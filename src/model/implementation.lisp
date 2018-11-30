@@ -113,19 +113,18 @@
                   data
                   &key (input (input model)) (decoder (decoder model)))
   (let ((mode (make 'cl-htm.training:train-mode)))
-    (~>> (cl-ds:chunked data 1000)
+    (~>> (cl-ds:chunked data 1024)
          (cl-ds.alg:on-each
           (lambda (subrange)
-            (lparallel:future
-              (let ((contexts (contexts model))
-                    (sdrs (layers model)))
-                (cl-ds:traverse
-                 (lambda (data-point)
-                   (insert-point input decoder model mode
-                                 data-point contexts sdrs))
-                 subrange)))))
-         cl-ds.alg:to-vector
-         (map nil #'lparallel:force)))
+            (let ((contexts (contexts model))
+                  (sdrs (layers model)))
+              (cl-ds:traverse
+               (lambda (data-point)
+                 (insert-point input decoder model mode
+                               data-point contexts sdrs))
+               subrange))))
+         (cl-ds.threads:in-parallel _ :chunk-size-hint 1)
+         (cl-ds:traverse #'identity)))
   model)
 
 

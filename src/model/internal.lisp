@@ -67,6 +67,10 @@
   outputs)
 
 
+(defstruct decoder-output
+  class count)
+
+
 (defun make-metric-dictionary (outputs)
   (let* ((counting-dictionary (read-buffer outputs))
          (size (hash-table-count counting-dictionary))
@@ -74,7 +78,11 @@
     (iterate
       (for i from 0)
       (for (neurons data) in-hashtable counting-dictionary)
-      (setf (aref vector i) (cons neurons (hash-table-alist data))))
+      (setf (aref vector i) (cons neurons
+                                  (mapcar (lambda (x)
+                                            (make-decoder-output :class (car x)
+                                                                 :count (cdr x)))
+                                          (hash-table-alist data)))))
     (cl-ds:make-from-traversable 'cl-ds.ms.egnat:mutable-egnat-metric-set
                                  vector
                                  (compose #'vector= #'car)
@@ -105,4 +113,5 @@
        (cl-ds:near
         (access-stored-outputs output)
         (list (cl-htm.training:past-predictive-neurons context)))
-       (cl-ds.alg:on-each #'rest)))
+       (cl-ds.alg:on-each #'rest)
+       cl-ds.alg:flatten-lists))

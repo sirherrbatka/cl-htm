@@ -42,7 +42,9 @@
 
 
 (defclass all-outputs ()
-  ((%stored-outputs
+  ((%mutex :initform (bt:make-lock)
+           :reader read-mutex)
+   (%stored-outputs
     :initarg :stored-outputs
     :accessor access-stored-outputs
     :initform nil
@@ -95,23 +97,36 @@
 
 
 (defun add-data-point (outputs context data-point)
-  (let* ((buffer (access-buffer outputs))
-         (neurons (cl-htm.training:active-neurons context))
-         (copy (map-into (make-array (length neurons) :element-type 'fixnum)
-                         #'identity
-                         neurons))
-         (test (read-test outputs))
-         (inner (gethash copy buffer
-                         (make-hash-table :test test))))
-    (incf (gethash inner data-point))
-    (setf (gethash copy buffer) inner))
-  outputs)
+  (bt:with-lock-held ((read-mutex outputs))
+    (let* ((buffer (access-buffer outputs))
+           (neurons (cl-htm.training:active-neurons context))
+           (copy (map-into (make-array (length neurons) :element-type 'fixnum)
+                           #'identity
+                           neurons))
+           (test (read-test outputs))
+           (inner (gethash copy buffer
+                           (make-hash-table :test test))))
+      (incf (gethash inner data-point))
+      (setf (gethash copy buffer) inner))
+    outputs))
 
 
 (defun prediction (context output)
-  (~>> (access-close-limit output)
-       (cl-ds:near
-        (access-stored-outputs output)
-        (list (cl-htm.training:past-predictive-neurons context)))
-       (cl-ds.alg:on-each #'rest)
-       cl-ds.alg:flatten-lists))
+  (let ((predictive-neurons (cl-htm.training:past-predictive-neurons context)))
+    (~>> (access-close-limit output)
+         (cl-ds:near
+          (access-stored-outputs output)
+          (list predictive-neurons))
+         (cl-ds.alg:on-each
+          (lambda (x)
+            (let* ((neurons (first x))
+                   (distance (jaccard-metric
+                              predictive-neurons
+                              neurons))
+                   (data (rest x)))
+              (mapcar (compose #'box (curry #'list* distance))
+                      data))))
+         cl-ds.alg:flatten-lists
+         cl-ds.alg:to-vector
+         (sort _ #'< :key (compose #'first-elt #'unbox))
+         (cl-ds.alg:on-each (compose #'rest #'unbox)))))

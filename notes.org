@@ -10,5 +10,6 @@
  #+BEGIN_QUOTE
  The lateral connections in the sequence memory model are learned using a Hebbian-like rule. Specifically, if a cell is depolarized and subsequently becomes active, we reinforce the dendritic segment that caused the depolarization. If no cell in an active column is predicted, we select the cell with the most activated segment and reinforce that segment. Reinforcement of a dendritic segment involves decreasing permanence values of inactive synapses by a small value p and increasing the permanence for active synapses by a larger value p+.
  #+END_QUOTE
-* TODO Don't use independent SDRs for each layer, reuse instead.
+* DONE Don't use independent SDRs for each layer, reuse instead.
+  CLOSED: [2018-12-01 sob 10:48]
 ** rename to-sdr to something more reasonable

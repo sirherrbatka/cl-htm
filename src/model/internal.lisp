@@ -23,7 +23,7 @@
 (defun jaccard-metric (vect1 vect2)
   (declare (optimize (speed 3) (debug 0)
                      (safety 1) (space 0))
-           (type (simple-array fixnum (*)) vect1 vect2))
+           (type (array fixnum (*)) vect1 vect2))
   (let* ((union 0.0)
          (intersection 0.0)
          (increase-union (lambda (x)
@@ -74,7 +74,7 @@
 
 
 (defun make-metric-dictionary (outputs)
-  (let* ((counting-dictionary (read-buffer outputs))
+  (let* ((counting-dictionary (access-buffer outputs))
          (size (hash-table-count counting-dictionary))
          (vector (make-array size)))
     (iterate
@@ -87,12 +87,14 @@
                                           (hash-table-alist data)))))
     (cl-ds:make-from-traversable 'cl-ds.ms.egnat:mutable-egnat-metric-set
                                  vector
-                                 (compose #'vector= #'car)
-                                 (fork #'jaccard-metric #'car #'car))))
+                                 (fork #'vector= #'car #'car)
+                                 (lambda (a b) (jaccard-metric (car a) (car b)))
+                                 ;; (fork #'jaccard-metric #'car #'car)
+                                 'single-float)))
 
 
 (defun fill-dictionary (outputs)
-  (setf (access-metric-dictionary outputs) (make-metric-dictionary outputs))
+  (setf (access-stored-outputs outputs) (make-metric-dictionary outputs))
   outputs)
 
 
@@ -106,16 +108,26 @@
            (test (read-test outputs))
            (inner (gethash copy buffer
                            (make-hash-table :test test))))
-      (incf (gethash inner data-point))
+      (incf (gethash data-point inner 0))
       (setf (gethash copy buffer) inner))
     outputs))
 
 
+(defun transform-vector (function vector)
+  (map-into vector function vector))
+
+
 (defun prediction (context output)
-  (let ((predictive-neurons (cl-htm.training:past-predictive-neurons context)))
+  (let ((outputs (access-stored-outputs output))
+        (predictive-neurons (~> context
+                                cl-htm.training:past-predictive-neurons
+                                copy-array)))
+    (when (null outputs)
+      (fill-dictionary output)
+      (setf outputs (access-stored-outputs output)))
     (~>> (access-close-limit output)
          (cl-ds:near
-          (access-stored-outputs output)
+          outputs
           (list predictive-neurons))
          (cl-ds.alg:on-each
           (lambda (x)
@@ -129,4 +141,4 @@
          cl-ds.alg:flatten-lists
          cl-ds.alg:to-vector
          (sort _ #'< :key (compose #'first-elt #'unbox))
-         (cl-ds.alg:on-each (compose #'rest #'unbox)))))
+         (transform-vector (compose #'cdr #'unbox)))))

@@ -6,6 +6,7 @@
   (:export
    #:activated-columns-fraction
    #:adapt-mode
+   #:active-neurons
    #:basic-context
    #:basic-parameters
    #:decay

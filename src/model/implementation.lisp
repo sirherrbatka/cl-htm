@@ -73,6 +73,27 @@
        (prediction (last-elt contexts))))
 
 
+(defmethod pass-to-decoder ((decoder fundamental-discreete-decoder)
+                            (model fundamental-model)
+                            (mode cl-htm.training:adapt-mode)
+                            data-point
+                            sdrs
+                            contexts)
+  (~> decoder read-outputs (add-data-point (last-elt contexts) data-point)))
+
+
+(defmethod pass-to-decoder ((decoder fundamental-vector-decoder)
+                            (model fundamental-model)
+                            (mode cl-htm.training:fundamental-mode)
+                            data-point
+                            sdrs
+                            contexts)
+  (call-next-method decoder model mode
+                    (aref data-point (read-prediction-index decoder))
+                    sdrs
+                    contexts))
+
+
 (defmethod insert-point ((input fundamental-input)
                          (decoder fundamental-decoder)
                          (model fundamental-model)
@@ -80,20 +101,21 @@
                          data-point
                          contexts
                          sdrs)
-  (iterate
-    (with initial-data = data-point)
-    (with destination  = (input/output-sdr model sdrs))
-    (with parameters   = (parameters model))
-    (while (more-data-p input mode data-point))
-    (setf data-point (encode-data-point input destination data-point))
-    (activate model mode contexts parameters sdrs)
-    (when (more-data-p input mode data-point)
-      (cl-htm.sdr:clear-all-active destination))
-    (finally (return
-               (prog1 (pass-to-decoder decoder model mode
-                                       initial-data sdrs
-                                       contexts)
-                 (reset-model model sdrs contexts))))))
+  (declare (optimize (debug 3)))
+  (let ((destination (input/output-sdr model sdrs))
+        (parameters (parameters model))
+        (initial-data data-point))
+    (iterate
+      (while (more-data-p input mode data-point))
+      (setf data-point (encode-data-point input destination data-point))
+      (activate model mode contexts parameters sdrs)
+      (when (more-data-p input mode data-point)
+        (cl-htm.sdr:clear-all-active destination))
+      (finally (return
+                 (prog1 (pass-to-decoder decoder model mode
+                                         initial-data sdrs
+                                         contexts)
+                   (reset-model model sdrs contexts)))))))
 
 
 (defmethod predict ((model fundamental-model)
@@ -113,6 +135,24 @@
                   data
                   &key (input (input model)) (decoder (decoder model)))
   (let ((mode (make 'cl-htm.training:train-mode)))
+    (~>> (cl-ds:chunked data 1024)
+         (cl-ds.alg:on-each
+          (lambda (subrange
+                   &aux (contexts (contexts model)) (sdrs (layers model)))
+            (cl-ds:traverse
+             (lambda (data-point)
+               (insert-point input decoder model mode
+                             data-point contexts sdrs))
+             subrange)))
+         (cl-ds.threads:in-parallel _ :chunk-size-hint 1)
+         (cl-ds:traverse #'identity)))
+  model)
+
+
+(defmethod adapt ((model fundamental-model)
+                  data
+                  &key (input (input model)) (decoder (decoder model)))
+  (let ((mode (make 'cl-htm.training:adapt-mode)))
     (~>> (cl-ds:chunked data 1024)
          (cl-ds.alg:on-each
           (lambda (subrange
@@ -192,7 +232,7 @@
                         data-point)
   (ensure-data-wrapping data-point)
   (< (the fixnum (cdr data-point))
-     (the fixnum (read-encoded-duration input))))
+     (the fixnum (read-encoded-length input))))
 
 
 (defmethod more-data-p ((input random-vector-encoder)
@@ -229,3 +269,13 @@
           :decoder decoder
           :input-sdr-size input-size
           :training-parameters training-parameters)))
+
+
+(defun make-vector-decoder (hash-table-test prediction-index close-limit)
+  (assert (member hash-table-test '(eq eql equal)))
+  (make-instance 'fundamental-vector-decoder
+                 :prediction-index prediction-index
+                 :outputs (make-instance
+                           'all-outputs
+                           :test hash-table-test
+                           :close-limit close-limit)))

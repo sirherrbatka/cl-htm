@@ -5,6 +5,7 @@
   (:use #:cl #:cl-htm.aux-package)
   (:export
    #:activate
+   #:adapt
    #:basic-model
    #:context
    #:contexts
@@ -20,6 +21,7 @@
    #:decoder
    #:insert-point
    #:make-model
+   #:make-vector-decoder
    #:more-data-p
    #:input/output-sdr
    #:parameters

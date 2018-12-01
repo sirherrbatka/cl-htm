@@ -32,6 +32,8 @@
 
 (defgeneric train (model data &key input decoder))
 
+(defgeneric adapt (model data &key input decoder))
+
 (defgeneric make-model (model-class
                         input-size
                         training-parameters

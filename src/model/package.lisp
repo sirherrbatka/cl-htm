@@ -23,6 +23,7 @@
    #:input
    #:input/output-sdr
    #:insert-point
+   #:ensure-data-wrapping
    #:layers
    #:make-model
    #:make-vector-decoder

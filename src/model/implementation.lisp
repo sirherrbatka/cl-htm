@@ -133,72 +133,51 @@
 
 (defmethod train ((model fundamental-model)
                   data
-                  &key (input (input model)) (decoder (decoder model))
-                    (thread-count 4))
-  (declare (optimize (debug 3)))
+                  &key (input (input model)) (decoder (decoder model)))
   (let* ((mode (make 'cl-htm.training:train-mode))
-         (queues (map-into (make-array thread-count)
-                           (curry #'lparallel.queue:make-queue
-                                  :fixed-capacity 2048)))
-         (index 0)
-         (jobs (map-into (make-array thread-count)
-                         (lambda (q &aux
-                                      (contexts (contexts model))
-                                      (sdrs (layers model)))
-                           (bt:make-thread
-                            (lambda ()
-                              (iterate
-                                (for (data . more) =
-                                     (lparallel.queue:pop-queue q))
-                                (while more)
-                                (insert-point input decoder model mode
-                                              data contexts sdrs)))))
-                         queues)))
-    (unwind-protect
-         (progn
-           (~>> data
-                (cl-ds:traverse (lambda (x)
-                                  (lparallel.queue:push-queue (list* x t)
-                                                              (aref queues index))
-                                  (setf index (~> index 1+ (rem thread-count))))))
-           (map nil (lambda (x) (lparallel.queue:push-queue (list* nil nil) x))
-                queues))
-      (map nil #'bt:join-thread jobs)))
+         (queue (lparallel.queue:make-queue :fixed-capacity 32)))
+    (~>> data
+         (make-instance 'cl-ds:chunked-range :chunk-size 16000
+                                             :original-range _)
+         (cl-ds:traverse (lambda (chunk)
+                           (lparallel.queue:push-queue
+                            (lparallel:future
+                              (cl-ds:traverse
+                               (lambda (data &aux
+                                               (contexts (contexts model))
+                                               (sdrs (layers model)))
+                                 (insert-point input decoder model mode
+                                               data contexts sdrs))
+                               chunk))
+                            queue))))
+    (iterate
+      (until (lparallel.queue:queue-empty-p queue))
+      (lparallel:force (lparallel.queue:pop-queue queue))))
   model)
 
 
 (defmethod adapt ((model fundamental-model)
                   data
-                  &key (input (input model)) (decoder (decoder model))
-                    (thread-count 4))
+                  &key (input (input model)) (decoder (decoder model)))
   (let* ((mode (make 'cl-htm.training:adapt-mode))
-         (queues (map-into (make-array thread-count)
-                           (curry #'lparallel.queue:make-queue
-                                  :fixed-capacity 2048)))
-         (index 0)
-         (jobs (map-into (make-array thread-count)
-                         (lambda (q &aux
-                                      (contexts (contexts model))
-                                      (sdrs (layers model)))
-                           (bt:make-thread
-                            (lambda ()
-                              (iterate
-                                (for (data . more) =
-                                     (lparallel.queue:pop-queue q))
-                                (while more)
-                                (insert-point input decoder model mode
-                                              data contexts sdrs)))))
-                         queues)))
-    (unwind-protect
-         (progn
-           (~>> data
-                (cl-ds:traverse (lambda (x)
-                                  (lparallel.queue:push-queue (list* x t)
-                                                              (aref queues index))
-                                  (setf index (~> index 1+ (rem thread-count))))))
-           (map nil (lambda (x) (lparallel.queue:push-queue (list* nil nil) x))
-                queues))
-      (map nil #'bt:join-thread jobs)))
+         (queue (lparallel.queue:make-queue :fixed-capacity 32)))
+    (~>> data
+         (make-instance 'cl-ds:chunked-range :chunk-size 16000
+                                             :original-range _)
+         (cl-ds:traverse (lambda (chunk)
+                           (lparallel.queue:push-queue
+                            (lparallel:future
+                              (cl-ds:traverse
+                               (lambda (data &aux
+                                               (contexts (contexts model))
+                                               (sdrs (layers model)))
+                                 (insert-point input decoder model mode
+                                               data contexts sdrs))
+                               chunk))
+                            queue))))
+    (iterate
+      (until (lparallel.queue:queue-empty-p queue))
+      (lparallel:force (lparallel.queue:pop-queue queue))))
   model)
 
 

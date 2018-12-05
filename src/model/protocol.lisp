@@ -47,3 +47,7 @@
 (defgeneric decoder (model))
 
 (defgeneric (setf decoder) (value model))
+
+(defgeneric hashes (encoder))
+
+(defgeneric hash-function (encoder))

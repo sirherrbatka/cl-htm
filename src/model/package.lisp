@@ -10,26 +10,29 @@
    #:context
    #:contexts
    #:decode-sdr
+   #:decoder
    #:encode-data-point
    #:fundamental-decoder
    #:fundamental-discreete-decoder
    #:fundamental-encoder
    #:fundamental-input
    #:fundamental-model
+   #:hash-function
+   #:hashes
+   #:hashval
    #:input
-   #:output-size
-   #:decoder
+   #:input/output-sdr
    #:insert-point
+   #:layers
    #:make-model
    #:make-vector-decoder
    #:more-data-p
-   #:input/output-sdr
+   #:output-size
    #:parameters
    #:pass-to-decoder
    #:predict
    #:random-symbol-encoder
    #:random-vector-encoder
    #:reset-model
-   #:layers
    #:sequence-input
    #:train))

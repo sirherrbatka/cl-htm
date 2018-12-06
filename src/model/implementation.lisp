@@ -137,7 +137,7 @@
   (let* ((mode (make 'cl-htm.training:train-mode))
          (queue (lparallel.queue:make-queue :fixed-capacity 32)))
     (~>> data
-         (make-instance 'cl-ds:chunked-range :chunk-size 16000
+         (make-instance 'cl-ds:chunked-range :chunk-size 160000
                                              :original-range _)
          (cl-ds:traverse (lambda (chunk)
                            (lparallel.queue:push-queue
@@ -162,7 +162,7 @@
   (let* ((mode (make 'cl-htm.training:adapt-mode))
          (queue (lparallel.queue:make-queue :fixed-capacity 32)))
     (~>> data
-         (make-instance 'cl-ds:chunked-range :chunk-size 16000
+         (make-instance 'cl-ds:chunked-range :chunk-size 160000
                                              :original-range _)
          (cl-ds:traverse (lambda (chunk)
                            (lparallel.queue:push-queue

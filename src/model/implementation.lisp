@@ -141,7 +141,7 @@
             (lambda ()
               (~>>
                data
-               (make-instance 'cl-ds:chunked-range :chunk-size 160000
+               (make-instance 'cl-ds:chunked-range :chunk-size 32000
                                                    :original-range _)
                (cl-ds:traverse (lambda (chunk)
                                  (lparallel.queue:push-queue
@@ -174,7 +174,7 @@
             (lambda ()
               (~>>
                data
-               (make-instance 'cl-ds:chunked-range :chunk-size 160000
+               (make-instance 'cl-ds:chunked-range :chunk-size 32000
                                                    :original-range _)
                (cl-ds:traverse (lambda (chunk)
                                  (lparallel.queue:push-queue

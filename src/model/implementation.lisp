@@ -135,24 +135,32 @@
                   data
                   &key (input (input model)) (decoder (decoder model)))
   (let* ((mode (make 'cl-htm.training:train-mode))
-         (queue (lparallel.queue:make-queue :fixed-capacity 32)))
-    (~>> data
-         (make-instance 'cl-ds:chunked-range :chunk-size 160000
-                                             :original-range _)
-         (cl-ds:traverse (lambda (chunk)
-                           (lparallel.queue:push-queue
-                            (lparallel:future
-                              (cl-ds:traverse
-                               (lambda (data &aux
-                                               (contexts (contexts model))
-                                               (sdrs (layers model)))
-                                 (insert-point input decoder model mode
-                                               data contexts sdrs))
-                               chunk))
-                            queue))))
+         (queue (lparallel.queue:make-queue :fixed-capacity 32))
+         (thread
+           (bt:make-thread
+            (lambda ()
+              (~>>
+               data
+               (make-instance 'cl-ds:chunked-range :chunk-size 160000
+                                                   :original-range _)
+               (cl-ds:traverse (lambda (chunk)
+                                 (lparallel.queue:push-queue
+                                  (lparallel:future
+                                    (cl-ds:traverse
+                                     (lambda (data
+                                              &aux
+                                                (contexts (contexts model))
+                                                (sdrs (layers model)))
+                                       (insert-point input decoder model mode
+                                                     data contexts sdrs))
+                                     chunk)
+                                    t)
+                                  queue))))
+              (lparallel.queue:push-queue nil queue)))))
     (iterate
-      (until (lparallel.queue:queue-empty-p queue))
-      (lparallel:force (lparallel.queue:pop-queue queue))))
+      (for v = (lparallel:force (lparallel.queue:pop-queue queue)))
+      (while v))
+    (bt:join-thread thread))
   model)
 
 
@@ -160,24 +168,32 @@
                   data
                   &key (input (input model)) (decoder (decoder model)))
   (let* ((mode (make 'cl-htm.training:adapt-mode))
-         (queue (lparallel.queue:make-queue :fixed-capacity 32)))
-    (~>> data
-         (make-instance 'cl-ds:chunked-range :chunk-size 160000
-                                             :original-range _)
-         (cl-ds:traverse (lambda (chunk)
-                           (lparallel.queue:push-queue
-                            (lparallel:future
-                              (cl-ds:traverse
-                               (lambda (data &aux
-                                               (contexts (contexts model))
-                                               (sdrs (layers model)))
-                                 (insert-point input decoder model mode
-                                               data contexts sdrs))
-                               chunk))
-                            queue))))
+         (queue (lparallel.queue:make-queue :fixed-capacity 32))
+         (thread
+           (bt:make-thread
+            (lambda ()
+              (~>>
+               data
+               (make-instance 'cl-ds:chunked-range :chunk-size 160000
+                                                   :original-range _)
+               (cl-ds:traverse (lambda (chunk)
+                                 (lparallel.queue:push-queue
+                                  (lparallel:future
+                                    (cl-ds:traverse
+                                     (lambda (data
+                                              &aux
+                                                (contexts (contexts model))
+                                                (sdrs (layers model)))
+                                       (insert-point input decoder model mode
+                                                     data contexts sdrs))
+                                     chunk)
+                                    t)
+                                  queue))))
+              (lparallel.queue:push-queue nil queue)))))
     (iterate
-      (until (lparallel.queue:queue-empty-p queue))
-      (lparallel:force (lparallel.queue:pop-queue queue))))
+      (for v = (lparallel:force (lparallel.queue:pop-queue queue)))
+      (while v))
+    (bt:join-thread thread))
   model)
 
 

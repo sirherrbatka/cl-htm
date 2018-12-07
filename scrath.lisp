@@ -10,7 +10,7 @@
 (defparameter *encoder* (make-instance
                          'cl-htm.model:random-vector-encoder
                          :encoded-length 2
-                         :count 40))
+                         :count 80))
 
 (defparameter *decoder* (cl-htm.model:make-vector-decoder
                          'eql
@@ -19,41 +19,39 @@
 
 (defparameter *model* (cl-htm.model:make-model
                        'cl-htm.model:basic-model
-                       2000
+                       4000
                        *training-parameters*
                        (cl-htm.nl:layers
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 50
+                                         :synapses-count 128
+                                         :segments-count 128
                                          :column-count 100
-                                         :size 2000)
+                                         :size 4000)
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 50
-                                         :column-count 1000
-                                         :size 2000)
+                                         :synapses-count 128
+                                         :segments-count 128
+                                         :column-count 100
+                                         :size 4000)
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 50
-                                         :column-count 1000
-                                         :size 2000)
+                                         :synapses-count 128
+                                         :segments-count 128
+                                         :column-count 100
+                                         :size 4000)
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 50
-                                         :column-count 1000
-                                         :size 2000))
+                                         :synapses-count 128
+                                         :segments-count 128
+                                         :column-count 100
+                                         :size 4000))
                        :input *encoder*
                        :decoder *decoder*))
 
-(require :sb-sprof)
-(progn
-  (sb-sprof:reset)
-  (sb-sprof:start-profiling)
-  (time
-   (cl-htm.model:train *model*
-                       (cl-ds:xpr (:i 100000)
-                         (unless (zerop i)
-                           (cl-ds:send-recur (vector 1 2 3)
-                                             :i (1- i))))))
-  (sb-sprof:stop-profiling))
+(cl-htm.model:train *model*
+                    (cl-ds:xpr (:i 1000)
+                      (unless (zerop i)
+                        (cl-ds:send-recur (vector 1 2 3)
+                                          :i (1- i)))))
 
-(cl-htm.model:adapt *model* (cl-ds:xpr (:i 100000)
+(cl-htm.model:adapt *model* (cl-ds:xpr (:i 100)
                               (unless (zerop i)
                                 (cl-ds:send-recur (vector 1 2 3)
                                                   :i (1- i)))))

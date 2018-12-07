@@ -103,7 +103,7 @@
     (let* ((buffer (access-buffer outputs))
            (neurons (cl-htm.training:active-neurons context))
            (copy (map-into (make-array (length neurons) :element-type 'fixnum)
-                           #'identity
+                           #'first-elt
                            neurons))
            (test (read-test outputs))
            (inner (gethash copy buffer

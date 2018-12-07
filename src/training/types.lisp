@@ -2,7 +2,7 @@
 
 
 (define-constant +empty-vector+
-    (make-array 0 :element-type 'fixnum)
+    (make-array 0)
   :test #'vector=)
 
 
@@ -21,7 +21,7 @@
                     :reader active-neurons))
   (:default-initargs
    :past-predictive-neurons +empty-vector+
-   :active-neurons (make-array 0 :element-type 'fixnum
+   :active-neurons (make-array 0 :element-type t
                                  :fill-pointer 0
                                  :adjustable t)))
 

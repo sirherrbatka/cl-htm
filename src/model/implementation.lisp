@@ -143,10 +143,10 @@
                data
                (make-instance 'cl-ds:chunked-range :chunk-size 32000
                                                    :original-range _)
-               (cl-ds:traverse (lambda (chunk)
-                                 (lparallel.queue:push-queue
-                                  (lparallel:future
-                                    (cl-ds:traverse
+               (cl-ds:across (lambda (chunk)
+                               (lparallel.queue:push-queue
+                                (lparallel:future
+                                  (cl-ds:traverse
                                      (lambda (data
                                               &aux
                                                 (contexts (contexts model))
@@ -154,7 +154,7 @@
                                        (insert-point input decoder model mode
                                                      data contexts sdrs))
                                      chunk)
-                                    t)
+                                  t)
                                   queue))))
               (lparallel.queue:push-queue nil queue)))))
     (iterate
@@ -176,19 +176,19 @@
                data
                (make-instance 'cl-ds:chunked-range :chunk-size 32000
                                                    :original-range _)
-               (cl-ds:traverse (lambda (chunk)
-                                 (lparallel.queue:push-queue
-                                  (lparallel:future
-                                    (cl-ds:traverse
-                                     (lambda (data
-                                              &aux
-                                                (contexts (contexts model))
-                                                (sdrs (layers model)))
-                                       (insert-point input decoder model mode
-                                                     data contexts sdrs))
-                                     chunk)
-                                    t)
-                                  queue))))
+               (cl-ds:across (lambda (chunk)
+                               (lparallel.queue:push-queue
+                                (lparallel:future
+                                  (cl-ds:traverse
+                                   (lambda (data
+                                            &aux
+                                              (contexts (contexts model))
+                                              (sdrs (layers model)))
+                                     (insert-point input decoder model mode
+                                                   data contexts sdrs))
+                                   chunk)
+                                  t)
+                                queue))))
               (lparallel.queue:push-queue nil queue)))))
     (iterate
       (for v = (lparallel:force (lparallel.queue:pop-queue queue)))

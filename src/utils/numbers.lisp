@@ -16,5 +16,5 @@
     result))
 
 
-(defun random-synapses-strength (&key (from 0) (to 50))
+(defun random-synapses-strength (&key (from 0) (to 100))
   (random-in-range from to))

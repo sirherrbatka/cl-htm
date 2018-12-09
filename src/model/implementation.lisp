@@ -63,25 +63,6 @@
   nil)
 
 
-(defmethod pass-to-decoder ((decoder fundamental-discreete-decoder)
-                            (model fundamental-model)
-                            (mode cl-htm.training:predict-mode)
-                            data-point
-                            sdrs
-                            contexts)
-  (~>> decoder read-outputs
-       (prediction (last-elt contexts))))
-
-
-(defmethod pass-to-decoder ((decoder fundamental-discreete-decoder)
-                            (model fundamental-model)
-                            (mode cl-htm.training:adapt-mode)
-                            data-point
-                            sdrs
-                            contexts)
-  (~> decoder read-outputs (add-data-point (last-elt contexts) data-point)))
-
-
 (defmethod pass-to-decoder ((decoder fundamental-vector-decoder)
                             (model fundamental-model)
                             (mode cl-htm.training:fundamental-mode)
@@ -112,10 +93,9 @@
       (when (more-data-p input mode data-point)
         (cl-htm.sdr:clear-all-active destination))
       (finally (return
-                 (prog1 (pass-to-decoder decoder model mode
-                                         initial-data sdrs
-                                         contexts)
-                   (reset-model model sdrs contexts)))))))
+                 (pass-to-decoder decoder model mode
+                                  initial-data sdrs
+                                  contexts))))))
 
 
 (defmethod predict ((model fundamental-model)
@@ -126,8 +106,10 @@
         (contexts (contexts model)))
     (cl-ds.alg:on-each
      (lambda (data-point)
-       (insert-point input decoder model mode
-                     data-point contexts sdrs))
+       (prog1
+           (insert-point input decoder model mode
+                         data-point contexts sdrs)
+         (reset-model model sdrs contexts)))
      data)))
 
 
@@ -152,7 +134,8 @@
                                                 (contexts (contexts model))
                                                 (sdrs (layers model)))
                                        (insert-point input decoder model mode
-                                                     data contexts sdrs))
+                                                     data contexts sdrs)
+                                       (reset-model model sdrs contexts))
                                      chunk)
                                   t)
                                   queue))))
@@ -185,7 +168,8 @@
                                               (contexts (contexts model))
                                               (sdrs (layers model)))
                                      (insert-point input decoder model mode
-                                                   data contexts sdrs))
+                                                   data contexts sdrs)
+                                     (reset-model model sdrs contexts))
                                    chunk)
                                   t)
                                 queue))))

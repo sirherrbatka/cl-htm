@@ -24,6 +24,7 @@
    #:input/output-sdr
    #:insert-point
    #:ensure-data-wrapping
+   #:encoded-length
    #:layers
    #:make-model
    #:make-vector-decoder

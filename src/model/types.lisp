@@ -64,4 +64,5 @@
 
 (defclass random-vector-encoder (random-symbol-encoder)
   ((%encoded-length :initarg :encoded-length
+                    :accessor encoded-length
                     :reader read-encoded-length)))

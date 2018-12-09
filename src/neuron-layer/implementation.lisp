@@ -299,15 +299,29 @@
                             (declare (type fixnum segment neuron length))
                             (with neuron = (first-elt vector))
                             (with length = (length vector))
-                            (for segment
+                            (for segment-index
                                  from 1
                                  below length)
+                            (for segment = (aref vector segment-index))
                             (iterate
                               (for synaps from 0 below synapses-count)
                               (setf (synapses-strength segment synaps)
                                     (~> (synapses-strength segment synaps)
                                         (- decay)
-                                        (max minimum-weight)))))))))
+                                        (max minimum-weight)))))))
+     :on-second-missing (lambda (vector)
+                          (declare (type vector vector))
+                          (iterate
+                            (with neuron = (first-elt vector))
+                            (with length = (length vector))
+                            (for segment-index from 1 below length)
+                            (for segment = (aref vector segment-index))
+                            (iterate
+                              (for synaps from 0 below synapses-count)
+                              (setf (synapses-strength segment synaps)
+                                    (~> (synapses-strength segment synaps)
+                                        (+ p+)
+                                        (min minimum-weight))))))))
   nil)
 
 
@@ -388,9 +402,9 @@
                                i
                                cl-htm.sdr:sdr)
       (cl-htm.sdr:clear-all-active sdr)
-      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons)
       (map nil (lambda (v &aux (i (first-elt v))) (setf (neuron) 1))
-           active-neurons))))
+           active-neurons)
+      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons))))
 
 
 (defmethod context ((layer neuron-layer))

@@ -1,4 +1,5 @@
-* neuron-layer
+* Temporar memory
+** neuron-layer
 ** predictive-state
  #+BEGIN_QUOTE
  The predictive state of the neuron is handled as follows: if a dendritic segment receives enough input, it becomes active and subsequently depolarizes the cell body without causing an immediate spike.
@@ -13,3 +14,33 @@
 * DONE Don't use independent SDRs for each layer, reuse instead.
   CLOSED: [2018-12-01 sob 10:48]
 ** rename to-sdr to something more reasonable
+* SpatialPooler
+* Connections
+** initial pernamence
+** max synapses per segment
+** connected pernamence
+** learning radius
+* neuron
+** index
+** column
+** hash?
+** synapses?
+* synaps
+** links cell and segment
+** permanence
+* segment
+** creates synapses
+** stores last used iteration
+* column
+** holds cells
+** single proximal dendrite
+** get least used cell
+* ComputeCycle
+** returns predictive cells
+* ProximalDendrites
+** many synapses
+* DistalDendrites
+** just one synaps?
+* Pool
+* Connections
+** maps segments to cell

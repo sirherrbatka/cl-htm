@@ -1,4 +1,4 @@
-* Temporar memory
+* Temporal memory
 ** neuron-layer
 ** predictive-state
  #+BEGIN_QUOTE

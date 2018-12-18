@@ -18,9 +18,12 @@
   ((%past-predictive-neurons :initarg :past-predictive-neurons
                              :accessor past-predictive-neurons)
    (%active-neurons :initarg :active-neurons
-                    :reader active-neurons))
+                    :reader active-neurons)
+   (%extra-data :initarg :extra-data
+                :reader extra-data))
   (:default-initargs
    :past-predictive-neurons +empty-vector+
+   :extra-data (make-hash-table)
    :active-neurons (make-array 0 :element-type t
                                  :fill-pointer 0
                                  :adjustable t)))

@@ -15,6 +15,7 @@
    #:fundamental-parameters
    #:maximum-weight
    #:minimum-weight
+   #:extra-data
    #:p+
    #:p-
    #:past-predictive-neurons

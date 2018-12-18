@@ -20,7 +20,7 @@
    (%active-neurons :initarg :active-neurons
                     :reader active-neurons)
    (%extra-data :initarg :extra-data
-                :reader extra-data))
+                :reader read-extra-data))
   (:default-initargs
    :past-predictive-neurons +empty-vector+
    :extra-data (make-hash-table)

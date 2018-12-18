@@ -20,3 +20,7 @@
 (defgeneric maximum-weight (parameters))
 
 (defgeneric minimum-weight (parameters))
+
+(defgeneric extra-data (context location))
+
+(defgeneric (setf extra-data) (new-val context location))

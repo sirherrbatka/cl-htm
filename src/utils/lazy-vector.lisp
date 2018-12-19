@@ -16,7 +16,7 @@
 (defgeneric at (vector position))
 
 
-(defgeneric matching (vector test-fn))
+(defgeneric matching (vector test-fn &key key))
 
 
 (defmethod at ((vector lazy-vector) position)
@@ -47,22 +47,22 @@
     (call-next-method)))
 
 
-(defmethod matching ((vector lazy-vector) test-fn)
+(defmethod matching ((vector lazy-vector) test-fn &key (key #'identity))
   (let* ((inner-vector (slot-value vector '%inner-vector))
-         (index (position-if test-fn inner-vector)))
+         (index (position-if test-fn inner-vector :key key)))
     (declare (type simple-vector inner-vector))
     (unless (null index)
       (aref inner-vector index))))
 
 
-(defmethod matching ((vector potential-lazy-vector) test-fn)
+(defmethod matching ((vector potential-lazy-vector) test-fn &key (key #'identity))
   (let* ((inner-vector (slot-value vector '%inner-vector))
          (length (array-dimension inner-vector 0)))
     (iterate
       (declare (type fixnum i))
       (for i from 0 below length)
       (for value = (aref inner-vector i))
-      (when (funcall test-fn value)
+      (when (funcall test-fn (funcall key value))
         (return-from matching value)))
     (iterate
       (with range = (read-data-range vector))
@@ -72,7 +72,7 @@
       (for (values value more) = (cl-ds:consume-front range))
       (while more)
       (push value collected)
-      (when (funcall test-fn value)
+      (when (funcall test-fn (funcall key value))
         (setf found? t)
         (finish))
       (finally

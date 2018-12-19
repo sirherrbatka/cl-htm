@@ -6,4 +6,5 @@
   (:export
    #:random-float
    #:random-synapses-strength
+   #:at
    #:vector-iota))

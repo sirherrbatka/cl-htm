@@ -71,7 +71,7 @@
       (for i from 0)
       (for (values value more) = (cl-ds:consume-front range))
       (while more)
-      (collect value)
+      (push value collected)
       (when (funcall test-fn value)
         (setf found? t)
         (finish))

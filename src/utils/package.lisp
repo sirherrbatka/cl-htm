@@ -6,6 +6,7 @@
   (:export
    #:random-float
    #:random-synapses-strength
+   #:matching
    #:at
    #:make-lazy-vector
    #:vector-iota))

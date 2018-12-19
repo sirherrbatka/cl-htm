@@ -16,6 +16,9 @@
 (defgeneric at (vector position))
 
 
+(defgeneric matching (vector test-fn))
+
+
 (defmethod at ((vector lazy-vector) position)
   (aref (the simple-vector (slot-value vector '%inner-vector)) position))
 
@@ -42,6 +45,52 @@
           (change-class vector 'lazy-vector))
         (setf (slot-value vector '%inner-vector) new-vector)))
     (call-next-method)))
+
+
+(defmethod matching ((vector lazy-vector) test-fn)
+  (let* ((inner-vector (slot-value vector '%inner-vector))
+         (index (position-if test-fn inner-vector)))
+    (declare (type simple-vector inner-vector))
+    (unless (null index)
+      (aref inner-vector index))))
+
+
+(defmethod matching ((vector potential-lazy-vector) test-fn)
+  (let* ((inner-vector (slot-value vector '%inner-vector))
+         (length (array-dimension inner-vector 0)))
+    (iterate
+      (declare (type fixnum i))
+      (for i from 0 below length)
+      (for value = (aref inner-vector i))
+      (when (funcall test-fn value)
+        (return-from matching value)))
+    (iterate
+      (with range = (read-data-range vector))
+      (with found? = nil)
+      (with collected = nil)
+      (for i from 0)
+      (for (values value more) = (cl-ds:consume-front range))
+      (while more)
+      (collect value)
+      (when (funcall test-fn value)
+        (setf found? t)
+        (finish))
+      (finally
+       (unless (~>> range cl-ds:peek-front (nth-value 1))
+         (change-class vector 'lazy-vector))
+       (return
+         (unless (zerop i)
+           (let* ((new-size (+ length i))
+                  (new-vector (make-array
+                               new-size
+                               :element-type (array-element-type inner-vector))))
+             (iterate
+               (for j from new-size downto length)
+               (for c in collected)
+               (setf (aref new-vector j) c))
+             (setf (slot-value vector '%inner-vector) new-vector)
+             (when found?
+               (aref new-vector (1- new-size)))))))))))
 
 
 (defun make-lazy-vector (element-type range)

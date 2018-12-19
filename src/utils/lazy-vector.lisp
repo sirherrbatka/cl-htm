@@ -9,6 +9,7 @@
 
 (defclass potential-lazy-vector (lazy-vector)
   ((%data-range :type cl-ds:fundamental-range
+                :initarg :data-range
                 :reader read-data-range)))
 
 
@@ -41,3 +42,9 @@
           (change-class vector 'lazy-vector))
         (setf (slot-value vector '%inner-vector) new-vector)))
     (call-next-method)))
+
+
+(defun make-lazy-vector (element-type range)
+  (make-instance 'potential-lazy-vector
+                 :inner-vector (make-array 0 :element-type element-type)
+                 :data-range range))

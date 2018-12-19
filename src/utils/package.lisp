@@ -7,4 +7,5 @@
    #:random-float
    #:random-synapses-strength
    #:at
+   #:make-lazy-vector
    #:vector-iota))

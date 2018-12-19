@@ -90,7 +90,7 @@
                (setf (aref new-vector j) c))
              (setf (slot-value vector '%inner-vector) new-vector)
              (when found?
-               (aref new-vector (1- new-size)))))))))))
+               (first collected))))))))))
 
 
 (defun make-lazy-vector (element-type range)

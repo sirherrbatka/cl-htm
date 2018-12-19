@@ -18,7 +18,8 @@
                (:file "package")
                (:module "utils"
                 :components ((:file "package")
-                             (:file "numbers")))
+                             (:file "numbers")
+                             (:file "lazy-vector")))
                (:module "sdr"
                 :components ((:file "package")
                              (:file "protocol")

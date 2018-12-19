@@ -25,8 +25,9 @@
     (declare (type simple-vector vector)
              (type fixnum length))
     (unless (< position length)
-      (let ((new-vector (make-array (+ position 1)
-                                    :element-type (array-element-type inner-vector)))
+      (let ((new-vector (make-array
+                         (+ position 1)
+                         :element-type (array-element-type inner-vector)))
             (range (read-data-range vector)))
         (map-into new-vector #'identity inner-vector)
         (iterate

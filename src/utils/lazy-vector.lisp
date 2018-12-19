@@ -22,7 +22,7 @@
 (defmethod at ((vector potential-lazy-vector) position)
   (let* ((inner-vector (slot-value vector '%inner-vector))
          (length (array-dimension inner-vector 0)))
-    (declare (type simple-vector vector)
+    (declare (type simple-vector inner-vector)
              (type fixnum length))
     (unless (< position length)
       (let ((new-vector (make-array

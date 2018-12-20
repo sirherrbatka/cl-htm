@@ -78,19 +78,19 @@
       (finally
        (unless (~>> range cl-ds:peek-front (nth-value 1))
          (change-class vector 'lazy-vector))
+       (unless (zerop i)
+         (let* ((new-size (+ length i))
+                (new-vector (make-array
+                             new-size
+                             :element-type (array-element-type inner-vector))))
+           (iterate
+             (for j from new-size downto length)
+             (for c in collected)
+             (setf (aref new-vector j) c))
+           (setf (slot-value vector '%inner-vector) new-vector)))
        (return
-         (unless (zerop i)
-           (let* ((new-size (+ length i))
-                  (new-vector (make-array
-                               new-size
-                               :element-type (array-element-type inner-vector))))
-             (iterate
-               (for j from new-size downto length)
-               (for c in collected)
-               (setf (aref new-vector j) c))
-             (setf (slot-value vector '%inner-vector) new-vector)
-             (when found?
-               (first collected))))))))))
+         (when found?
+           (first collected))))))))
 
 
 (defun make-lazy-vector (element-type range)

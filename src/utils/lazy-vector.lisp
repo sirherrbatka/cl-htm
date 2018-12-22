@@ -30,10 +30,11 @@
     (declare (type simple-vector inner-vector)
              (type fixnum length))
     (unless (< position length)
-      (let ((new-vector (make-array
-                         (+ position 1)
-                         :element-type (array-element-type inner-vector)))
-            (range (read-data-range vector)))
+      (let* ((element-type (array-element-type inner-vector))
+             (new-vector (make-array
+                          (+ position 1)
+                          :element-type element-type))
+             (range (read-data-range vector)))
         (map-into new-vector #'identity inner-vector)
         (iterate
           (with range = (read-data-range vector))
@@ -82,9 +83,10 @@
          (change-class vector 'lazy-vector))
        (unless (zerop i)
          (let* ((new-size (+ length i))
+                (element-type (array-element-type inner-vector))
                 (new-vector (make-array
                              new-size
-                             :element-type (array-element-type inner-vector))))
+                             :element-type element-type)))
            (iterate
              (for j from (1- new-size) downto 0)
              (for c in collected)

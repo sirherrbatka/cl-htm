@@ -19,7 +19,8 @@
                (:module "utils"
                 :components ((:file "package")
                              (:file "numbers")
-                             (:file "lazy-vector")))
+                             (:file "lazy-vector")
+                             (:test-file "lazy-vector-tests")))
                (:module "sdr"
                 :components ((:file "package")
                              (:file "protocol")

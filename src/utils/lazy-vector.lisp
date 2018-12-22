@@ -20,7 +20,8 @@
 
 
 (defmethod at ((vector lazy-vector) position)
-  (aref (the simple-vector (slot-value vector '%inner-vector)) position))
+  (aref (slot-value vector '%inner-vector)
+        position))
 
 
 (defmethod at ((vector potential-lazy-vector) position)
@@ -41,10 +42,11 @@
           (unless m
             (error "Not enough data to fill the vector!"))
           (setf (aref new-vector i) v))
-        (unless (~>> range cl-ds:peek-front (nth-value 1))
+        (unless (nth-value 1 (cl-ds:peek-front range))
           (change-class vector 'lazy-vector))
-        (setf (slot-value vector '%inner-vector) new-vector)))
-    (call-next-method)))
+        (setf (slot-value vector '%inner-vector) new-vector
+              inner-vector new-vector)))
+    (aref inner-vector position)))
 
 
 (defmethod matching ((vector lazy-vector) test-fn &key (key #'identity))
@@ -68,7 +70,7 @@
       (with range = (read-data-range vector))
       (with found? = nil)
       (with collected = nil)
-      (for i from 0)
+      (for i from 1)
       (for (values value more) = (cl-ds:consume-front range))
       (while more)
       (push value collected)
@@ -76,7 +78,7 @@
         (setf found? t)
         (finish))
       (finally
-       (unless (~>> range cl-ds:peek-front (nth-value 1))
+       (unless (nth-value 1 (cl-ds:peek-front range))
          (change-class vector 'lazy-vector))
        (unless (zerop i)
          (let* ((new-size (+ length i))
@@ -84,13 +86,13 @@
                              new-size
                              :element-type (array-element-type inner-vector))))
            (iterate
-             (for j from new-size downto length)
+             (for j from (1- new-size) downto 0)
              (for c in collected)
              (setf (aref new-vector j) c))
            (setf (slot-value vector '%inner-vector) new-vector)))
        (return
          (when found?
-           (first collected))))))))
+           (first collected)))))))
 
 
 (defun make-lazy-vector (element-type range)

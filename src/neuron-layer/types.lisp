@@ -19,11 +19,26 @@
 (vector-classes:define-data neuron-layer-weights ()
   ((%columns :initarg :columns
              :reader columns)
-   (synapses-strength :array t
-                      :type non-negative-fixnum
-                      :dimensions-arg :synapses-strength
-                      :documentation "Weights of synapses for each neuron."
-                      :initform (cl-htm.utils:random-synapses-strength))))
+   (distal-segments
+    :array t
+    :type t
+    :initform nil
+    :documentation "Weights and locations of the distal segments (lazily initialized).")
+   (%segments-count
+    :array nil
+    :type fixnum
+    :accessor access-segments-count
+    :initarg :segments-count)
+   (%synapses-count :array nil
+                    :accessor access-synapses-count
+                    :type fixnum
+                    :initarg :synapses-count)
+   (proximal-synapses-strength
+    :array t
+    :type non-negative-fixnum
+    :dimensions-arg :synapses-strength
+    :documentation "Weights of proximal synapses for each neuron."
+    :initform (cl-htm.utils:random-synapses-strength))))
 
 
 (vector-classes:define-data neuron-layer (neuron-layer-weights)

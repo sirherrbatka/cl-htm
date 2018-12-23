@@ -44,6 +44,17 @@
       result))))
 
 
+(defun distal-segment (layer neuron-index)
+  (vector-classes:with-data (((segment distal-segments))
+                             (columns layer)
+                             neuron-index
+                             neuron-column)
+    (ensure (segment)
+      (cl-htm.utils:make-lazy-vector
+       t
+       (cl-htm.training:)))))
+
+
 (defmethod select-active-columns
     ((layer neuron-layer)
      (training-parameters cl-htm.training:fundamental-parameters)
@@ -330,6 +341,9 @@
     (setf (slot-value result 'vector-classes::%size)
           (vector-classes:size neuron)
 
+          (access-synapses-count result) (access-synapses-count result)
+          (access-segments-count result) (access-segments-count result)
+
           (slot-value result '%columns) (columns neuron)
 
           (slot-value result 'synapses-strength)
@@ -436,12 +450,14 @@
   (lret ((result (vector-classes:make-data
                   'neuron-layer-weights
                   size
+                  :synapses-count synapses-count
+                  :segments-count segments-count
                   :synapses-strength (list segments-count
                                            synapses-count)
                   :columns (vector-classes:make-data
                             'neuron-column
                             column-count
-                            :input-size (list segments-count synapses-count)
+                            :input-size (list synapses-count)
                             :column-indices (coerce (iota column-count)
                                                     '(vector fixnum))))))
     (vector-classes:with-data (((input input))

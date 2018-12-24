@@ -34,6 +34,8 @@
     :accessor access-synapses-count
     :type fixnum
     :initarg :synapses-count)
+   (%input-size :initarg :input-size
+                :accessor access-input-size)
    (proximal-synapses-strength
     :array t
     :type non-negative-fixnum

@@ -44,8 +44,10 @@
       result))))
 
 
-(defun make-segment (synapses-count)
-  cl-ds.utils:todo)
+(defun make-segment (layer synapses-count)
+  (let ((weights (make-array synapses-count :element-type 'fixnum))
+        (destination ()))
+    (map-into weights (cl-htm.utils:random-synapses-strength))))
 
 
 (defun distal-segment (layer neuron-index)
@@ -352,6 +354,7 @@
     (setf (slot-value result 'vector-classes::%size)
           (vector-classes:size neuron)
 
+          (access-input-size neuron) (access-input-size neuron)
           (access-synapses-count result) (access-synapses-count result)
           (access-segments-count result) (access-segments-count result)
 
@@ -461,6 +464,7 @@
   (lret ((result (vector-classes:make-data
                   'neuron-layer-weights
                   size
+                  :input-size input-size
                   :synapses-count synapses-count
                   :segments-count segments-count
                   :synapses-strength (list segments-count

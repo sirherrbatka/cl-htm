@@ -372,6 +372,9 @@
 
           (slot-value result '%columns) (columns neuron)
 
+          (slot-value result 'distal-segments)
+          (slot-value neuron 'distal-segments)
+
           (slot-value result 'synapses-strength)
           (slot-value neuron 'synapses-strength))))
 

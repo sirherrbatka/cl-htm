@@ -44,15 +44,26 @@
       result))))
 
 
+(defun make-segment (synapses-count)
+  cl-ds.utils:todo)
+
+
 (defun distal-segment (layer neuron-index)
-  (vector-classes:with-data (((segment distal-segments))
-                             (columns layer)
-                             neuron-index
-                             neuron-column)
-    (ensure (segment)
-      (cl-htm.utils:make-lazy-vector
-       t
-       (cl-htm.training:)))))
+  (let ((segment-count (access-segments-count layer))
+        (synapses-count (access-synapses-count layer)))
+    (vector-classes:with-data (((segment distal-segments))
+                               layer
+                               neuron-index
+                               neuron-layer)
+      (ensure (segment)
+        (cl-htm.utils:make-lazy-vector
+         t
+         (cl-ds:xpr (:i 0)
+           (let ((new-i (1+ i)))
+             (if (< new-i segment-count)
+                 (cl-ds:send-recur (make-segment synapses-count)
+                                   :i new-i)
+                 (cl-ds:send-finish (make-segment synapses-count))))))))))
 
 
 (defmethod select-active-columns

@@ -29,10 +29,11 @@
     :type fixnum
     :accessor access-segments-count
     :initarg :segments-count)
-   (%synapses-count :array nil
-                    :accessor access-synapses-count
-                    :type fixnum
-                    :initarg :synapses-count)
+   (%synapses-count
+    :array nil
+    :accessor access-synapses-count
+    :type fixnum
+    :initarg :synapses-count)
    (proximal-synapses-strength
     :array t
     :type non-negative-fixnum

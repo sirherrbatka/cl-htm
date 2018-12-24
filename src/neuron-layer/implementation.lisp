@@ -44,10 +44,20 @@
       result))))
 
 
-(defun make-segment (layer synapses-count)
+(defstruct segment
+  (source (make-array 0 :element-type 'fixnum) :type (array fixnum (*)))
+  (weight (make-array 0 :element-type 'fixnum) :type (array fixnum (*))))
+
+
+(defun build-segment (layer synapses-count)
   (let ((weights (make-array synapses-count :element-type 'fixnum))
-        (destination ()))
-    (map-into weights (cl-htm.utils:random-synapses-strength))))
+        (layer-size (vector-classes:size layer))
+        (source (make-array synapses-count :element-type 'fixnum)))
+    (map-into weights #'cl-htm.utils:random-synapses-strength)
+    (iterate
+      (for i from 0 below synapses-count)
+      (setf (aref source i) (random layer-size)))
+    (make-segement :source source :weight weight)))
 
 
 (defun distal-segment (layer neuron-index)
@@ -63,9 +73,10 @@
          (cl-ds:xpr (:i 0)
            (let ((new-i (1+ i)))
              (if (< new-i segment-count)
-                 (cl-ds:send-recur (make-segment synapses-count)
+                 (cl-ds:send-recur (build-segment layer synapses-count)
                                    :i new-i)
-                 (cl-ds:send-finish (make-segment synapses-count))))))))))
+                 (cl-ds:send-finish (build-segment layer
+                                                   synapses-count))))))))))
 
 
 (defmethod select-active-columns

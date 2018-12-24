@@ -40,5 +40,7 @@
 
 (defgeneric to-declared-layer (declared-layer prev-layer))
 
+(defgeneric to-read-only-layer (layer))
+
 (defun layers (&rest arguments)
   (apply #'list arguments))

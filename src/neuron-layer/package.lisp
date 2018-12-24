@@ -15,6 +15,7 @@
    #:to-effective-layer
    #:make-weights
    #:to-declared-layer
+   #:to-read-only-layer
    #:declared-layers
    #:layers
    #:layer

@@ -73,10 +73,11 @@
          (cl-ds:xpr (:i 0)
            (let ((new-i (1+ i)))
              (if (< new-i segment-count)
-                 (cl-ds:send-recur (build-segment layer synapses-count)
-                                   :i new-i)
-                 (cl-ds:send-finish (build-segment layer
-                                                   synapses-count))))))))))
+                 (cl-ds:send-recur
+                  (build-segment layer synapses-count)
+                  :i new-i)
+                 (cl-ds:send-finish
+                  (build-segment layer synapses-count))))))))))
 
 
 (defmethod select-active-columns

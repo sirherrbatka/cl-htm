@@ -11,7 +11,7 @@
      (input cl-htm.sdr:sdr)
      (columns neuron-column))
   (declare (optimize (speed 1) (safety 1)
-                     (space 0) (debug 1)))
+                     (space 0) (debug 3)))
   (nest
    (vector-classes:with-data (((column-input input))
                               columns column neuron-column))
@@ -23,7 +23,8 @@
           (column-size (truncate (vector-classes:size layer)
                                  size))
           (synapses-count (access-synapses-count layer))
-          (active-input-vector (make-array synapses-count :element-type 'fixnum))
+          (active-input-vector (make-array synapses-count
+                                           :element-type 'fixnum))
           (result (make-array size :element-type 'non-negative-fixnum)))
      (declare (type fixnum synapses-count size))
      (iterate
@@ -38,7 +39,7 @@
           (for i from 0 below synapses-count)
           (for j = (column-input i))
           (unless (zerop (active))
-            (setf (aref active-input-vector size) j)
+            (setf (aref active-input-vector size) i)
             (incf size)))
         (iterate
           (for neuron from (* column column-size))
@@ -184,8 +185,8 @@
                                                      active-synapses)
                                  (incf activity (weight source.weight)))
                                previous-active-neurons
-                               segment
-                               :second-key #'source)
+                               (segment-source-weight segment)
+                               :key #'source)
                               (> activity threshold))))
                          active-synapses)))
           (unless (null active-segment)
@@ -199,7 +200,7 @@
 
 
 (defun selecting-the-most-active-neuron (layer columns input)
-  (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)))
+  (declare (optimize (speed 1) (safety 3) (debug 3) (space 0)))
   (nest
    (vector-classes:with-data (((synapses-strength proximal-synapses-strength))
                               layer neuron-index neuron-layer))
@@ -209,8 +210,8 @@
                               input input-index cl-htm.sdr:sdr))
    (let* ((column-size (truncate (the fixnum (vector-classes:size layer))
                                 (the fixnum (vector-classes:size columns))))
-          (segments-count (array-dimension columns-input 1))
-          (synapses-count (array-dimension columns-input 2))
+          (segments-count (access-segments-count layer))
+          (synapses-count (access-synapses-count layer))
           (segment-pointers (make-array segments-count
                                         :element-type 'fixnum
                                         :initial-element 0))
@@ -358,17 +359,17 @@
     (setf (slot-value result 'vector-classes::%size)
           (vector-classes:size neuron)
 
+          (slot-value result 'proximal-synapses-strength)
+          (slot-value neuron 'proximal-synapses-strength)
+
           (access-input-size neuron) (access-input-size neuron)
-          (access-synapses-count result) (access-synapses-count result)
-          (access-segments-count result) (access-segments-count result)
+          (slot-value result '%synapses-count) (access-synapses-count neuron)
+          (slot-value result '%segments-count) (access-segments-count neuron)
 
           (slot-value result '%columns) (columns neuron)
 
           (slot-value result 'distal-segments)
-          (slot-value neuron 'distal-segments)
-
-          (slot-value result 'synapses-strength)
-          (slot-value neuron 'synapses-strength))))
+          (slot-value neuron 'distal-segments))))
 
 
 (defmethod update-synapses
@@ -475,8 +476,7 @@
                   :input-size input-size
                   :synapses-count synapses-count
                   :segments-count segments-count
-                  :synapses-strength (list segments-count
-                                           synapses-count)
+                  :proximal-synapses-count (list synapses-count)
                   :columns (vector-classes:make-data
                             'neuron-column
                             column-count
@@ -490,13 +490,10 @@
       (iterate
         (with indices = (~> input-size iota (coerce '(vector fixnum))))
         (for i from 0 below (vector-classes:size (columns result)))
-
         (iterate
-          (for j from 0 below segments-count)
-          (iterate
-            (for s from 0 below synapses-count)
-            (for index in-vector (shuffle indices))
-            (setf (input j s) index)))))))
+          (for s from 0 below synapses-count)
+          (for index in-vector (shuffle indices))
+          (setf (input s) index))))))
 
 
 (defmethod to-declared-layer ((layer layer) (prev integer))

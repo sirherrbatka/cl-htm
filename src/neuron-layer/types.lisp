@@ -39,7 +39,7 @@
    (proximal-synapses-strength
     :array t
     :type non-negative-fixnum
-    :dimensions-arg :synapses-strength
+    :dimensions-arg :proximal-synapses-count
     :documentation "Weights of proximal synapses for each neuron."
     :initform (cl-htm.utils:random-synapses-strength))))
 

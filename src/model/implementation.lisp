@@ -116,6 +116,7 @@
 (defmethod train ((model fundamental-model)
                   data
                   &key (input (input model)) (decoder (decoder model)))
+  #|
   (let* ((mode (make 'cl-htm.training:train-mode))
          (queue (lparallel.queue:make-queue :fixed-capacity 32))
          (thread
@@ -144,6 +145,15 @@
       (for v = (lparallel:force (lparallel.queue:pop-queue queue)))
       (while v))
     (bt:join-thread thread))
+  |#
+  (let* ((mode (make 'cl-htm.training:train-mode))
+         (contexts (contexts model))
+         (sdrs (layers model)))
+    (cl-ds:traverse (lambda (data)
+                      (insert-point input decoder model mode
+                                    data contexts sdrs)
+                      (reset-model model sdrs contexts))
+                    data))
   model)
 
 

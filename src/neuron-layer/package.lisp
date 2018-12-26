@@ -10,6 +10,7 @@
    #:calculate-active-synapses-for-columns
    #:columns
    #:context
+   #:output-size
    #:layer
    #:neuron-layer-weights
    #:to-effective-layer

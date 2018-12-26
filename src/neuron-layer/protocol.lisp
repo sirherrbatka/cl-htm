@@ -45,3 +45,5 @@
 
 (defun layers (&rest arguments)
   (apply #'list arguments))
+
+(defgeneric output-size (layer))

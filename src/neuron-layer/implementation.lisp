@@ -408,7 +408,7 @@
                           columns
                           active-synapses-for-columns))
          (locks (map 'vector
-                     (lambda (segment)
+                     (lambda (i)
                        (lret ((lock (aref all-locks i)))
                          (bt:acquire-lock lock)))
                      active-columns)))
@@ -418,7 +418,8 @@
                                      sdr
                                      training-parameters
                                      columns
-                                     active-columns)))
+                                     active-columns
+                                     context)))
            (declare (type (array fixnum (*))
                           active-columns)
                     (type (array * (*)) predictive-neurons)
@@ -437,8 +438,8 @@
                                i
                                cl-htm.sdr:sdr)
       (cl-htm.sdr:clear-all-active sdr)
-      (map nil (lambda (v &aux (i (first-elt v))) (setf (neuron) 1))
-           active-neurons)
+      (map nil (lambda (i) (setf (neuron) 1))
+           active-columns)
       (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons))))
 
 
@@ -505,11 +506,15 @@
          (read-arguments layer)))
 
 
+(defmethod output-size ((layer layer))
+  (~> layer columns vector-classes:size))
+
+
 (defmethod to-declared-layer ((layer layer)
                               (prev neuron-layer-weights))
   (apply #'make-weights
          (read-type layer)
-         (vector-classes:size prev)
+         (output-size prev)
          (read-arguments layer)))
 
 

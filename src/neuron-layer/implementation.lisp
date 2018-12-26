@@ -186,7 +186,7 @@
                                  (incf activity (weight source.weight)))
                                previous-active-neurons
                                (segment-source-weight segment)
-                               :key #'source)
+                               :second-key #'source)
                               (> activity threshold))))
                          active-synapses)))
           (unless (null active-segment)
@@ -210,54 +210,37 @@
                               input input-index cl-htm.sdr:sdr))
    (let* ((column-size (truncate (the fixnum (vector-classes:size layer))
                                 (the fixnum (vector-classes:size columns))))
-          (segments-count (access-segments-count layer))
           (synapses-count (access-synapses-count layer))
-          (segment-pointers (make-array segments-count
-                                        :element-type 'fixnum
-                                        :initial-element 0))
-          (synapses-array (make-array (list segments-count synapses-count)
+          (synapses-array (make-array synapses-count
                                       :element-type 'fixnum)))
      (declare (type fixnum column-size synapses-count)))
-   (lambda (column-index)
-     (declare (type fixnum column-index))
+   (lambda (column-index &aux (segment-pointer 0))
+     (declare (type fixnum column-index segment-pointer))
      (iterate
-       (for k from 0 below segments-count)
-       (iterate
-         (declare (type fixnum k input-index))
-         (for h from 0 below synapses-count)
-         (for input-index = (columns-input k h))
-         (unless (zerop (active))
-           (setf (aref synapses-array k (aref segment-pointers k))
-                 h)
-           (incf (aref segment-pointers k)))))
+       (declare (type fixnum input-index))
+       (for h from 0 below synapses-count)
+       (for input-index = (columns-input h))
+       (unless (zerop (active))
+         (setf (aref synapses-array segment-pointer)
+               h)
+         (incf segment-pointer)))
      (iterate
-       (declare (type fixnum segment i
-                      neuron-index column-start
-                      sum))
+       (declare (type fixnum i neuron-index
+                      column-start neuron))
        (with column-start = (* column-index column-size))
-       (with result = (make-array 2 :element-type 'fixnum))
+       (with neuron = 0)
        (for neuron-index from column-start)
        (for i from 0 below column-size)
-       (for sum = 0)
-       (for segment = 0)
-       (iterate outer
-         (declare (type fixnum s segment-signal))
-         (for s from 0 below segments-count)
-         (for segment-signal =
-              (iterate
-                (declare (type fixnum k i))
-                (for i from 0 below (aref segment-pointers s))
-                (for k = (aref synapses-array s i))
-                (sum (synapses-strength s k))))
-         (incf sum segment-signal)
-         (maximize segment-signal into maxi)
-         (when (eql maxi segment-signal)
-           (setf segment s)))
-       (maximize sum into maxi)
-       (when (= maxi sum)
-         (setf (aref result 0) neuron-index
-               (aref result 1) segment))
-       (finally (return result))))))
+       (for neuron-signal =
+            (iterate
+              (declare (type fixnum k i))
+              (for i from 0 below segment-pointer)
+              (for k = (aref synapses-array i))
+              (sum (synapses-strength k))))
+       (maximize neuron-signal into maxi)
+       (when (eql maxi neuron-signal)
+         (setf neuron neuron-index))
+       (finally (return neuron))))))
 
 
 (defmethod select-active-neurons ((layer neuron-layer)

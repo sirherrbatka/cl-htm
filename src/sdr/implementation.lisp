@@ -16,7 +16,7 @@
             (declare (type fixnum i k length))
             (with length = (length active))
             (for k from 0 below length)
-            (for i = (first-elt (aref active k)))
+            (for i = (aref active k))
             (setf (active-neuron) 0))))
     (setf (dense-active-neurons sdr) nil))
   sdr)

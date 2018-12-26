@@ -10,16 +10,20 @@
     ((layer neuron-layer)
      (input cl-htm.sdr:sdr)
      (columns neuron-column))
-  (declare (optimize (speed 3) (safety 0)
-                     (space 0) (debug 0)))
+  (declare (optimize (speed 1) (safety 1)
+                     (space 0) (debug 1)))
   (nest
    (vector-classes:with-data (((column-input input))
-                              columns i neuron-column))
+                              columns column neuron-column))
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               input j cl-htm.sdr:sdr))
+   (vector-classes:with-data (((synaps proximal-synapses-strength))
+                              layer neuron neuron-layer))
    (let* ((size (vector-classes:size columns))
-          (segment-count (array-dimension column-input 1))
-          (synapses-count (array-dimension column-input 2))
+          (column-size (truncate (vector-classes:size layer)
+                                 size))
+          (synapses-count (access-synapses-count layer))
+          (active-input-vector (make-array synapses-count :element-type 'fixnum))
           (result (make-array size :element-type 'non-negative-fixnum)))
      (declare (type fixnum synapses-count size))
      (iterate
@@ -28,36 +32,70 @@
        (setf (aref result i) i))
      (map-into
       result
-      (lambda (i)
-        (declare (type fixnum i))
+      (lambda (column &aux (size 0) (sum 0))
+        (declare (type non-negative-fixnum column size sum))
         (iterate
-          (declare (type fixnum s)
-                   (type non-negative-fixnum sum))
-          (with sum = 0)
-          (for s from 0 below segment-count)
+          (for i from 0 below synapses-count)
+          (for j = (column-input i))
+          (unless (zerop (active))
+            (setf (aref active-input-vector size) j)
+            (incf size)))
+        (iterate
+          (for neuron from (* column column-size))
+          (repeat column-size)
           (iterate
-            (declare (type fixnum syn j))
-            (for syn from 0 below synapses-count)
-            (for j = (column-input s syn))
-            (incf sum (active)))
-          (finally (return sum))))
+            (for i from 0 below size)
+            (for j = (aref active-input-vector i))
+            (incf sum (synaps j))))
+        sum)
       result))))
 
 
+(defun source (source.weight)
+  (car source.weight))
+
+
+(defun weight (source.weight)
+  (cdr source.weight))
+
+
+(defun (setf weight) (new-val source.weight)
+  (setf (cdr source.weight) new-val))
+
+
+(defun source.weight (source weight)
+  (list* source weight))
+
+
 (defstruct segment
-  (source (make-array 0 :element-type 'fixnum) :type (array fixnum (*)))
-  (weight (make-array 0 :element-type 'fixnum) :type (array fixnum (*))))
+  (source-weight (make-array 0 :element-type 'list) :type (array list (*))))
+
+
+(defun neuron.segment (neuron segment active-synapses)
+  (list neuron segment active-synapses))
+
+
+(defun active-synapses (neuron.segment)
+  (caddr neuron.segment))
+
+
+(defun neuron (neuron.segment)
+  (car neuron.segment))
+
+
+(defun segment (neuron.segment)
+  (cadr neuron.segment))
 
 
 (defun build-segment (layer synapses-count)
-  (let ((weights (make-array synapses-count :element-type 'fixnum))
-        (layer-size (vector-classes:size layer))
-        (source (make-array synapses-count :element-type 'fixnum)))
-    (map-into weights #'cl-htm.utils:random-synapses-strength)
+  (let ((layer-size (vector-classes:size layer))
+        (source (make-array synapses-count :element-type 'list)))
     (iterate
       (for i from 0 below synapses-count)
-      (setf (aref source i) (random layer-size)))
-    (make-segement :source source :weight weight)))
+      (setf (aref source i) (source.weight
+                             (random layer-size)
+                             (cl-htm.utils:random-synapses-strength))))
+    (make-segment :source-weight (sort source #'< :key #'source))))
 
 
 (defun distal-segment (layer neuron-index)
@@ -84,7 +122,7 @@
     ((layer neuron-layer)
      (training-parameters cl-htm.training:fundamental-parameters)
      (columns neuron-column)
-     active-synapses)
+     context)
   (check-type active-synapses (simple-array non-negative-fixnum (*)))
   (let* ((activated-columns-fraction (cl-htm.training:activated-columns-fraction
                                       training-parameters))
@@ -104,73 +142,58 @@
      (sdr cl-htm.sdr:sdr)
      (training-parameters cl-htm.training:fundamental-parameters)
      (columns neuron-column)
-     active-columns)
-  (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)))
+     active-columns
+     context)
+  (declare (optimize (speed 1) (safety 1) (debug 1) (space 0)))
   (check-type active-columns (array fixnum (*)))
   (nest
-   (vector-classes:with-data (((synapses-strength synapses-strength))
-                              layer neuron-index neuron-layer))
-   (vector-classes:with-data (((columns-input input))
-                              columns column-index neuron-column))
-   (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
-                              sdr input-index cl-htm.sdr:sdr))
    (let* ((threshold (cl-htm.training:threshold training-parameters))
           (column-size (/ (the fixnum (vector-classes:size layer))
                           (the fixnum (vector-classes:size columns))))
+          (previous-active-neurons (cl-htm.training:active-neurons context))
           (result (make-array
                    (truncate column-size 10)
                    :adjustable t
                    :fill-pointer 0
-                   :element-type t))
-          (segments-count (array-dimension columns-input 1))
-          (synapses-count (array-dimension columns-input 2))
-          (segment-pointers (make-array segments-count
-                                        :element-type 'fixnum
-                                        :initial-element 0))
-          (synapses-array (make-array (list segments-count synapses-count)
-                                      :element-type 'fixnum)))
-     (declare (type fixnum threshold column-size
-                    synapses-count segments-count)
+                   :element-type t)))
+     (declare (type fixnum threshold column-size)
               (type vector result))
      (map
       nil
       (lambda (column-index)
         (declare (type fixnum column-index))
         (iterate
-          (for k from 0 below segments-count)
-          (iterate
-            (declare (type fixnum k input-index))
-            (for h from 0 below synapses-count)
-            (for input-index = (columns-input k h))
-            (unless (zerop (active))
-              (setf (aref synapses-array k (aref segment-pointers k))
-                    h)
-              (incf (aref segment-pointers k)))))
-        (iterate
           (declare (type fixnum i neuron-index column-start))
           (with column-start = (* column-index column-size))
           (for neuron-index from column-start)
           (for i from 0 below column-size)
-          (vector-push-extend nil result)
-          (iterate outer
-            (for s from 0 below segments-count)
-            (iterate
-              (declare (type fixnum sum k i))
-              (with sum = 0)
-              (for i from 0 below (aref segment-pointers s))
-              (for k = (aref synapses-array s i))
-              (incf sum (synapses-strength s k))
-              (when (> sum threshold)
-                (let ((target
-                        (ensure (last-elt result)
-                          (make-array 16 :element-type 'fixnum
-                                         :adjustable t
-                                         :fill-pointer 1
-                                         :initial-element neuron-index))))
-                  (vector-push-extend s target))
-                (leave))))
-          (when (~> result last-elt null)
-            (decf (fill-pointer result)))))
+          (for segment = (distal-segment layer neuron-index))
+          (for (values active-segment active-synapses) =
+               (let ((active-synapses (vect)))
+                 (values (cl-htm.utils:matching
+                          segment
+                          (lambda (segment)
+                            (declare (type segment segment))
+                            (setf (fill-pointer active-synapses) 0)
+                            (let ((activity 0))
+                              (declare (type fixnum activity))
+                              (cl-ds.utils:on-ordered-intersection
+                               (lambda (previous-neuron source.weight)
+                                 (declare (ignore previous-neuron))
+                                 (vector-push-extend source.weight
+                                                     active-synapses)
+                                 (incf activity (weight source.weight)))
+                               previous-active-neurons
+                               segment
+                               :second-key #'source)
+                              (> activity threshold))))
+                         active-synapses)))
+          (unless (null active-segment)
+            (vector-push-extend (neuron.segment neuron-index
+                                                active-segment
+                                                active-synapses)
+                                result)
+            (leave))))
       active-columns)
      result)))
 
@@ -178,7 +201,7 @@
 (defun selecting-the-most-active-neuron (layer columns input)
   (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)))
   (nest
-   (vector-classes:with-data (((synapses-strength synapses-strength))
+   (vector-classes:with-data (((synapses-strength proximal-synapses-strength))
                               layer neuron-index neuron-layer))
    (vector-classes:with-data (((columns-input input))
                               columns column-index neuron-column))
@@ -275,7 +298,7 @@
      active-columns
      predictive-neurons
      active-neurons)
-  (declare (optimize (speed 3) (safety 0) (debug 0) (space 0)))
+  (declare (optimize (speed 1) (safety 1) (debug 3) (space 0)))
   (check-type predictive-neurons vector)
   (check-type active-columns (simple-array * (*)))
   (check-type active-neurons vector)
@@ -284,80 +307,49 @@
                               input input-index cl-htm.sdr:sdr))
    (vector-classes:with-data (((column-input input))
                               columns column-index neuron-column))
-   (vector-classes:with-data (((synapses-strength synapses-strength))
+   (vector-classes:with-data (((synapses-strength proximal-synapses-strength))
                               layer neuron neuron-layer))
    (let* ((decay (cl-htm.training:decay parameters))
           (p+ (cl-htm.training:p+ parameters))
           (p- (cl-htm.training:p- parameters))
-          (synapses-count (array-dimension column-input 2))
           (column-count (vector-classes:size columns))
           (maximum-weight (cl-htm.training:maximum-weight parameters))
-          (minimum-weight (cl-htm.training:minimum-weight parameters))
-          (column-size (truncate (the fixnum (vector-classes:size layer))
-                                 column-count)))
+          (minimum-weight (cl-htm.training:minimum-weight parameters)))
      (declare (type fixnum decay p+ p-
                     maximum-weight minimum-weight)
-              (type non-negative-fixnum column-size
-                    synapses-count column-count))
+              (type non-negative-fixnum column-count))
      (cl-ds.utils:on-ordered-intersection
       ;; reinforce!
-      (lambda (active-neuron predictive-neuron)
-        (declare (ignore predictive-neuron)
-                 (type vector active-neuron))
-        (iterate
-          (declare (type non-negative-fixnum neuron column-index)
-                   (type fixnum i segment))
-          (with neuron = (first-elt active-neuron))
-          (with column-index = (truncate neuron column-size))
-          (for i from 1 below (length active-neuron))
-          (for segment = (aref active-neuron i))
-          (iterate
-            (for synaps from 0 below synapses-count)
-            (for input-index = (column-input segment synaps))
-            (if (zerop (active))
-                (setf (synapses-strength segment synaps)
-                      (~> (synapses-strength segment synaps)
-                          (- p-)
-                          (max minimum-weight)))
-                (setf (synapses-strength segment synaps)
-                      (~> (synapses-strength segment synaps)
-                          (+ p+)
-                          (min maximum-weight)))))))
+      (lambda (active-neuron predictive-neuron.segment)
+        (let* ((segment (segment predictive-neuron.segment))
+               (content (cl-htm.utils:content segment))
+               (active-synapses (active-synapses predictive-neuron.segment)))
+          (declare (type simple-vector content)
+                   (type vector active-synapses))
+          (cl-ds.utils:on-ordered-intersection
+           (lambda (synaps not-important)
+             (declare (ignore not-important))
+             (setf (weight synaps)
+                   (~> (weight synaps)
+                       (+ p+)
+                       (min maximum-weight))))
+           content
+           active-synapses
+           :on-second-missing (lambda (x) (setf (weight x)
+                                                (~> (weight x)
+                                                    (- p-)
+                                                    (max minimum-weight))))
+           :same #'eq
+           :less (constantly nil))))
       active-neurons
       predictive-neurons
       :same #'eql
-      :first-key #'first-elt
-      :second-key #'first-elt
+      :second-key #'neuron
       ;; decaying active segments of inactive neurons
-      :on-first-missing (lambda (vector)
-                          (declare (type vector vector))
-                          (iterate
-                            (declare (type fixnum segment neuron length))
-                            (with neuron = (first-elt vector))
-                            (with length = (length vector))
-                            (for segment-index
-                                 from 1
-                                 below length)
-                            (for segment = (aref vector segment-index))
-                            (iterate
-                              (for synaps from 0 below synapses-count)
-                              (setf (synapses-strength segment synaps)
-                                    (~> (synapses-strength segment synaps)
-                                        (- decay)
-                                        (max minimum-weight)))))))
-     :on-second-missing (lambda (vector)
-                          (declare (type vector vector))
-                          (iterate
-                            (with neuron = (first-elt vector))
-                            (with length = (length vector))
-                            (for segment-index from 1 below length)
-                            (for segment = (aref vector segment-index))
-                            (iterate
-                              (for synaps from 0 below synapses-count)
-                              (setf (synapses-strength segment synaps)
-                                    (~> (synapses-strength segment synaps)
-                                        (+ p+)
-                                        (min minimum-weight))))))))
+      :on-first-missing (lambda (neuron)
+                          )
+      :on-second-missing (lambda (neuron)
+                           ))))
   nil)
 
 
@@ -416,7 +408,7 @@
                           columns
                           active-synapses-for-columns))
          (locks (map 'vector
-                     (lambda (i)
+                     (lambda (segment)
                        (lret ((lock (aref all-locks i)))
                          (bt:acquire-lock lock)))
                      active-columns)))

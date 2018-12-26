@@ -1,10 +1,14 @@
 (in-package #:cl-htm.utils)
 
 
+(defgeneric content (vector))
+
+
 (defclass lazy-vector ()
   ((%inner-vector :type simple-vector
                   :initarg :inner-vector
-                  :reader read-inner-vector)))
+                  :reader read-inner-vector
+                  :reader content)))
 
 
 (defclass potential-lazy-vector (lazy-vector)

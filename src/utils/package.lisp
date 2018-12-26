@@ -5,6 +5,7 @@
   (:use #:cl #:cl-htm.aux-package)
   (:export
    #:at
+   #:content
    #:make-lazy-vector
    #:matching
    #:random-float

@@ -33,8 +33,8 @@
        (setf (aref result i) i))
      (map-into
       result
-      (lambda (column &aux (size 0) (sum 0))
-        (declare (type non-negative-fixnum column size sum))
+      (lambda (column &aux (size 0))
+        (declare (type non-negative-fixnum column size))
         (iterate
           (for i from 0 below synapses-count)
           (for j = (column-input i))
@@ -42,13 +42,15 @@
             (setf (aref active-input-vector size) i)
             (incf size)))
         (iterate
+          (declare (type fixnum sum neuron))
+          (with sum = 0)
           (for neuron from (* column column-size))
           (repeat column-size)
           (iterate
             (for i from 0 below size)
             (for j = (aref active-input-vector i))
-            (incf sum (synaps j))))
-        sum)
+            (incf sum (synaps j)))
+          (finally (return sum))))
       result))))
 
 

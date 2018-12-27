@@ -31,27 +31,26 @@
        (declare (type fixnum i))
        (for i from 0 below size)
        (setf (aref result i) i))
-     (map-into
-      result
-      (lambda (column &aux (size 0))
-        (declare (type non-negative-fixnum column size))
-        (iterate
-          (for i from 0 below synapses-count)
-          (for j = (column-input i))
-          (unless (zerop (active))
-            (setf (aref active-input-vector size) i)
-            (incf size)))
-        (iterate
-          (declare (type fixnum sum neuron))
-          (with sum = 0)
-          (for neuron from (* column column-size))
-          (repeat column-size)
-          (iterate
-            (for i from 0 below size)
-            (for j = (aref active-input-vector i))
-            (incf sum (synaps j)))
-          (finally (return sum))))
-      result))))
+     (map-into result
+               (lambda (column &aux (size 0))
+                 (declare (type non-negative-fixnum column size))
+                 (iterate
+                   (for i from 0 below synapses-count)
+                   (for j = (column-input i))
+                   (unless (zerop (active))
+                     (setf (aref active-input-vector size) i)
+                     (incf size)))
+                 (iterate
+                   (declare (type fixnum sum neuron))
+                   (with sum = 0)
+                   (for neuron from (* column column-size))
+                   (repeat column-size)
+                   (iterate
+                     (for i from 0 below size)
+                     (for j = (aref active-input-vector i))
+                     (incf sum (synaps j)))
+                   (finally (return sum))))
+               result))))
 
 
 (defmethod select-active-columns
@@ -254,10 +253,11 @@
                        (min maximum-weight))))
            content
            active-synapses
-           :on-second-missing (lambda (x) (setf (weight x)
-                                                (~> (weight x)
-                                                    (- p-)
-                                                    (max minimum-weight))))
+           :on-second-missing (lambda (x)
+                                (setf (weight x)
+                                      (~> (weight x)
+                                          (- p-)
+                                          (max minimum-weight))))
            :same #'eq
            :less (constantly nil))))
       active-neurons
@@ -265,7 +265,7 @@
       :same #'eql
       :second-key #'neuron
       ;; decaying active segments of inactive neurons
-      :on-first-missing (lambda (neuron)
+      :on-first-missing (lambda (predictive-neuron.segment)
                           )
       :on-second-missing (lambda (neuron)
                            ))))

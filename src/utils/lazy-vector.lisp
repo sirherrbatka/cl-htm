@@ -84,8 +84,10 @@
         (finish))
       (finally
        (unless (nth-value 1 (cl-ds:peek-front range))
-         (change-class vector 'lazy-vector))
-       (unless (zerop i)
+         (setf vector (change-class vector 'lazy-vector
+                                    :inner-vector inner-vector)))
+       (unless (eql (array-dimension inner-vector 0)
+                    length)
          (let* ((new-size length)
                 (element-type (array-element-type inner-vector))
                 (new-vector (make-array

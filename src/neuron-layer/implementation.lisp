@@ -123,7 +123,7 @@
     ((layer neuron-layer)
      (training-parameters cl-htm.training:fundamental-parameters)
      (columns neuron-column)
-     context)
+     active-synapses)
   (check-type active-synapses (simple-array non-negative-fixnum (*)))
   (let* ((activated-columns-fraction (cl-htm.training:activated-columns-fraction
                                       training-parameters))

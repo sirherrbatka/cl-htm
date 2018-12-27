@@ -24,8 +24,7 @@
 
 
 (defmethod at ((vector lazy-vector) position)
-  (aref (slot-value vector '%inner-vector)
-        position))
+  (aref (slot-value vector '%inner-vector) position))
 
 
 (defmethod at ((vector potential-lazy-vector) position)
@@ -79,6 +78,7 @@
       (for (values value more) = (cl-ds:consume-front range))
       (while more)
       (push value collected)
+      (incf length)
       (when (funcall test-fn (funcall key value))
         (setf found? t)
         (finish))
@@ -86,11 +86,12 @@
        (unless (nth-value 1 (cl-ds:peek-front range))
          (change-class vector 'lazy-vector))
        (unless (zerop i)
-         (let* ((new-size (+ length i))
+         (let* ((new-size length)
                 (element-type (array-element-type inner-vector))
                 (new-vector (make-array
                              new-size
                              :element-type element-type)))
+           (map-into new-vector #'identity inner-vector)
            (iterate
              (for j from (1- new-size) downto 0)
              (for c in collected)

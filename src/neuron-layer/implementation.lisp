@@ -266,7 +266,14 @@
       :second-key #'neuron
       ;; decaying active segments of inactive neurons
       :on-first-missing (lambda (predictive-neuron.segment)
-                          )
+                          (let* ((segment (segment predictive-neuron.segment))
+                                 (content (cl-htm.utils:content segment)))
+                            (map-into content
+                                      (lambda (x)
+                                        (~> (weight x)
+                                            (- decay)
+                                            (min maximum-weight)))
+                                      content)))
       :on-second-missing (lambda (neuron)
                            ))))
   nil)

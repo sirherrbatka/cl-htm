@@ -272,7 +272,7 @@
                                       (lambda (x)
                                         (~> (weight x)
                                             (- decay)
-                                            (min maximum-weight)))
+                                            (max minimum-weight)))
                                       content)))
       :on-second-missing (lambda (neuron)
                            ))))

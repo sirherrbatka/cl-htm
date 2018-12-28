@@ -91,6 +91,7 @@
                   :element-type t))
          ((:flet matching-test (active-synapses segment))
           (declare (type segment segment))
+          ;; gather active synapses in segment
           (setf (fill-pointer active-synapses) 0)
           (let ((activity 0))
             (declare (type fixnum activity))

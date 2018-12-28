@@ -84,11 +84,10 @@
          (column-size (/ (the fixnum (vector-classes:size layer))
                          (the fixnum (vector-classes:size columns))))
          (previous-active-neurons (cl-htm.training:active-neurons context))
-         (result (make-array
-                  (truncate column-size 10)
-                  :adjustable t
-                  :fill-pointer 0
-                  :element-type t))
+         (result (make-array (truncate column-size 10)
+                             :adjustable t
+                             :fill-pointer 0
+                             :element-type t))
          ((:flet matching-test (active-synapses segment))
           (declare (type segment segment))
           ;; gather active synapses in segment

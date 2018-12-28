@@ -200,8 +200,7 @@
     active-neurons))
 
 
-(defun reinforce-segment (p+ p-
-                          maximum-weight minimum-weight
+(defun reinforce-segment (p+ p- maximum-weight minimum-weight
                           active-neuron predictive-neuron.segment)
   (declare (ignore active-neuron))
   (bind ((segment (segment predictive-neuron.segment))

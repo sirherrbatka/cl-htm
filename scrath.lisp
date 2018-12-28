@@ -2,7 +2,7 @@
   (make-instance 'cl-htm.training:basic-parameters
                  :activated-columns-fraction 0.02
                  :maximum-weight 1000
-                 :threshold 200
+                 :threshold 50
                  :p- 5
                  :p+ 10
                  :decay 2))
@@ -10,7 +10,7 @@
 (defparameter *encoder* (make-instance
                          'cl-htm.model:random-vector-encoder
                          :encoded-length 2
-                         :count 80))
+                         :count 40))
 
 (defparameter *decoder* (cl-htm.model:make-vector-decoder
                          'eql
@@ -19,34 +19,24 @@
 
 (defparameter *model* (cl-htm.model:make-model
                        'cl-htm.model:basic-model
-                       4000
+                       2000
                        *training-parameters*
                        (cl-htm.nl:layers
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 128
-                                         :segments-count 128
-                                         :column-count 100
-                                         :size 4000)
+                                         :synapses-count 64
+                                         :segments-count 64
+                                         :column-count 2000
+                                         :size (* 8 2000))
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 128
-                                         :segments-count 128
-                                         :column-count 100
-                                         :size 4000)
-                        (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 128
-                                         :segments-count 128
-                                         :column-count 100
-                                         :size 4000)
-                        (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 128
-                                         :segments-count 128
-                                         :column-count 100
-                                         :size 4000))
+                                         :synapses-count 64
+                                         :segments-count 64
+                                         :column-count 2000
+                                         :size (* 8 2000)))
                        :input *encoder*
                        :decoder *decoder*))
 
 (cl-htm.model:train *model*
-                    (cl-ds:xpr (:i 10)
+                    (cl-ds:xpr (:i 1000)
                       (unless (zerop i)
                         (cl-ds:send-recur (vector 1 2 3)
                                           :i (1- i)))))

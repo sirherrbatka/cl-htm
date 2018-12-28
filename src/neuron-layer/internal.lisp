@@ -1,19 +1,26 @@
 (in-package #:cl-htm.nl)
 
+
+(defstruct source.weight
+  (%source 0 :type (unsigned-byte 16))
+  (%weight 0 :type (unsigned-byte 16)))
+
+
 (defun source (source.weight)
-  (car source.weight))
+  (source.weight-%source source.weight))
 
 
 (defun weight (source.weight)
-  (cdr source.weight))
+  (source.weight-%weight source.weight))
 
 
 (defun (setf weight) (new-val source.weight)
-  (setf (cdr source.weight) new-val))
+  (setf (source.weight-%weight source.weight) new-val))
 
 
 (defun source.weight (source weight)
-  (list* source weight))
+  (make-source.weight :%source source
+                      :%weight weight))
 
 
 (defstruct segment

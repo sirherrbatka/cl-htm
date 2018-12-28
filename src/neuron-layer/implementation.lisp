@@ -183,6 +183,7 @@
                                   active-columns
                                   predictive-neurons
                                   active-neurons)
+  (declare (optimize (debug 3)))
   (check-type predictive-neurons vector)
   (check-type active-columns (simple-array fixnum (*)))
   (check-type active-neurons (array * (*)))
@@ -193,17 +194,16 @@
     (cl-ds.utils:on-ordered-intersection
      (lambda (column neuron)
        (declare (ignore column))
-       (vector-push-extend neuron active-neurons))
+       (vector-push-extend (neuron neuron) active-neurons))
      active-columns
      predictive-neurons
      :same #'eql
-     :on-first-missing (compose (rcurry #'vector-push-extend active-neurons)
-                                (selecting-the-most-active-neuron layer
-                                                                  columns
-                                                                  input))
+     :on-second-missing (compose (rcurry #'vector-push-extend active-neurons)
+                                 (selecting-the-most-active-neuron layer
+                                                                   columns
+                                                                   input))
      :second-key (lambda (neuron)
-                   (truncate (first-elt neuron)
-                             column-size)))
+                   (truncate (neuron neuron) column-size)))
     active-neurons))
 
 
@@ -240,10 +240,8 @@
       ;; reinforce!
       (lambda (active-neuron predictive-neuron.segment)
         (let* ((segment (segment predictive-neuron.segment))
-               (content (cl-htm.utils:content segment))
                (active-synapses (active-synapses predictive-neuron.segment)))
-          (declare (type simple-vector content)
-                   (type vector active-synapses))
+          (declare (type vector active-synapses))
           (cl-ds.utils:on-ordered-intersection
            (lambda (synaps not-important)
              (declare (ignore not-important))
@@ -251,15 +249,17 @@
                    (~> (weight synaps)
                        (+ p+)
                        (min maximum-weight))))
-           content
+           (segment-source-weight segment)
            active-synapses
            :on-second-missing (lambda (x)
                                 (setf (weight x)
                                       (~> (weight x)
                                           (- p-)
                                           (max minimum-weight))))
-           :same #'eq
-           :less (constantly nil))))
+           :same #'eql
+           :first-key #'source
+           :second-key #'source
+           :less #'<)))
       active-neurons
       predictive-neurons
       :same #'eql
@@ -267,7 +267,7 @@
       ;; decaying active segments of inactive neurons
       :on-first-missing (lambda (predictive-neuron.segment)
                           (let* ((segment (segment predictive-neuron.segment))
-                                 (content (cl-htm.utils:content segment)))
+                                 (content (~> segment segment-source-weight)))
                             (map nil
                                  (lambda (x)
                                    (setf (weight x)
@@ -316,7 +316,7 @@
      (context cl-htm.training:fundamental-context)
      (training-parameters cl-htm.training:fundamental-parameters)
      (mode cl-htm.training:fundamental-mode))
-  (declare (optimize (speed 3) (safety 1)))
+  (declare (optimize (debug 3) (safety 1)))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons
@@ -367,7 +367,7 @@
       (cl-htm.sdr:clear-all-active sdr)
       (map nil (lambda (i) (setf (neuron) 1))
            active-columns)
-      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons))))
+      (setf (cl-htm.sdr:dense-active-neurons sdr) active-columns))))
 
 
 (defmethod context ((layer neuron-layer))

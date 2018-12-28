@@ -205,6 +205,66 @@
     active-neurons))
 
 
+(defun reinforce-segment (p+ p-
+                          maximum-weight minimum-weight
+                          active-neuron
+                          predictive-neuron.segment)
+  (declare (ignore active-neuron))
+  (let* ((segment (segment predictive-neuron.segment))
+         (active-synapses (active-synapses predictive-neuron.segment)))
+    (declare (type vector active-synapses))
+    ;; segment level
+    (cl-ds.utils:on-ordered-intersection
+     (lambda (synaps not-important)
+       (declare (ignore not-important))
+       (setf (weight synaps)
+             (~> (weight synaps)
+                 (+ p+)
+                 (min maximum-weight))))
+     (segment-source-weight segment)
+     active-synapses
+     :on-second-missing (lambda (x)
+                          (setf (weight x)
+                                (~> (weight x)
+                                    (- p-)
+                                    (max minimum-weight))))
+     :same #'eql
+     :first-key #'source
+     :second-key #'source
+     :less #'<)))
+
+
+(defun update-neurons (active-neurons
+                       predictive-neurons
+                       parameters)
+  (let* ((decay (cl-htm.training:decay parameters))
+         (p+ (cl-htm.training:p+ parameters))
+         (p- (cl-htm.training:p- parameters))
+         (maximum-weight (cl-htm.training:maximum-weight parameters))
+         (minimum-weight (cl-htm.training:minimum-weight parameters)))
+    (declare (type fixnum decay p+ p-
+                   maximum-weight minimum-weight))
+    (cl-ds.utils:on-ordered-intersection
+     ;; reinforce!
+     (curry #'reinforce-segment p+ p- maximum-weight minimum-weight)
+     active-neurons
+     predictive-neurons
+     :same #'eql
+     :second-key #'neuron
+     ;; decaying active segments of inactive neurons
+     :on-first-missing (lambda (predictive-neuron.segment)
+                         (~>> predictive-neuron.segment
+                              segment
+                              segment-source-weight
+                              (map nil
+                                   (lambda (x)
+                                     (setf (weight x)
+                                           (~> (weight x) (- decay)
+                                               (max minimum-weight)))))))
+     :on-second-missing (lambda (neuron)
+                          ))))
+
+
 (defmethod update-synapses
     ((parameters cl-htm.training:fundamental-parameters)
      (layer neuron-layer)
@@ -218,65 +278,7 @@
   (check-type predictive-neurons vector)
   (check-type active-columns (simple-array * (*)))
   (check-type active-neurons vector)
-  (nest
-   (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
-                              input input-index cl-htm.sdr:sdr))
-   (vector-classes:with-data (((column-input input))
-                              columns column-index neuron-column))
-   (vector-classes:with-data (((synapses-strength proximal-synapses-strength))
-                              layer neuron neuron-layer))
-   (let* ((decay (cl-htm.training:decay parameters))
-          (p+ (cl-htm.training:p+ parameters))
-          (p- (cl-htm.training:p- parameters))
-          (column-count (vector-classes:size columns))
-          (maximum-weight (cl-htm.training:maximum-weight parameters))
-          (minimum-weight (cl-htm.training:minimum-weight parameters)))
-     (declare (type fixnum decay p+ p-
-                    maximum-weight minimum-weight)
-              (type non-negative-fixnum column-count))
-     ;; neuron level
-     (cl-ds.utils:on-ordered-intersection
-      ;; reinforce!
-      (lambda (active-neuron predictive-neuron.segment)
-        (let* ((segment (segment predictive-neuron.segment))
-               (active-synapses (active-synapses predictive-neuron.segment)))
-          (declare (type vector active-synapses))
-          ;; segment level
-          (cl-ds.utils:on-ordered-intersection
-           (lambda (synaps not-important)
-             (declare (ignore not-important))
-             (setf (weight synaps)
-                   (~> (weight synaps)
-                       (+ p+)
-                       (min maximum-weight))))
-           (segment-source-weight segment)
-           active-synapses
-           :on-second-missing (lambda (x)
-                                (setf (weight x)
-                                      (~> (weight x)
-                                          (- p-)
-                                          (max minimum-weight))))
-           :same #'eql
-           :first-key #'source
-           :second-key #'source
-           :less #'<)))
-      active-neurons
-      predictive-neurons
-      :same #'eql
-      :second-key #'neuron
-      ;; decaying active segments of inactive neurons
-      :on-first-missing (lambda (predictive-neuron.segment)
-                          (let* ((segment (segment predictive-neuron.segment))
-                                 (content (~> segment segment-source-weight)))
-                            (map nil
-                                 (lambda (x)
-                                   (setf (weight x)
-                                         (~> (weight x)
-                                             (- decay)
-                                             (max minimum-weight))))
-                                 content)))
-      :on-second-missing (lambda (neuron)
-                           ))))
+  (update-neurons active-neurons predictive-neurons parameters)
   nil)
 
 

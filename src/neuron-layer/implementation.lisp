@@ -91,23 +91,23 @@
                    :adjustable t
                    :fill-pointer 0
                    :element-type t))
+          ((:flet matching-test (active-synapses segment))
+           (declare (type segment segment))
+           (setf (fill-pointer active-synapses) 0)
+           (let ((activity 0))
+             (declare (type fixnum activity))
+             (cl-ds.utils:on-ordered-intersection
+              (lambda (previous-neuron source.weight)
+                (declare (ignore previous-neuron))
+                (vector-push-extend source.weight
+                                    active-synapses)
+                (incf activity (weight source.weight)))
+              previous-active-neurons
+              (segment-source-weight segment)
+              :second-key #'source)
+             (> activity threshold)))
           ((:flet active-segment (segment active-synapses))
-           (cl-htm.utils:matching segment
-                                  (lambda (segment)
-                                    (declare (type segment segment))
-                                    (setf (fill-pointer active-synapses) 0)
-                                    (let ((activity 0))
-                                      (declare (type fixnum activity))
-                                      (cl-ds.utils:on-ordered-intersection
-                                       (lambda (previous-neuron source.weight)
-                                         (declare (ignore previous-neuron))
-                                         (vector-push-extend source.weight
-                                                             active-synapses)
-                                         (incf activity (weight source.weight)))
-                                       previous-active-neurons
-                                       (segment-source-weight segment)
-                                       :second-key #'source)
-                                      (> activity threshold))))))
+           (cl-htm.utils:matching segment (curry #'matching-test active-synapses))))
      (declare (type fixnum threshold column-size)
               (type vector result))
      (map nil

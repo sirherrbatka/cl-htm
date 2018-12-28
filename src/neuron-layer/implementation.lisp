@@ -276,20 +276,10 @@
 
 (defmethod to-effective-layer ((neuron neuron-layer-weights))
   (lret ((result (make 'neuron-layer)))
-    (setf (slot-value result 'vector-classes::%size)
-          (vector-classes:size neuron)
-
-          (slot-value result 'proximal-synapses-strength)
-          (slot-value neuron 'proximal-synapses-strength)
-
-          (access-input-size neuron) (access-input-size neuron)
-          (slot-value result '%synapses-count) (access-synapses-count neuron)
-          (slot-value result '%segments-count) (access-segments-count neuron)
-
-          (slot-value result '%columns) (columns neuron)
-
-          (slot-value result 'distal-segments)
-          (slot-value neuron 'distal-segments))))
+    (cl-ds.utils:copy-slots (neuron result)
+      vector-classes::%size proximal-synapses-strength
+      %input-size %synapses-count %segments-count
+      %columns distal-segments)))
 
 
 (defmethod update-synapses

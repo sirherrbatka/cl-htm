@@ -237,11 +237,20 @@
 (defun update-neurons (active-neurons
                        predictive-neurons
                        parameters)
-  (let* ((decay (cl-htm.training:decay parameters))
+  (bind ((decay (cl-htm.training:decay parameters))
          (p+ (cl-htm.training:p+ parameters))
          (p- (cl-htm.training:p- parameters))
          (maximum-weight (cl-htm.training:maximum-weight parameters))
-         (minimum-weight (cl-htm.training:minimum-weight parameters)))
+         (minimum-weight (cl-htm.training:minimum-weight parameters))
+         ((:flet decay (predictive-neuron.segment))
+          (~>> predictive-neuron.segment
+               segment
+               segment-source-weight
+               (map nil
+                    (lambda (x)
+                      (setf (weight x)
+                            (~> (weight x) (- decay)
+                                (max minimum-weight))))))))
     (declare (type fixnum decay p+ p-
                    maximum-weight minimum-weight))
     (cl-ds.utils:on-ordered-intersection
@@ -252,17 +261,8 @@
      :same #'eql
      :second-key #'neuron
      ;; decaying active segments of inactive neurons
-     :on-first-missing (lambda (predictive-neuron.segment)
-                         (~>> predictive-neuron.segment
-                              segment
-                              segment-source-weight
-                              (map nil
-                                   (lambda (x)
-                                     (setf (weight x)
-                                           (~> (weight x) (- decay)
-                                               (max minimum-weight)))))))
-     :on-second-missing (lambda (neuron)
-                          ))))
+     :on-first-missing #'decay
+     :on-second-missing (lambda (neuron) (declare (ignore neuron))))))
 
 
 (defmethod update-synapses

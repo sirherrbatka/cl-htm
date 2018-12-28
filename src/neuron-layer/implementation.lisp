@@ -93,43 +93,41 @@
                    :element-type t)))
      (declare (type fixnum threshold column-size)
               (type vector result))
-     (map
-      nil
-      (lambda (column-index)
-        (declare (type fixnum column-index))
-        (iterate
-          (declare (type fixnum i neuron-index column-start))
-          (with column-start = (* column-index column-size))
-          (for neuron-index from column-start)
-          (for i from 0 below column-size)
-          (for segment = (distal-segment layer neuron-index))
-          (for (values active-segment active-synapses) =
-               (let ((active-synapses (vect)))
-                 (values (cl-htm.utils:matching
-                          segment
-                          (lambda (segment)
-                            (declare (type segment segment))
-                            (setf (fill-pointer active-synapses) 0)
-                            (let ((activity 0))
-                              (declare (type fixnum activity))
-                              (cl-ds.utils:on-ordered-intersection
-                               (lambda (previous-neuron source.weight)
-                                 (declare (ignore previous-neuron))
-                                 (vector-push-extend source.weight
-                                                     active-synapses)
-                                 (incf activity (weight source.weight)))
-                               previous-active-neurons
-                               (segment-source-weight segment)
-                               :second-key #'source)
-                              (> activity threshold))))
-                         active-synapses)))
-          (unless (null active-segment)
-            (vector-push-extend (neuron.segment neuron-index
-                                                active-segment
-                                                active-synapses)
-                                result)
-            (leave))))
-      active-columns)
+     (map nil
+          (lambda (column-index)
+            (declare (type fixnum column-index))
+            (iterate
+              (declare (type fixnum i neuron-index column-start))
+              (with column-start = (* column-index column-size))
+              (with active-synapses = (vect))
+              (for neuron-index from column-start)
+              (for i from 0 below column-size)
+              (for segment = (distal-segment layer neuron-index))
+              (for active-segment =
+                   (cl-htm.utils:matching
+                    segment
+                    (lambda (segment)
+                      (declare (type segment segment))
+                      (setf (fill-pointer active-synapses) 0)
+                      (let ((activity 0))
+                        (declare (type fixnum activity))
+                        (cl-ds.utils:on-ordered-intersection
+                         (lambda (previous-neuron source.weight)
+                           (declare (ignore previous-neuron))
+                           (vector-push-extend source.weight
+                                               active-synapses)
+                           (incf activity (weight source.weight)))
+                         previous-active-neurons
+                         (segment-source-weight segment)
+                         :second-key #'source)
+                        (> activity threshold)))))
+              (unless (null active-segment)
+                (vector-push-extend (neuron.segment neuron-index
+                                                    active-segment
+                                                    active-synapses)
+                                    result)
+                (leave))))
+          active-columns)
      result)))
 
 

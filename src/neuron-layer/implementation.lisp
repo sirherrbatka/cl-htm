@@ -91,7 +91,6 @@
          ((:flet matching-test (active-synapses segment))
           (declare (type segment segment))
           ;; gather active synapses in segment
-          (setf (fill-pointer active-synapses) 0)
           (let ((activity 0))
             (declare (type fixnum activity))
             (cl-ds.utils:on-ordered-intersection
@@ -121,7 +120,8 @@
                                                   active-segment
                                                   active-synapses)
                                   result)
-              (leave)))))
+              (leave))
+            (setf (fill-pointer active-synapses) 0))))
     (declare (type fixnum threshold column-size)
              (type vector result))
     (map nil #'gather-neurons active-columns)

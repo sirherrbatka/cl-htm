@@ -187,21 +187,22 @@
   (check-type active-neurons (array * (*)))
   (setf (fill-pointer active-neurons) 0)
   (let ((column-size (truncate (vector-classes:size layer)
-                               (vector-classes:size columns))))
+                               (vector-classes:size columns)))
+        (push-to-vector (lambda (column neuron)
+                          (declare (ignore column))
+                          (vector-push-extend (neuron neuron)
+                                              active-neurons)))
+        (select-and-push (compose (rcurry #'vector-push-extend active-neurons)
+                                  (selecting-the-most-active-neuron layer
+                                                                    columns
+                                                                    input))))
     (declare (type non-negative-fixnum column-size))
-    (cl-ds.utils:on-ordered-intersection
-     (lambda (column neuron)
-       (declare (ignore column))
-       (vector-push-extend (neuron neuron) active-neurons))
-     active-columns
-     predictive-neurons
-     :same #'eql
-     :on-second-missing (compose (rcurry #'vector-push-extend active-neurons)
-                                 (selecting-the-most-active-neuron layer
-                                                                   columns
-                                                                   input))
-     :second-key (lambda (neuron)
-                   (truncate (neuron neuron) column-size)))
+    (cl-ds.utils:on-ordered-intersection push-to-vector
+                                         active-columns
+                                         predictive-neurons
+                                         :same #'eql
+                                         :on-second-missing select-and-push
+     :second-key (lambda (neuron) (truncate (neuron neuron) column-size)))
     active-neurons))
 
 
@@ -210,28 +211,29 @@
                           active-neuron
                           predictive-neuron.segment)
   (declare (ignore active-neuron))
-  (let* ((segment (segment predictive-neuron.segment))
-         (active-synapses (active-synapses predictive-neuron.segment)))
+  (bind ((segment (segment predictive-neuron.segment))
+         (active-synapses (active-synapses predictive-neuron.segment))
+         ((:flet increase-synaps (synaps not-important))
+          (declare (ignore not-important))
+          (setf (weight synaps)
+                (~> (weight synaps)
+                    (+ p+)
+                    (min maximum-weight))))
+         ((:flet decrease-synaps (x))
+          (setf (weight x)
+                (~> (weight x)
+                    (- p-)
+                    (max minimum-weight)))))
     (declare (type vector active-synapses))
     ;; segment level
-    (cl-ds.utils:on-ordered-intersection
-     (lambda (synaps not-important)
-       (declare (ignore not-important))
-       (setf (weight synaps)
-             (~> (weight synaps)
-                 (+ p+)
-                 (min maximum-weight))))
-     (segment-source-weight segment)
-     active-synapses
-     :on-second-missing (lambda (x)
-                          (setf (weight x)
-                                (~> (weight x)
-                                    (- p-)
-                                    (max minimum-weight))))
-     :same #'eql
-     :first-key #'source
-     :second-key #'source
-     :less #'<)))
+    (cl-ds.utils:on-ordered-intersection #'increase-synaps
+                                         (segment-source-weight segment)
+                                         active-synapses
+                                         :on-second-missing #'decrease-synaps
+                                         :same #'eql
+                                         :first-key #'source
+                                         :second-key #'source
+                                         :less #'<)))
 
 
 (defun update-neurons (active-neurons
@@ -253,16 +255,15 @@
                                 (max minimum-weight))))))))
     (declare (type fixnum decay p+ p-
                    maximum-weight minimum-weight))
-    (cl-ds.utils:on-ordered-intersection
-     ;; reinforce!
-     (curry #'reinforce-segment p+ p- maximum-weight minimum-weight)
-     active-neurons
-     predictive-neurons
-     :same #'eql
-     :second-key #'neuron
-     ;; decaying active segments of inactive neurons
-     :on-first-missing #'decay
-     :on-second-missing (lambda (neuron) (declare (ignore neuron))))))
+    (cl-ds.utils:on-ordered-intersection (curry #'reinforce-segment
+                                                p+ p- maximum-weight
+                                                minimum-weight)
+                                         active-neurons
+                                         predictive-neurons
+                                         :same #'eql
+                                         :second-key #'neuron
+                                         :on-first-missing #'decay
+                                         :on-second-missing #'identity)))
 
 
 (defmethod update-synapses

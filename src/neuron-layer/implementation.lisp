@@ -19,38 +19,37 @@
                               input j cl-htm.sdr:sdr))
    (vector-classes:with-data (((synaps proximal-synapses-strength))
                               layer neuron neuron-layer))
-   (let* ((size (vector-classes:size columns))
+   (bind ((size (vector-classes:size columns))
           (column-size (truncate (vector-classes:size layer)
                                  size))
           (synapses-count (access-synapses-count layer))
           (active-input-vector (make-array synapses-count
                                            :element-type 'fixnum))
-          (result (make-array size :element-type 'non-negative-fixnum)))
+          (result (make-array size :element-type 'non-negative-fixnum))
+          ((:dflet count-for-column (column &aux (size 0)))
+           (declare (type non-negative-fixnum column size))
+           (iterate
+             (for i from 0 below synapses-count)
+             (for j = (column-input i))
+             (unless (zerop (active))
+               (setf (aref active-input-vector size) i)
+               (incf size)))
+           (iterate
+             (declare (type fixnum sum neuron))
+             (with sum = 0)
+             (for neuron from (* column column-size))
+             (repeat column-size)
+             (iterate
+               (for i from 0 below size)
+               (for j = (aref active-input-vector i))
+               (incf sum (synaps j)))
+             (finally (return sum)))))
      (declare (type fixnum synapses-count size))
      (iterate
        (declare (type fixnum i))
        (for i from 0 below size)
-       (setf (aref result i) i))
-     (map-into result
-               (lambda (column &aux (size 0))
-                 (declare (type non-negative-fixnum column size))
-                 (iterate
-                   (for i from 0 below synapses-count)
-                   (for j = (column-input i))
-                   (unless (zerop (active))
-                     (setf (aref active-input-vector size) i)
-                     (incf size)))
-                 (iterate
-                   (declare (type fixnum sum neuron))
-                   (with sum = 0)
-                   (for neuron from (* column column-size))
-                   (repeat column-size)
-                   (iterate
-                     (for i from 0 below size)
-                     (for j = (aref active-input-vector i))
-                     (incf sum (synaps j)))
-                   (finally (return sum))))
-               result))))
+       (setf (aref result i) (count-for-column i)))
+     result)))
 
 
 (defmethod select-active-columns

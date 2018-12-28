@@ -69,7 +69,7 @@
         (cl-ds.utils:select-top activated-columns-count
                                 #'> :key
                                 (lambda (x) (aref active-synapses x)))
-        (sort #'<)))) ; could be some bucket sort to speed things up (but probabbly won't change that much)
+        (sort #'<))))
 
 
 (defmethod select-predictive-neurons
@@ -392,7 +392,9 @@
 
 (defmethod make-weights ((type (eql 'neuron-layer-weights))
                          input-size
-                         &key size column-count synapses-count segments-count)
+                         &key
+                           size column-count
+                           synapses-count segments-count)
   (check-type column-count positive-fixnum)
   (check-type synapses-count positive-fixnum)
   (check-type size positive-fixnum)

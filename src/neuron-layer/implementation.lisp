@@ -208,8 +208,7 @@
 
 (defun reinforce-segment (p+ p-
                           maximum-weight minimum-weight
-                          active-neuron
-                          predictive-neuron.segment)
+                          active-neuron predictive-neuron.segment)
   (declare (ignore active-neuron))
   (bind ((segment (segment predictive-neuron.segment))
          (active-synapses (active-synapses predictive-neuron.segment))
@@ -236,9 +235,7 @@
                                          :less #'<)))
 
 
-(defun update-neurons (active-neurons
-                       predictive-neurons
-                       parameters)
+(defun update-neurons (active-neurons predictive-neurons parameters)
   (bind ((decay (cl-htm.training:decay parameters))
          (p+ (cl-htm.training:p+ parameters))
          (p- (cl-htm.training:p- parameters))

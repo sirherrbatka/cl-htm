@@ -82,7 +82,7 @@
   (declare (optimize (speed 1) (safety 1) (debug 1) (space 0)))
   (check-type active-columns (array fixnum (*)))
   (nest
-   (let* ((threshold (cl-htm.training:threshold training-parameters))
+   (bind ((threshold (cl-htm.training:threshold training-parameters))
           (column-size (/ (the fixnum (vector-classes:size layer))
                           (the fixnum (vector-classes:size columns))))
           (previous-active-neurons (cl-htm.training:active-neurons context))
@@ -90,7 +90,24 @@
                    (truncate column-size 10)
                    :adjustable t
                    :fill-pointer 0
-                   :element-type t)))
+                   :element-type t))
+          ((:flet active-segment (segment active-synapses))
+           (cl-htm.utils:matching segment
+                                  (lambda (segment)
+                                    (declare (type segment segment))
+                                    (setf (fill-pointer active-synapses) 0)
+                                    (let ((activity 0))
+                                      (declare (type fixnum activity))
+                                      (cl-ds.utils:on-ordered-intersection
+                                       (lambda (previous-neuron source.weight)
+                                         (declare (ignore previous-neuron))
+                                         (vector-push-extend source.weight
+                                                             active-synapses)
+                                         (incf activity (weight source.weight)))
+                                       previous-active-neurons
+                                       (segment-source-weight segment)
+                                       :second-key #'source)
+                                      (> activity threshold))))))
      (declare (type fixnum threshold column-size)
               (type vector result))
      (map nil
@@ -103,24 +120,7 @@
               (for neuron-index from column-start)
               (for i from 0 below column-size)
               (for segment = (distal-segment layer neuron-index))
-              (for active-segment =
-                   (cl-htm.utils:matching
-                    segment
-                    (lambda (segment)
-                      (declare (type segment segment))
-                      (setf (fill-pointer active-synapses) 0)
-                      (let ((activity 0))
-                        (declare (type fixnum activity))
-                        (cl-ds.utils:on-ordered-intersection
-                         (lambda (previous-neuron source.weight)
-                           (declare (ignore previous-neuron))
-                           (vector-push-extend source.weight
-                                               active-synapses)
-                           (incf activity (weight source.weight)))
-                         previous-active-neurons
-                         (segment-source-weight segment)
-                         :second-key #'source)
-                        (> activity threshold)))))
+              (for active-segment = (active-segment segment active-synapses))
               (unless (null active-segment)
                 (vector-push-extend (neuron.segment neuron-index
                                                     active-segment

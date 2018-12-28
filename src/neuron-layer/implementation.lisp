@@ -107,7 +107,8 @@
               :second-key #'source)
              (> activity threshold)))
           ((:flet active-segment (segment active-synapses))
-           (cl-htm.utils:matching segment (curry #'matching-test active-synapses))))
+           (cl-htm.utils:matching segment
+                                  (curry #'matching-test active-synapses))))
      (declare (type fixnum threshold column-size)
               (type vector result))
      (map nil

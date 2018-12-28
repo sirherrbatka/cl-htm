@@ -94,8 +94,7 @@
           (cl-ds.utils:on-ordered-intersection
            (lambda (previous-neuron source.weight)
              (declare (ignore previous-neuron))
-             (vector-push-extend source.weight
-                                 active-synapses)
+             (vector-push-extend source.weight active-synapses)
              (incf activity (weight source.weight)))
            previous-active-neurons
            (segment-source-weight segment)

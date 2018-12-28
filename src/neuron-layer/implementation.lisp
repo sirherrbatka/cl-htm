@@ -234,12 +234,14 @@
      (declare (type fixnum decay p+ p-
                     maximum-weight minimum-weight)
               (type non-negative-fixnum column-count))
+     ;; neuron level
      (cl-ds.utils:on-ordered-intersection
       ;; reinforce!
       (lambda (active-neuron predictive-neuron.segment)
         (let* ((segment (segment predictive-neuron.segment))
                (active-synapses (active-synapses predictive-neuron.segment)))
           (declare (type vector active-synapses))
+          ;; segment level
           (cl-ds.utils:on-ordered-intersection
            (lambda (synaps not-important)
              (declare (ignore not-important))

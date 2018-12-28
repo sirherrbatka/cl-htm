@@ -313,11 +313,10 @@
            (calculate-active-synapses-for-columns
             layer sdr columns))
          (all-locks (read-locks columns))
-         (active-columns (select-active-columns
-                          layer
-                          training-parameters
-                          columns
-                          active-synapses-for-columns))
+         (active-columns (select-active-columns layer
+                                                training-parameters
+                                                columns
+                                                active-synapses-for-columns))
          (locks (map 'vector
                      (lambda (i)
                        (lret ((lock (aref all-locks i)))

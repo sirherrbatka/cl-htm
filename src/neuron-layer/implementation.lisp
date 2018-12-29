@@ -230,8 +230,17 @@
 
 (defun reinforce-most-active (p+ p- maximum-weight minimum-weight
                               active-neurons layer neuron-index)
-  (let ((segments (distal-segment layer neuron-index))
-        (segments-count (access-segments-count layer)))
+  (bind ((segments (distal-segment layer neuron-index))
+         (segments-count (access-segments-count layer))
+         ((:flet segment-active-synapses (segment &aux (result vect)))
+          (cl-ds.utils:on-ordered-intersection
+           (lambda (neuron synaps)
+             (vector-push-extend synaps result))
+           active-neurons
+           segment
+           :same #'eql
+           :second-key #'source)
+          result))
     (iterate
      (with final-segment = nil)
      (with final-active-synapses = nil)

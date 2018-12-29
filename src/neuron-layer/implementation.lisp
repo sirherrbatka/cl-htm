@@ -229,9 +229,23 @@
 
 
 (defun reinforce-most-active (p+ p- maximum-weight minimum-weight
-                              layer neuron-index)
+                              active-neurons layer neuron-index)
   ;; TODO
-  )
+  (let ((segments (distal-segment layer neuron-index))
+        (segments-count (access-segments-count layer)))
+    (iterate
+     (with final-segment = nil)
+     (with final-active-synapses = nil)
+     (for i from (1- segments-count) downto 0)
+     (for segment = (cl-htm.utils:at segments i))
+     (for active-synapses = (segment-active-synapses segment
+                                                     active-neurons))
+     (for activity = (reduce #'+ active-synapses :key #'weight))
+     (maximize activity into maxi)
+     (when (eql maxi activity)
+       (setf final-segment segment
+             final-active-synapses active-synapses)))
+    ))
 
 
 (defun update-neurons (active-neurons predictive-neurons parameters)
@@ -262,6 +276,7 @@
                                          :on-second-missing (curry #'reinforce-most-active
                                                                    p+ p- maximum-weight
                                                                    minimum-weight
+                                                                   active-neurons
                                                                    layer))))
 
 

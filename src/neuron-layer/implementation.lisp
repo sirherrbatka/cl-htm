@@ -228,6 +228,12 @@
                                          :less #'<)))
 
 
+(defun reinforce-most-active (p+ p- maximum-weight minimum-weight
+                              layer neuron-index)
+  ;; TODO
+  )
+
+
 (defun update-neurons (active-neurons predictive-neurons parameters)
   (bind ((decay (cl-htm.training:decay parameters))
          (p+ (cl-htm.training:p+ parameters))
@@ -253,7 +259,10 @@
                                          :same #'eql
                                          :second-key #'neuron
                                          :on-first-missing #'decay
-                                         :on-second-missing #'identity)))
+                                         :on-second-missing (curry #'reinforce-most-active
+                                                                   p+ p- maximum-weight
+                                                                   minimum-weight
+                                                                   layer))))
 
 
 (defmethod update-synapses

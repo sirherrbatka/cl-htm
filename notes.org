@@ -44,3 +44,5 @@
 * Pool
 * Connections
 ** maps segments to cell
+* TODO Use 16 bit numbers everywhere
+* TODO Reinforce most active segment if active neuron was not predictive.

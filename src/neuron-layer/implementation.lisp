@@ -232,12 +232,13 @@
                               active-neurons layer neuron-index)
   (bind ((segments (distal-segment layer neuron-index))
          (segments-count (access-segments-count layer))
-         ((:flet segment-active-synapses (segment &aux (result vect)))
+         ((:flet segment-active-synapses (segment &aux (result (vect))))
           (cl-ds.utils:on-ordered-intersection
            (lambda (neuron synaps)
+             (declare (ignore neuron))
              (vector-push-extend synaps result))
            active-neurons
-           segment
+           (segment-source-weight segment)
            :same #'eql
            :second-key #'source)
           result))
@@ -246,8 +247,7 @@
      (with final-active-synapses = nil)
      (for i from (1- segments-count) downto 0)
      (for segment = (cl-htm.utils:at segments i))
-     (for active-synapses = (segment-active-synapses segment
-                                                     active-neurons))
+     (for active-synapses = (segment-active-synapses segment))
      (for activity = (reduce #'+ active-synapses :key #'weight))
      (maximize activity into maxi)
      (when (eql maxi activity)
@@ -261,7 +261,7 @@
                                          active-synapses))))))
 
 
-(defun update-neurons (active-neurons predictive-neurons parameters)
+(defun update-neurons (layer active-neurons predictive-neurons parameters)
   (bind ((decay (cl-htm.training:decay parameters))
          (p+ (cl-htm.training:p+ parameters))
          (p- (cl-htm.training:p- parameters))
@@ -306,7 +306,7 @@
   (check-type predictive-neurons vector)
   (check-type active-columns (simple-array * (*)))
   (check-type active-neurons vector)
-  (update-neurons active-neurons predictive-neurons parameters)
+  (update-neurons layer active-neurons predictive-neurons parameters)
   nil)
 
 

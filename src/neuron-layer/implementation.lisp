@@ -10,8 +10,8 @@
     ((layer neuron-layer)
      (input cl-htm.sdr:sdr)
      (columns neuron-column))
-  (declare (optimize (speed 1) (safety 1)
-                     (space 0) (debug 3)))
+  (declare (optimize (speed 3) (safety 1)
+                     (space 0) (debug 0)))
   (nest
    (vector-classes:with-data (((column-input input))
                               columns column neuron-column))

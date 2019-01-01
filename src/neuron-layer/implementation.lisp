@@ -385,8 +385,8 @@
                                cl-htm.sdr:sdr)
       (cl-htm.sdr:clear-all-active sdr)
       (map nil (lambda (i) (setf (neuron) 1))
-           active-columns)
-      (setf (cl-htm.sdr:dense-active-neurons sdr) active-columns))))
+           active-neurons)
+      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons))))
 
 
 (defmethod context ((layer neuron-layer))
@@ -451,7 +451,7 @@
 
 
 (defmethod output-size ((layer layer))
-  (~> layer columns vector-classes:size))
+  (~> layer vector-classes:size))
 
 
 (defmethod to-declared-layer ((layer layer)

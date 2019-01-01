@@ -25,13 +25,13 @@
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
                                          :synapses-count 64
                                          :segments-count 64
-                                         :column-count 2000
-                                         :size (* 8 2000))
+                                         :column-count 800
+                                         :size (* 800 16))
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
                                          :synapses-count 64
                                          :segments-count 64
-                                         :column-count 2000
-                                         :size (* 8 2000)))
+                                         :column-count 800
+                                         :size (* 800 16)))
                        :input *encoder*
                        :decoder *decoder*))
 

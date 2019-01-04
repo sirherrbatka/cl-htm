@@ -6,6 +6,7 @@
   (:export
    #:at
    #:content
+   #:size
    #:make-lazy-vector
    #:matching
    #:random-float

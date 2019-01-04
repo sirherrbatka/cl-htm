@@ -23,6 +23,16 @@
 (defgeneric matching (vector test-fn &key key))
 
 
+(defgeneric size (vector))
+
+
+(defmethod size ((vector lazy-vector))
+  (let ((inner (read-inner-vector vector)))
+    (if (null inner)
+        0
+        (array-dimension inner 0))))
+
+
 (defmethod at ((vector lazy-vector) position)
   (aref (slot-value vector '%inner-vector) position))
 
@@ -47,7 +57,7 @@
             (error "Not enough data to fill the vector!"))
           (setf (aref new-vector i) v))
         (unless (nth-value 1 (cl-ds:peek-front range))
-          (change-class vector 'lazy-vector))
+          (setf vector (change-class vector 'lazy-vector)))
         (setf (slot-value vector '%inner-vector) new-vector
               inner-vector new-vector)))
     (aref inner-vector position)))

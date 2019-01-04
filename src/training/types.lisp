@@ -19,6 +19,8 @@
                              :accessor past-predictive-neurons)
    (%active-neurons :initarg :active-neurons
                     :reader active-neurons)
+   (%first-iteration :initform t
+                     :accessor first-iteration)
    (%extra-data :initarg :extra-data
                 :reader read-extra-data))
   (:default-initargs

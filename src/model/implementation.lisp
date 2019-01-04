@@ -91,7 +91,10 @@
       (setf data-point (encode-data-point input destination data-point))
       (activate model mode contexts parameters sdrs)
       (when (more-data-p input mode data-point)
-        (cl-htm.sdr:clear-all-active destination))
+        (cl-htm.sdr:clear-all-active destination)
+        (iterate
+          (for context in contexts)
+          (setf (cl-htm.training:first-iteration context) nil)))
       (finally (return
                  (pass-to-decoder decoder model mode
                                   initial-data sdrs
@@ -116,7 +119,6 @@
 (defmethod train ((model fundamental-model)
                   data
                   &key (input (input model)) (decoder (decoder model)))
-  #|
   (let* ((mode (make 'cl-htm.training:train-mode))
          (queue (lparallel.queue:make-queue :fixed-capacity 32))
          (thread
@@ -145,15 +147,6 @@
       (for v = (lparallel:force (lparallel.queue:pop-queue queue)))
       (while v))
     (bt:join-thread thread))
-  |#
-  (let* ((mode (make 'cl-htm.training:train-mode))
-         (contexts (contexts model))
-         (sdrs (layers model)))
-    (cl-ds:traverse (lambda (data)
-                      (insert-point input decoder model mode
-                                    data contexts sdrs)
-                      (reset-model model sdrs contexts))
-                    data))
   model)
 
 

@@ -7,6 +7,7 @@
    #:activated-columns-fraction
    #:adapt-mode
    #:active-neurons
+   #:first-iteration
    #:basic-context
    #:basic-parameters
    #:decay

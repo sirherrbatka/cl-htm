@@ -180,22 +180,23 @@
   (check-type active-columns (simple-array fixnum (*)))
   (check-type active-neurons (array * (*)))
   (setf (fill-pointer active-neurons) 0)
-  (let ((column-size (truncate (vector-classes:size layer)
-                               (vector-classes:size columns)))
-        (push-to-vector (lambda (column neuron)
-                          (declare (ignore column))
-                          (vector-push-extend (neuron neuron)
-                                              active-neurons)))
-        (select-and-push (compose (rcurry #'vector-push-extend active-neurons)
-                                  (selecting-the-most-active-neuron layer
-                                                                    columns
-                                                                    input))))
+  (let* ((column-size (truncate (vector-classes:size layer)
+                                (vector-classes:size columns)))
+         (push-to-vector (lambda (column neuron)
+                           (declare (ignore column))
+                           (vector-push-extend (neuron neuron)
+                                               active-neurons)))
+         (burst-column (lambda (column-index)
+                         (iterate
+                           (for i from column-index)
+                           (repeat column-size)
+                           (vector-push-extend i active-neurons)))))
     (declare (type non-negative-fixnum column-size))
     (cl-ds.utils:on-ordered-intersection push-to-vector
                                          active-columns
                                          predictive-neurons
                                          :same #'eql
-                                         :on-second-missing select-and-push
+                                         :on-second-missing burst-column
      :second-key (lambda (neuron) (truncate (neuron neuron) column-size)))
     active-neurons))
 
@@ -335,8 +336,10 @@
      (sdr cl-htm.sdr:sdr)
      (context cl-htm.training:fundamental-context)
      (training-parameters cl-htm.training:fundamental-parameters)
-     (mode cl-htm.training:fundamental-mode))
+     (mode cl-htm.training:train-mode))
   (declare (optimize (debug 3) (safety 1)))
+  (when (cl-htm.training:first-iteration context)
+    (return-from activate))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons

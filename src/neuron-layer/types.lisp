@@ -11,6 +11,12 @@
           :initform (bt:make-lock)
           :type bt:lock
           :reader read-locks)
+   (proximal-synapses-strength
+    :array t
+    :type non-negative-fixnum
+    :dimensions-arg :proximal-synapses-count
+    :documentation "Weights of proximal synapses for each neuron."
+    :initform (cl-htm.utils:random-synapses-strength))
    (%column-indices :initarg :column-indices
                     :type (simple-array fixnum)
                     :reader read-column-indices)))
@@ -35,13 +41,7 @@
     :type fixnum
     :initarg :synapses-count)
    (%input-size :initarg :input-size
-                :accessor access-input-size)
-   (proximal-synapses-strength
-    :array t
-    :type non-negative-fixnum
-    :dimensions-arg :proximal-synapses-count
-    :documentation "Weights of proximal synapses for each neuron."
-    :initform (cl-htm.utils:random-synapses-strength))))
+                :accessor access-input-size)))
 
 
 (vector-classes:define-data neuron-layer (neuron-layer-weights)

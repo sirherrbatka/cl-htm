@@ -18,32 +18,19 @@
    (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
                               input j cl-htm.sdr:sdr))
    (vector-classes:with-data (((synaps proximal-synapses-strength))
-                              layer neuron neuron-layer))
+                              columns column neuron-column))
    (bind ((size (vector-classes:size columns))
-          (column-size (truncate (vector-classes:size layer)
-                                 size))
           (synapses-count (access-synapses-count layer))
-          (active-input-vector (make-array synapses-count
-                                           :element-type 'fixnum))
           (result (make-array size :element-type 'non-negative-fixnum))
-          ((:dflet count-for-column (column &aux (size 0)))
+          ((:dflet count-for-column (column))
            (declare (type non-negative-fixnum column size))
            (iterate
+             (with result = 0)
              (for i from 0 below synapses-count)
              (for j = (column-input i))
              (unless (zerop (active))
-               (setf (aref active-input-vector size) i)
-               (incf size)))
-           (iterate
-             (declare (type fixnum sum neuron))
-             (with sum = 0)
-             (for neuron from (* column column-size))
-             (repeat column-size)
-             (iterate
-               (for i from 0 below size)
-               (for j = (aref active-input-vector i))
-               (incf sum (synaps j)))
-             (finally (return sum)))))
+               (incf result (synaps)))
+             (finally (return result)))))
      (declare (type fixnum synapses-count size))
      (iterate
        (declare (type fixnum i))
@@ -123,50 +110,6 @@
              (type vector result))
     (map nil #'gather-neurons active-columns)
     result))
-
-
-(defun selecting-the-most-active-neuron (layer columns input)
-  (declare (optimize (speed 1) (safety 3) (debug 3) (space 0)))
-  (nest
-   (vector-classes:with-data (((synapses-strength proximal-synapses-strength))
-                              layer neuron-index neuron-layer))
-   (vector-classes:with-data (((columns-input input))
-                              columns column-index neuron-column))
-   (vector-classes:with-data (((active cl-htm.sdr:active-neurons))
-                              input input-index cl-htm.sdr:sdr))
-   (let* ((column-size (truncate (the fixnum (vector-classes:size layer))
-                                (the fixnum (vector-classes:size columns))))
-          (synapses-count (access-synapses-count layer))
-          (synapses-array (make-array synapses-count
-                                      :element-type 'fixnum)))
-     (declare (type fixnum column-size synapses-count)))
-   (lambda (column-index &aux (segment-pointer 0))
-     (declare (type fixnum column-index segment-pointer))
-     (iterate
-       (declare (type fixnum input-index))
-       (for h from 0 below synapses-count)
-       (for input-index = (columns-input h))
-       (unless (zerop (active))
-         (setf (aref synapses-array segment-pointer)
-               h)
-         (incf segment-pointer)))
-     (iterate
-       (declare (type fixnum i neuron-index
-                      column-start neuron))
-       (with column-start = (* column-index column-size))
-       (with neuron = 0)
-       (for neuron-index from column-start)
-       (for i from 0 below column-size)
-       (for neuron-signal =
-            (iterate
-              (declare (type fixnum k i))
-              (for i from 0 below segment-pointer)
-              (for k = (aref synapses-array i))
-              (sum (synapses-strength k))))
-       (maximize neuron-signal into maxi)
-       (when (eql maxi neuron-signal)
-         (setf neuron neuron-index))
-       (finally (return neuron))))))
 
 
 (defmethod select-active-neurons ((layer neuron-layer)
@@ -314,9 +257,8 @@
 (defmethod to-effective-layer ((neuron neuron-layer-weights))
   (lret ((result (make 'neuron-layer)))
     (cl-ds.utils:copy-slots (neuron result)
-      vector-classes::%size proximal-synapses-strength
-      %input-size %synapses-count %segments-count
-      %columns distal-segments)))
+      vector-classes::%size %input-size %synapses-count
+      %segments-count %columns distal-segments)))
 
 
 (defmethod update-synapses

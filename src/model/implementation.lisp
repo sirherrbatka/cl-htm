@@ -124,22 +124,21 @@
          (thread
            (bt:make-thread
             (lambda ()
-              (~>>
+              (~>
                data
                (make-instance 'cl-ds:chunked-range :chunk-size 32000
                                                    :original-range _)
                (cl-ds:across (lambda (chunk)
                                (lparallel.queue:push-queue
                                 (lparallel:future
-                                  (cl-ds:traverse
-                                     (lambda (data
-                                              &aux
-                                                (contexts (contexts model))
-                                                (sdrs (layers model)))
-                                       (insert-point input decoder model mode
-                                                     data contexts sdrs)
-                                       (reset-model model sdrs contexts))
-                                     chunk)
+                                  (cl-ds:traverse chunk
+                                                  (lambda (data
+                                                           &aux
+                                                             (contexts (contexts model))
+                                                             (sdrs (layers model)))
+                                                    (insert-point input decoder model mode
+                                                                  data contexts sdrs)
+                                                    (reset-model model sdrs contexts)))
                                   t)
                                   queue))))
               (lparallel.queue:push-queue nil queue)))))

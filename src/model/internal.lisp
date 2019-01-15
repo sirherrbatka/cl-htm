@@ -85,8 +85,8 @@
                                             (make-decoder-output :class (car x)
                                                                  :count (cdr x)))
                                           (hash-table-alist data)))))
-    (cl-ds:make-from-traversable 'cl-ds.ms.egnat:mutable-egnat-metric-set
-                                 vector
+    (cl-ds:make-from-traversable vector
+                                 'cl-ds.ms.egnat:mutable-egnat-metric-set
                                  (fork #'vector= #'car #'car)
                                  (lambda (a b) (jaccard-metric (car a) (car b)))
                                  ;; (fork #'jaccard-metric #'car #'car)

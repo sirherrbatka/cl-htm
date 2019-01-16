@@ -342,8 +342,9 @@
     (select-active-neurons layer columns sdr
                            active-columns prev-data
                            active-neurons)
-    (update-synapses training-parameters layer sdr mode columns
-                     active-columns context prev-data active-neurons)
+    (update-synapses training-parameters layer sdr
+                     mode columns context active-columns
+                     prev-data active-neurons)
     (setf (cl-htm.training:past-predictive-neurons context)
           predictive-neurons)
     (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))

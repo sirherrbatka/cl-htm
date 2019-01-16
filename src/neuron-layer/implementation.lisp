@@ -338,8 +338,7 @@
                                 context)))
       (declare (type (array fixnum (*))
                      active-columns)
-               (type (array * (*)) predictive-neurons)
-               (type (simple-array bt:lock (*)) all-locks locks))
+               (type (array * (*)) predictive-neurons))
       (select-active-neurons layer columns sdr
                              active-columns prev-data
                              active-neurons)

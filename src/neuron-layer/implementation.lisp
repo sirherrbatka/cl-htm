@@ -328,25 +328,24 @@
          (active-columns (select-active-columns layer
                                                 training-parameters
                                                 columns
-                                                active-synapses-for-columns)))
-    (let* ((predictive-neurons (select-predictive-neurons
-                                layer
-                                sdr
-                                training-parameters
-                                columns
-                                active-columns
-                                context)))
-      (declare (type (array fixnum (*))
-                     active-columns)
-               (type (array * (*)) predictive-neurons))
-      (select-active-neurons layer columns sdr
-                             active-columns prev-data
-                             active-neurons)
-      (update-synapses training-parameters layer sdr mode columns
-                       active-columns context prev-data active-neurons)
-      (setf (cl-htm.training:past-predictive-neurons context)
-            predictive-neurons)
-      sdr)
+                                                active-synapses-for-columns))
+         (predictive-neurons (select-predictive-neurons
+                              layer
+                              sdr
+                              training-parameters
+                              columns
+                              active-columns
+                              context)))
+    (declare (type (array fixnum (*))
+                   active-columns)
+             (type (array * (*)) predictive-neurons))
+    (select-active-neurons layer columns sdr
+                           active-columns prev-data
+                           active-neurons)
+    (update-synapses training-parameters layer sdr mode columns
+                     active-columns context prev-data active-neurons)
+    (setf (cl-htm.training:past-predictive-neurons context)
+          predictive-neurons)
     (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
                                sdr
                                i

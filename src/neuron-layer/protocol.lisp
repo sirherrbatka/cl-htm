@@ -8,7 +8,7 @@
                       mode))
 
 (defgeneric update-synapses (training-parameters layer input mode
-                             columns active-columns
+                             columns context active-columns
                              predictive-neurons active-neurons))
 
 (defgeneric select-predictive-neurons (layer sdr training-parameters

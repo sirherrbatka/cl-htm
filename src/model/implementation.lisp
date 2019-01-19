@@ -108,12 +108,11 @@
         (sdrs (layers model))
         (contexts (contexts model)))
     (cl-ds.alg:on-each
+     data
      (lambda (data-point)
-       (prog1
-           (insert-point input decoder model mode
-                         data-point contexts sdrs)
-         (reset-model model sdrs contexts)))
-     data)))
+       (lret ((result (insert-point input decoder model mode
+                                   data-point contexts sdrs)))
+         (reset-model model sdrs contexts))))))
 
 
 (defmethod train ((model fundamental-model)
@@ -126,7 +125,7 @@
             (lambda ()
               (~>
                data
-               (make-instance 'cl-ds:chunked-range :chunk-size 32000
+               (make-instance 'cl-ds:chunked-range :chunk-size 1000
                                                    :original-range _)
                (cl-ds:across (lambda (chunk)
                                (lparallel.queue:push-queue
@@ -244,7 +243,7 @@
 
 
 (defmethod more-data-p ((input random-vector-encoder)
-                        (mode cl-htm.training:fundamental-mode)
+                        (mode cl-htm.training:predict-mode)
                         data-point)
   (ensure-data-wrapping data-point)
   (< (the fixnum (cdr data-point))
@@ -253,6 +252,14 @@
 
 (defmethod more-data-p ((input random-vector-encoder)
                         (mode cl-htm.training:train-mode)
+                        data-point)
+  (ensure-data-wrapping data-point)
+  (< (the fixnum (cdr data-point))
+     (the fixnum (length (car data-point)))))
+
+
+(defmethod more-data-p ((input random-vector-encoder)
+                        (mode cl-htm.training:adapt-mode)
                         data-point)
   (ensure-data-wrapping data-point)
   (< (the fixnum (cdr data-point))

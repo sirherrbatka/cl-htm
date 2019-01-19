@@ -2,6 +2,7 @@
 
 
 (defmethod reset-context ((context basic-context))
+  (break)
   (setf (past-predictive-neurons context) +empty-vector+
         (fill-pointer (active-neurons context)) 0
         (first-iteration context) t)

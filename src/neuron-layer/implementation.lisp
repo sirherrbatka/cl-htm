@@ -65,7 +65,7 @@
      (columns neuron-column)
      active-columns
      context)
-  (declare (optimize (speed 1) (safety 1) (debug 1) (space 0)))
+  (declare (optimize (speed 1) (safety 1) (debug 3) (space 0)))
   (check-type active-columns (array fixnum (*)))
   (bind ((threshold (cl-htm.training:threshold training-parameters))
          (column-size (/ (the fixnum (vector-classes:size layer))
@@ -109,6 +109,7 @@
     (declare (type fixnum threshold column-size)
              (type vector result))
     (map nil #'gather-neurons active-columns)
+    (break)
     result))
 
 
@@ -310,10 +311,52 @@
      (sdr cl-htm.sdr:sdr)
      (context cl-htm.training:fundamental-context)
      (training-parameters cl-htm.training:fundamental-parameters)
-     (mode cl-htm.training:train-mode))
+     (mode cl-htm.training:predict-mode))
   (declare (optimize (debug 3) (safety 1)))
-  (when (cl-htm.training:first-iteration context)
-    (return-from activate))
+  ;; calculate number of active synapses for each column
+  ;; select top active columns
+  ;; select predictive neurons
+  ;; set active neurons
+  ;; finally, return all predictive neurons
+  (let* ((columns (columns layer))
+         (active-synapses-for-columns
+           (calculate-active-synapses-for-columns
+            layer sdr columns))
+         (prev-data (cl-htm.training:past-predictive-neurons context))
+         (active-columns (select-active-columns layer
+                                                training-parameters
+                                                columns
+                                                active-synapses-for-columns))
+         (active-neurons (cl-htm.training:active-neurons context)))
+    (select-active-neurons layer columns sdr
+                           active-columns prev-data
+                           active-neurons)
+    (setf (cl-htm.training:past-predictive-neurons context)
+          (select-predictive-neurons
+           layer
+           sdr
+           training-parameters
+           columns
+           active-columns
+           context))
+    (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
+                               sdr
+                               i
+                               cl-htm.sdr:sdr)
+      (cl-htm.sdr:clear-all-active sdr)
+      (map nil (lambda (i) (setf (neuron) 1))
+           active-neurons)
+      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons)
+      (setf (cl-htm.training:active-neurons context) active-neurons))))
+
+
+(defmethod activate
+    ((layer neuron-layer)
+     (sdr cl-htm.sdr:sdr)
+     (context cl-htm.training:fundamental-context)
+     (training-parameters cl-htm.training:fundamental-parameters)
+     (mode cl-htm.training:fundamental-mode))
+  (declare (optimize (debug 3) (safety 1)))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons
@@ -342,9 +385,10 @@
     (select-active-neurons layer columns sdr
                            active-columns prev-data
                            active-neurons)
-    (update-synapses training-parameters layer sdr
-                     mode columns context active-columns
-                     prev-data active-neurons)
+    (unless (cl-htm.training:first-iteration context)
+      (update-synapses training-parameters layer sdr
+                       mode columns context active-columns
+                       prev-data active-neurons))
     (setf (cl-htm.training:past-predictive-neurons context)
           predictive-neurons)
     (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
@@ -354,7 +398,8 @@
       (cl-htm.sdr:clear-all-active sdr)
       (map nil (lambda (i) (setf (neuron) 1))
            active-neurons)
-      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons))))
+      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons))
+    (setf (cl-htm.training:active-neurons context) active-neurons)))
 
 
 (defmethod context ((layer neuron-layer))

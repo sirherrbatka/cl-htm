@@ -119,7 +119,7 @@
                                   active-columns
                                   predictive-neurons
                                   active-neurons)
-  (declare (optimize (debug 3)))
+  (declare (optimize (speed 3) (safety 0) (space 0)))
   (check-type predictive-neurons vector)
   (check-type active-columns (simple-array fixnum (*)))
   (check-type active-neurons (array * (*)))
@@ -136,12 +136,15 @@
                            (repeat column-size)
                            (vector-push-extend i active-neurons)))))
     (declare (type non-negative-fixnum column-size))
-    (cl-ds.utils:on-ordered-intersection push-to-vector
-                                         active-columns
-                                         predictive-neurons
-                                         :same #'eql
-                                         :on-second-missing burst-column
-     :second-key (lambda (neuron) (truncate (neuron neuron) column-size)))
+    (cl-ds.utils:on-ordered-intersection
+     push-to-vector
+     active-columns
+     predictive-neurons
+     :same #'eql
+     :on-second-missing burst-column
+     :second-key (lambda (neuron)
+                   (declare (type non-negative-fixnum neuron))
+                   (truncate (neuron neuron) column-size)))
     active-neurons))
 
 

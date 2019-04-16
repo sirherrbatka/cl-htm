@@ -63,16 +63,28 @@
   nil)
 
 
-(defmethod pass-to-decoder ((decoder fundamental-vector-decoder)
-                            (model fundamental-model)
-                            (mode cl-htm.training:fundamental-mode)
-                            data-point
-                            sdrs
-                            contexts)
+(defmethod pass-to-decoder :around ((decoder fundamental-vector-decoder)
+                                    (model fundamental-model)
+                                    (mode cl-htm.training:fundamental-mode)
+                                    data-point
+                                    sdrs
+                                    contexts)
   (call-next-method decoder model mode
                     (aref data-point (read-prediction-index decoder))
                     sdrs
                     contexts))
+
+
+(defmethod pass-to-decoder ((decoder fundamental-discreete-decoder)
+                            (model basic-model)
+                            (mode cl-htm.training:predict-mode)
+                            data-point
+                            sdrs
+                            contexts)
+  (~>> sdrs (input/output-sdr model)
+       cl-htm.sdr:dense-active-neurons
+       copy-array)
+  )
 
 
 (defmethod insert-point ((input fundamental-input)
@@ -156,7 +168,7 @@
          (thread
            (bt:make-thread
             (lambda ()
-              (~>>
+              (~>
                data
                (make-instance 'cl-ds:chunked-range :chunk-size 32000
                                                    :original-range _)
@@ -164,14 +176,14 @@
                                (lparallel.queue:push-queue
                                 (lparallel:future
                                   (cl-ds:traverse
+                                   chunk
                                    (lambda (data
                                             &aux
                                               (contexts (contexts model))
                                               (sdrs (layers model)))
                                      (insert-point input decoder model mode
                                                    data contexts sdrs)
-                                     (reset-model model sdrs contexts))
-                                   chunk)
+                                                    (reset-model model sdrs contexts)))
                                   t)
                                 queue))))
               (lparallel.queue:push-queue nil queue)))))

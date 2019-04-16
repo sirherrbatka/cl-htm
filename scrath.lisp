@@ -1,6 +1,6 @@
 (defparameter *training-parameters*
   (make-instance 'cl-htm.training:basic-parameters
-                 :activated-columns-fraction 0.02
+                 :activated-columns-fraction 0.1
                  :maximum-weight 1000
                  :threshold 50
                  :p- 5
@@ -19,26 +19,23 @@
 
 (defparameter *model* (cl-htm.model:make-model
                        'cl-htm.model:basic-model
-                       2000
+                       512
                        *training-parameters*
                        (cl-htm.nl:layers
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 64
-                                         :segments-count 64
-                                         :column-count 800
-                                         :size (* 800 16))
-                        (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 64
-                                         :segments-count 64
-                                         :column-count 800
-                                         :size (* 800 16)))
+                                         :synapses-count 16
+                                         :segments-count 32
+                                         :column-count 128
+                                         :size (* 128 8)))
                        :input *encoder*
                        :decoder *decoder*))
 
 (cl-htm.model:train *model*
                     (cl-ds:xpr (:i 1000)
                       (unless (zerop i)
-                        (cl-ds:send-recur (vector 1 2 3)
+                        (cl-ds:send-recur (if (oddp i)
+                                              (vector 8 9 10)
+                                              (vector 1 2 3))
                                           :i (1- i)))))
 
 (cl-htm.model:adapt *model* (cl-ds:xpr (:i 100)
@@ -50,7 +47,9 @@
   (cl-htm.model:predict *model*
                         (cl-ds:xpr (:i 50)
                           (unless (zerop i)
-                            (cl-ds:send-recur (vector 1 2 3)
+                            (cl-ds:send-recur (if (oddp i)
+                                                  (vector 8 9 10)
+                                                  (vector 1 2 3))
                                               :i (1- i))))))
 
 (defparameter *predictions-vector*

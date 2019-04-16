@@ -109,7 +109,6 @@
     (declare (type fixnum threshold column-size)
              (type vector result))
     (map nil #'gather-neurons active-columns)
-    (break)
     result))
 
 
@@ -319,26 +318,24 @@
   ;; set active neurons
   ;; finally, return all predictive neurons
   (let* ((columns (columns layer))
+         (active-neurons (cl-htm.training:active-neurons context))
          (active-synapses-for-columns
            (calculate-active-synapses-for-columns
             layer sdr columns))
-         (prev-data (cl-htm.training:past-predictive-neurons context))
          (active-columns (select-active-columns layer
                                                 training-parameters
                                                 columns
                                                 active-synapses-for-columns))
-         (active-neurons (cl-htm.training:active-neurons context)))
+         (predictive-neurons (select-predictive-neurons
+                              layer
+                              sdr
+                              training-parameters
+                              columns
+                              active-columns
+                              context)))
     (select-active-neurons layer columns sdr
-                           active-columns prev-data
+                           active-columns predictive-neurons
                            active-neurons)
-    (setf (cl-htm.training:past-predictive-neurons context)
-          (select-predictive-neurons
-           layer
-           sdr
-           training-parameters
-           columns
-           active-columns
-           context))
     (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
                                sdr
                                i
@@ -346,8 +343,9 @@
       (cl-htm.sdr:clear-all-active sdr)
       (map nil (lambda (i) (setf (neuron) 1))
            active-neurons)
-      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons)
-      (setf (cl-htm.training:active-neurons context) active-neurons))))
+      (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons
+            (cl-htm.training:active-neurons context) active-neurons
+            (cl-htm.training:past-predictive-neurons context) predictive-neurons))))
 
 
 (defmethod activate
@@ -363,7 +361,6 @@
   ;; set active neurons
   ;; finally, return all predictive neurons
   (let* ((columns (columns layer))
-         (prev-data (cl-htm.training:past-predictive-neurons context))
          (active-neurons (cl-htm.training:active-neurons context))
          (active-synapses-for-columns
            (calculate-active-synapses-for-columns
@@ -383,14 +380,12 @@
                    active-columns)
              (type (array * (*)) predictive-neurons))
     (select-active-neurons layer columns sdr
-                           active-columns prev-data
+                           active-columns predictive-neurons
                            active-neurons)
     (unless (cl-htm.training:first-iteration context)
       (update-synapses training-parameters layer sdr
                        mode columns context active-columns
-                       prev-data active-neurons))
-    (setf (cl-htm.training:past-predictive-neurons context)
-          predictive-neurons)
+                       predictive-neurons active-neurons))
     (vector-classes:with-data (((neuron cl-htm.sdr:active-neurons))
                                sdr
                                i
@@ -399,7 +394,8 @@
       (map nil (lambda (i) (setf (neuron) 1))
            active-neurons)
       (setf (cl-htm.sdr:dense-active-neurons sdr) active-neurons))
-    (setf (cl-htm.training:active-neurons context) active-neurons)))
+    (setf (cl-htm.training:active-neurons context) active-neurons
+          (cl-htm.training:past-predictive-neurons context) predictive-neurons)))
 
 
 (defmethod context ((layer neuron-layer))

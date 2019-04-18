@@ -177,7 +177,7 @@
            (bt:make-thread
             (lambda ()
               (~> (make-instance 'cl-ds:chunked-range
-                                 :chunk-size 32000
+                                 :chunk-size 1000
                                  :original-range data)
                   (cl-ds:traverse (lambda (chunk)
                                     (lparallel.queue:push-queue

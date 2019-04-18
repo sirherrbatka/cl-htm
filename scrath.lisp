@@ -5,12 +5,12 @@
                  :threshold 150
                  :p- 5
                  :p+ 50
-                 :decay 0))
+                 :decay 5))
 
 (defparameter *encoder* (make-instance
                          'cl-htm.model:random-vector-encoder
                          :encoded-length 2
-                         :count 40))
+                         :count 50))
 
 (defparameter *decoder* (cl-htm.model:make-vector-decoder
                          'eql
@@ -23,16 +23,16 @@
                        *training-parameters*
                        (cl-htm.nl:layers
                         (cl-htm.nl:layer 'cl-htm.nl:neuron-layer-weights
-                                         :synapses-count 16
-                                         :segments-count 32
-                                         :column-count 128
-                                         :size (* 128 8)))
+                                         :synapses-count 32
+                                         :segments-count 128
+                                         :column-count 256
+                                         :size (* 256 8)))
                        :input *encoder*
                        :decoder *decoder*))
 
 
 (cl-htm.model:train *model*
-                    (cl-ds:xpr (:i 1000)
+                    (cl-ds:xpr (:i 100)
                       (unless (zerop i)
                         (cl-ds:send-recur
                          #(1 2 3)

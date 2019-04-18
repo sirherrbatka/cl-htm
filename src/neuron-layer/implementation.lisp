@@ -250,9 +250,6 @@
     (declare (type fixnum decay p+ p-
                    maximum-weight minimum-weight))
     (setf active-neurons (sort active-neurons #'<))
-    (format t "p:~a~%a:~a~%~%"
-            (map 'vector #'first-elt predictive-neurons)
-            active-neurons)
     (cl-ds.utils:on-ordered-intersection
      (lambda (active predictive)
        (let ((column (truncate active column-size)))

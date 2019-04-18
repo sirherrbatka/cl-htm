@@ -142,21 +142,22 @@
          (thread
            (bt:make-thread
             (lambda ()
-              (~>
-               data
-               (make-instance 'cl-ds:chunked-range :chunk-size 1000
-                                                   :original-range _)
-               (cl-ds:traverse (lambda (chunk)
-                                 (lparallel.queue:push-queue
-                                  (lparallel:future
-                                    (cl-ds:traverse chunk
-                                                    (lambda (data
-                                                             &aux
-                                                               (contexts (contexts model))
-                                                               (sdrs (layers model)))
-                                                      (insert-point input decoder model mode
-                                                                    data contexts sdrs)
-                                                      (reset-model model sdrs contexts)))
+              (~> (make-instance 'cl-ds:chunked-range
+                                 :chunk-size 1000
+                                 :original-range data)
+                  (cl-ds:traverse (lambda (chunk)
+                                    (lparallel.queue:push-queue
+                                     (lparallel:future
+                                       (cl-ds:traverse
+                                        chunk
+                                        (lambda (data
+                                                 &aux
+                                                   (contexts (contexts model))
+                                                   (sdrs (layers model)))
+                                          (insert-point input decoder model
+                                                        mode data contexts
+                                                        sdrs)
+                                          (reset-model model sdrs contexts)))
                                     t)
                                   queue))))
               (lparallel.queue:push-queue nil queue)))))
@@ -175,24 +176,24 @@
          (thread
            (bt:make-thread
             (lambda ()
-              (~>
-               data
-               (make-instance 'cl-ds:chunked-range :chunk-size 32000
-                                                   :original-range _)
-               (cl-ds:traverse (lambda (chunk)
-                                 (lparallel.queue:push-queue
-                                  (lparallel:future
-                                    (cl-ds:traverse
-                                     chunk
-                                     (lambda (data
-                                              &aux
-                                                (contexts (contexts model))
-                                                (sdrs (layers model)))
-                                       (insert-point input decoder model mode
-                                                     data contexts sdrs)
-                                       (reset-model model sdrs contexts)))
-                                  t)
-                                queue))))
+              (~> (make-instance 'cl-ds:chunked-range
+                                 :chunk-size 32000
+                                 :original-range data)
+                  (cl-ds:traverse (lambda (chunk)
+                                    (lparallel.queue:push-queue
+                                     (lparallel:future
+                                       (cl-ds:traverse
+                                        chunk
+                                        (lambda (data
+                                                 &aux
+                                                   (contexts (contexts model))
+                                                   (sdrs (layers model)))
+                                          (insert-point input decoder model
+                                                        mode data contexts
+                                                        sdrs)
+                                          (reset-model model sdrs contexts)))
+                                       t)
+                                     queue))))
               (lparallel.queue:push-queue nil queue)))))
     (iterate
       (for v = (lparallel:force (lparallel.queue:pop-queue queue)))

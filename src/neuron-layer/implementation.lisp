@@ -65,7 +65,8 @@
      (columns neuron-column)
      active-columns
      context)
-  (declare (optimize (speed 1) (safety 1) (debug 3) (space 0)))
+  (declare (optimize (speed 1) (safety 1) (debug 3) (space 0))
+           (ignore sdr))
   (check-type active-columns (array fixnum (*)))
   (bind ((threshold (cl-htm.training:threshold training-parameters))
          (column-size (/ (the fixnum (vector-classes:size layer))
@@ -248,6 +249,10 @@
                                   (max minimum-weight)))))))))
     (declare (type fixnum decay p+ p-
                    maximum-weight minimum-weight))
+    (setf active-neurons (sort active-neurons #'<))
+    (format t "p:~a~%a:~a~%~%"
+            (map 'vector #'first-elt predictive-neurons)
+            active-neurons)
     (cl-ds.utils:on-ordered-intersection
      (lambda (active predictive)
        (let ((column (truncate active column-size)))
@@ -260,7 +265,7 @@
      predictive-neurons
      :same #'eql
      :second-key #'neuron
-     :on-first-missing #'decay
+     :on-first-missing (if (zerop decay) #'identity #'decay)
      :on-second-missing (lambda (neuron)
                           (let ((column (truncate neuron column-size)))
                             (bt:with-lock-held ((aref locks column))

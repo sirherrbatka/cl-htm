@@ -1,11 +1,11 @@
 (defparameter *training-parameters*
   (make-instance 'cl-htm.training:basic-parameters
-                 :activated-columns-fraction 0.1
+                 :activated-columns-fraction 0.05
                  :maximum-weight 1000
-                 :threshold 50
+                 :threshold 150
                  :p- 5
-                 :p+ 10
-                 :decay 2))
+                 :p+ 50
+                 :decay 0))
 
 (defparameter *encoder* (make-instance
                          'cl-htm.model:random-vector-encoder
@@ -30,13 +30,13 @@
                        :input *encoder*
                        :decoder *decoder*))
 
+
 (cl-htm.model:train *model*
                     (cl-ds:xpr (:i 1000)
                       (unless (zerop i)
-                        (cl-ds:send-recur (if (oddp i)
-                                              (vector 8 9 10)
-                                              (vector 1 2 3))
-                                          :i (1- i)))))
+                        (cl-ds:send-recur
+                         #(1 2 3)
+                         :i (1- i)))))
 
 (cl-htm.model:adapt *model* (cl-ds:xpr (:i 100)
                               (unless (zerop i)
@@ -45,12 +45,9 @@
 
 (defparameter *predictions*
   (cl-htm.model:predict *model*
-                        (cl-ds:xpr (:i 50)
+                        (cl-ds:xpr (:i 5)
                           (unless (zerop i)
-                            (cl-ds:send-recur (if (oddp i)
-                                                  (vector 8 9 10)
-                                                  (vector 1 2 3))
-                                              :i (1- i))))))
+                            (cl-ds:send-recur #(1 2 3) :i (1- i))))))
 
 (defparameter *predictions-vector*
   (cl-ds.alg:to-vector *predictions*))

@@ -81,10 +81,9 @@
                             data-point
                             sdrs
                             contexts)
-  (~>> sdrs (input/output-sdr model)
-       cl-htm.sdr:dense-active-neurons
-       copy-array)
-  )
+  (~>> contexts last-elt
+       cl-htm.training:past-predictive-neurons
+       (map '(vector fixnum) #'first-elt)))
 
 
 (defmethod insert-point ((input fundamental-input)

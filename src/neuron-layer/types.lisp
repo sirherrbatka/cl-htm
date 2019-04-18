@@ -16,6 +16,7 @@
     :type non-negative-fixnum
     :dimensions-arg :proximal-synapses-count
     :documentation "Weights of proximal synapses for each neuron."
+    :initarg :proximal-synapses-strength
     :initform (cl-htm.utils:random-synapses-strength))
    (%column-indices :initarg :column-indices
                     :type (simple-array fixnum)

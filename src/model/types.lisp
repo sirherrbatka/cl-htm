@@ -40,12 +40,31 @@
 
 (defclass fundamental-discreete-decoder (fundamental-decoder)
   ((%outputs :initarg :outputs
-             :reader read-outputs)))
+             :reader read-outputs)
+   (%test :initarg :test
+          :initform 'eql
+          :reader read-test)))
+
+
+(defun vector-hash (vector)
+  (iterate
+    (with hash = (logand most-positive-fixnum 14695981039346656037))
+    (with prime = (logand most-positive-fixnum 1099511628211))
+    (for elt in-vector vector)
+    (for sub = (sxhash elt))
+    (setf hash (logand most-positive-fixnum (logxor sub hash)))
+    (setf hash (logand most-positive-fixnum (* sub prime)))
+    (finally (return hash))))
+
+
+(cl-custom-hash-table:define-custom-hash-table-constructor
+    make-vector-hash-table :test vector= :hash-function vector-hash)
 
 
 (defclass fundamental-vector-decoder (fundamental-discreete-decoder)
   ((%prediction-index :initarg :prediction-index
-                      :reader read-prediction-index)))
+                      :reader read-prediction-index))
+  (:default-initargs :outputs (make-vector-hash-table)))
 
 
 (defclass random-symbol-encoder (fundamental-encoder) ;or atom-encoder?

@@ -65,7 +65,7 @@
      (columns neuron-column)
      active-columns
      context)
-  (declare (optimize (speed 1) (safety 1) (debug 3) (space 0))
+  (declare (optimize (speed 3) (safety 1) (debug 0) (space 0))
            (ignore sdr))
   (check-type active-columns (array fixnum (*)))
   (bind ((threshold (cl-htm.training:threshold training-parameters))
@@ -284,7 +284,7 @@
      active-columns
      predictive-neurons
      active-neurons)
-  (declare (optimize (speed 1) (safety 1) (debug 3) (space 0)))
+  (declare (optimize (speed 3) (safety 1) (debug 0) (space 0)))
   (check-type predictive-neurons vector)
   (check-type active-columns (simple-array * (*)))
   (check-type active-neurons vector)
@@ -319,7 +319,7 @@
      (context cl-htm.training:fundamental-context)
      (training-parameters cl-htm.training:fundamental-parameters)
      (mode cl-htm.training:predict-mode))
-  (declare (optimize (debug 3) (safety 1)))
+  (declare (optimize (speed 3) (debug 0) (safety 1)))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons
@@ -362,7 +362,7 @@
      (context cl-htm.training:fundamental-context)
      (training-parameters cl-htm.training:fundamental-parameters)
      (mode cl-htm.training:fundamental-mode))
-  (declare (optimize (debug 3) (safety 1)))
+  (declare (optimize (speed 3) (safety 1)))
   ;; calculate number of active synapses for each column
   ;; select top active columns
   ;; select predictive neurons

@@ -63,6 +63,15 @@
   nil)
 
 
+(defmethod pass-to-decoder ((decoder fundamental-discreete-decoder)
+                            (model fundamental-model)
+                            (mode cl-htm.training:adapt-mode)
+                            data-point
+                            sdrs
+                            contexts)
+  nil)
+
+
 (defmethod pass-to-decoder :around ((decoder fundamental-vector-decoder)
                                     (model fundamental-model)
                                     (mode cl-htm.training:fundamental-mode)
@@ -93,7 +102,6 @@
                          data-point
                          contexts
                          sdrs)
-  (declare (optimize (debug 3)))
   (let ((destination (input/output-sdr model sdrs))
         (parameters (parameters model))
         (initial-data data-point))
